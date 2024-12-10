@@ -6,6 +6,9 @@ body{
   font-size: 1.5rem;
 }
 
+h1{
+  font-size: 2rem;
+}
 
 .menu-items .link {
   text-decoration: none;
@@ -53,13 +56,14 @@ body{
   }
 
   table {
-    width: 100%;
+    width: 95vw;
     border-collapse: separate;
     border-spacing: 0;
     background-color: #1e1e2f; /* 어두운 배경색 */
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    table-layout: fixed; /* 고정 레이아웃 */
   }
 
   thead tr {
@@ -75,7 +79,6 @@ body{
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-
   }
 
   tbody tr:nth-child(even) {
@@ -111,6 +114,7 @@ body{
     overflow: hidden;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     font-size: 0.9rem; /* 작은 화면에서 폰트 크기 축소 */
+    table-layout: fixed; /* 고정 레이아웃 */
   }
 
   thead tr {
@@ -123,6 +127,9 @@ body{
     padding: 10px 12px;
     text-align: center;
     border-bottom: 1px solid #444; /* 행 구분선 */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   tbody tr:nth-child(even) {
@@ -362,3 +369,6 @@ margin: 0 auto;
 
 
 
+.table-info-content img{
+  max-width: 100%;
+}

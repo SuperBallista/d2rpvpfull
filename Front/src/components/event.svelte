@@ -173,6 +173,7 @@
   <style>
 table tr td:first-child, table tr th:first-child {
   width: 35%; /* 첫 번째 열 */
+  
 }
 table tr td:nth-child(2), table tr th:nth-child(2) {
   width: 15%; /* 두 번째 열 */

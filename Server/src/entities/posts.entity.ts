@@ -23,7 +23,7 @@ export class Post {
   @Column({ type: 'int', default: 0, nullable: true })
   views: number; // 기본값 0, NULL 허용
 
-  @Column({ type: 'int', default: 0, nullable: true })
+  @Column({ name: 'comments_count', type: 'int', default: 0, nullable: true })
   commentsCount: number; // 기본값 0, NULL 허용
 
   @Column({ length: 255, default: 'free', nullable: false })

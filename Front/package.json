@@ -41,6 +41,7 @@
     "nanoid": "^3.3.8",
     "picocolors": "^1.1.1",
     "postcss": "^8.4.49",
+    "quill": "^2.0.3",
     "readdirp": "^4.0.2",
     "rollup": "^4.28.0",
     "sade": "^1.8.1",

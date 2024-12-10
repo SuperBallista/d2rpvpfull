@@ -103,7 +103,7 @@
     </select>
   
     <input class="input-text" type="text" bind:value={word} />
-    <button class="simple-button" on:click={() => fetchSearch($category)}>검색</button>
+    <button class="simple-button small" on:click={() => fetchSearch($category)}>검색</button>
   
   
   <!-- 테이블 구조 -->
@@ -160,6 +160,7 @@
 }
 table tr td:nth-child(2), table tr th:nth-child(2) {
   width: 40%; /* 두 번째 열 */
+  
 }
 table tr td:nth-child(3), table tr th:nth-child(3) {
   width: 25%; /* 세 번째 열 */
@@ -169,13 +170,16 @@ table tr td:nth-child(4), table tr th:nth-child(4) {
 }
 
     .input-text {
-      width: 120px;
+      width: 130px;
     }
   
   
     .pagination {
       margin-top: 10px;
       text-align: center;
+    }
+    .small {
+      padding: 5px;
     }
   </style>
   

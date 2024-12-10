@@ -22,7 +22,7 @@
     else if (pathname.includes("tournament")) {
         titlestring = "대회기록";
     }
-    else if (pathname.includes("community")) {
+    else if (pathname.includes("boardlist")) {
         titlestring = "커뮤니티";
     }
     else if (pathname.includes("winners")) {
@@ -61,9 +61,12 @@
         align-items: center;
         margin-top: 65px;
     }
+    .hidden{
+        display: none;
+    }
 </style>
 
 
 
-<div class="header-container">
+<div class="header-container {pathname.includes('post') || pathname.includes('write') ? 'hidden' : ''}">
     <h1>{modestring} {titlestring}</h1></div>

@@ -105,26 +105,31 @@ export class BoardService {
       throw new HttpException('Error modifying post', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
-  async getPost(postId: number): Promise<any> {
+  async getPost(postId: number): Promise<Post> {
     try {
       const post = await this.postRepository.findOne({
         where: { postId: Number(postId) },
-        relations: ['comments'], // 댓글 포함
       });
-
+  
       if (!post) {
-        throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+        throw new HttpException(`Post with ID ${postId} not found`, HttpStatus.NOT_FOUND);
       }
-
-      post.views += 1;
-      await this.postRepository.save(post);
-
-      return post;
+  
+      // 안전하게 조회수 증가
+      await this.postRepository.increment({ postId: postId }, 'views', 1);
+  
+      // 최신 데이터 반환
+      const updatedPost = await this.postRepository.findOne({
+        where: { postId: Number(postId) },
+      });
+  
+      return updatedPost as Post;
     } catch (error) {
-      throw new HttpException('Error fetching post', HttpStatus.INTERNAL_SERVER_ERROR);
+      console.error(error);
+      throw new HttpException('Error while fetching the post', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+  
 
   async deletePost(postId: number, nickname: string): Promise<void> {
     try {
@@ -168,7 +173,7 @@ export class BoardService {
 
   async fetchCommentsByPostId(postId: number): Promise<any> {
     try {
-      return await this.commentRepository.find({ where: { postId: Number(postId) } });
+      return await this.commentRepository.find({ where: { postId: postId } });
     } catch (error) {
       throw new HttpException('Error fetching comments', HttpStatus.INTERNAL_SERVER_ERROR);
     }

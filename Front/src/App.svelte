@@ -10,6 +10,9 @@
   import Record from "./components/record.svelte";
   import Event from "./components/event.svelte";
   import Boardlist from "./components/Boardlist.svelte";
+  import Post from "./components/post.svelte"
+  import Write from "./components/write.svelte";
+    import Pastwinner from "./components/pastwinner.svelte";
 
 </script>
 <Router>
@@ -30,6 +33,9 @@
   <Route path="/:type/record" component={Record} />
   <Route path="/:type/tournament" component={Event}/>
   <Route path="/:type/boardlist" component={Boardlist}/>
+  <Route path="/:type/post/:id" component={Post}/>
+  <Route path="/:type/write" component={Write}/>
+  <Route path="/:type/winners" component={Pastwinner}/>
 
 </main>
 
