@@ -53,11 +53,12 @@
     }
   
     const handleEdit = (day: Date, text: string): void => {
-      if ($myaccount === "admin" || $myaccount === "admin_m") {
-        editing = day.toDateString();
-      }
-    };
-  
+    if ($myaccount === "admin" || $myaccount === "admin_m") {
+      editing = day.toDateString();
+      eventText = text || ""; // Initialize with existing event text or empty
+    }
+  };
+    
     const handleSave = async (day: Date): Promise<void> => {
       const eventDate = day.toDateString();
       const eventPayload = {
@@ -76,6 +77,7 @@
           alert("이벤트 기록을 저장하였습니다");
           events = { ...events, [eventDate]: eventText };
           editing = null;
+          eventText = "";
   
           const savedYear = year;
           const savedMonth = month;
@@ -170,22 +172,44 @@ function toggleTooltip(dayKey: number): void {
               {#if dayEntry === "empty"}
                 <td class="empty"></td>
               {:else}
-                <td
-                  class="day-cell"
-                  role="button"
-                  tabindex="0"
-                  on:click={() => toggleTooltip(dayEntry.dayKey)}
+              <td class="day-cell" role="button" tabindex="0">
+                <div
+                  on:click={() => handleEdit(dayEntry.day, eventname[dayEntry.dayKey])}
+                  class="day-number {$myaccount==="admin" || $myaccount === "admin_m" ? "pointer" : ""}"
                 >
-                  <div class="day-number">{dayEntry.day.getDate()}</div>
-                  <div class="inside-tooltip">{eventname[dayEntry.dayKey] || ""}</div>
+                  {dayEntry.day.getDate()}
+                </div>
+                
+                {#if editing === dayEntry.day.toDateString()}
+                  <input
+                    class="calendar-input"
+                    type="text"
+                    bind:value={eventText}   on:keydown={(event) => {
+                      if (event.key === "Enter") handleSave(dayEntry.day);
+                    }}
+                  />
+                  <button
+                    class="emphasis-button small"
+                    on:click={() => handleSave(dayEntry.day)}
+                  >
+                    저장
+                  </button>
+                {:else}
+                  <div
+                    class="inside-tooltip pointer"
+                    on:click={() => toggleTooltip(dayEntry.dayKey)}
+                  >
+                    {eventname[dayEntry.dayKey] || ""}
+                  </div>
                   <div
                     class="tooltiptext"
                     class:visible={activeTooltip === `${dayEntry.dayKey}`}
                   >
                     {eventname[dayEntry.dayKey] || "이벤트 없음"}
                   </div>
-                </td>
-              {/if}
+                {/if}
+              </td>
+                            {/if}
             {/each}
           </tr>
         {/each}
@@ -246,6 +270,25 @@ function toggleTooltip(dayKey: number): void {
     font-size: 0.8rem;
   }
   
+  .pointer{
+    cursor: pointer;
+  }
+
+  .calendar-input{
+    border: none; /* 테두리 제거 */
+  background: transparent; /* 배경 투명 */
+  color: inherit; /* 부모 요소의 텍스트 색상 상속 */
+  font-size: 0.8rem; /* 기본 폰트 크기 */
+  width: 60%; /* 셀 너비에 맞추기 */
+  text-align: center; /* 텍스트 중앙 정렬 */
+  outline: none; /* 포커스 시 파란 테두리 제거 */
+  padding: 0; /* 여백 제거 */
+  }
+  .calendar-input:focus{
+    outline: none;
+  }
+
+
   table {
   border-collapse: collapse; /* 테두리가 겹치지 않도록 설정 */
   width: 100%; /* 테이블 너비 */
@@ -278,5 +321,9 @@ table tr th:last-child {
   border-right: none; /* 끝 열의 오른쪽 선 제거 */
 }
 
+.small{
+  padding: 3px;
+  font-size: 0.7rem;
+}
 
 </style>

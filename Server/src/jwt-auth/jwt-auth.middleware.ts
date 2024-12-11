@@ -25,7 +25,7 @@ export class JwtAuthMiddleware implements NestMiddleware {
       }
     }
 
-    if (refreshToken) {
+    else if (refreshToken) {
       try {
         // 리프레시 토큰 검증 및 새 액세스 토큰 생성
         const decoded = await this.jwtService.verifyRefreshToken(refreshToken);

@@ -81,7 +81,6 @@ export class AuthService {
     const token = this.jwtService.createAccessToken(lowerCaseNickname);
     const refreshToken = this.jwtService.createRefreshToken(lowerCaseNickname);
 
-    console.log(user)
      
     return {
       username: lowerCaseNickname,

@@ -116,7 +116,6 @@ import { jwtService } from 'src/jwt/jwt.service';
           sameSite: 'strict', // CSRF 방지
           maxAge: 7 * 24 * 60 * 60 * 1000, // 7일 (밀리초 단위)
         });
-        console.log(data)
 
       // 클라이언트에 토큰 반환
       res.status(HttpStatus.OK).json({username : data.username, token: data.accessToken});

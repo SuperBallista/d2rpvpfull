@@ -276,9 +276,6 @@
     }
   };
 </script>
-<svelte:head>
-    <title>babapk 대전 시뮬레이터</title>
-</svelte:head>
 
 <div class="main_data table-outline">
   <div class="table-head">내 캐릭터 스탯</div>
@@ -367,25 +364,6 @@
       </div>
     </div>
   </div>
-  <!-- 
-  {#if $myclass == 4}
-    <div class="oneline">
-      
-        <input type="number" bind:value={$mydodge} /> 흘리기 확률(아마존 스킬)
-      
-    </div>
-  {/if} -->
-  <!-- 
-    <div class="oneline">
-      
-        <select bind:value={$myclass} style={nonblocknicknameStyle}>
-          <option value="1">성기사</option>
-          <option value="2">야만용사</option>
-          <option value="3">드루이드</option>
-          <option value="4">아마존</option>
-        </select> 클래스
-      
-    </div> -->
 
   <div class="table-contents-wrapper">
     <div class="table-contents">
@@ -496,26 +474,6 @@
       </div>
     </div>
   </div>
-
-  <!-- {#if $yourclass == 4}
-    <div class="oneline">
-      
-        <input type="number" bind:value={$yourdodge} /> 흘리기 확률(아마존 스킬)
-      
-    </div>
-  {/if} -->
-
-  <!-- 
-    <div class="oneline">
-      
-        <select bind:value={$yourclass} style={nonblocknicknameStyle}>
-          <option value="1">성기사</option>
-          <option value="2">야만용사</option>
-          <option value="3">드루이드</option>
-          <option value="4">아마존</option>
-        </select> 클래스
-      
-    </div> -->
 
   <div class="table-contents-wrapper">
     <div class="table-contents">

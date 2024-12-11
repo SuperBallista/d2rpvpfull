@@ -22,6 +22,7 @@ import Ring from "./components/calculater/ring.svelte";
 import Elo from "./components/calculater/elo.svelte";
     import Mpkadmin from "./components/mpkadmin.svelte";
     import Babapkadmin from "./components/babapkadmin.svelte";
+    
 </script>
 <Router>
 <nav>

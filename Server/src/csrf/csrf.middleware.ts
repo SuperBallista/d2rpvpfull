@@ -11,9 +11,6 @@ export class ManualCsrfMiddleware implements NestMiddleware {
     const csrfCookie = req.cookies['csrfToken']; // 쿠키에서 CSRF 토큰 가져오기
     const csrfHeader = req.headers['x-csrf-token']; // 헤더에서 CSRF 토큰 가져오기
 
-    // 디버깅용 로그
-    console.log('CSRF Cookie:', csrfCookie);
-    console.log('CSRF Header:', csrfHeader);
 
     // CSRF 토큰 검증
     if (!csrfCookie || !csrfHeader || csrfCookie !== csrfHeader) {

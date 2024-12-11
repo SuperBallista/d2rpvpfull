@@ -104,7 +104,7 @@ import {
       }
     }
   
-    // 비밀번호 변경 (b_user)
+    // 비밀번호 변경 (m_user)
     @Post('/change-pw/m-user')
     async changePasswordM(
       @User() user: any,

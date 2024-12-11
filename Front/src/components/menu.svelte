@@ -48,6 +48,7 @@ else
 myaccount.set("");
 jwtToken.set("");
 }
+console.log($jwtToken)
 
   }
   catch (error)

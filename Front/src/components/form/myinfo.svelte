@@ -175,6 +175,7 @@
             <button class="simple-button {challenge==="" ? "hidden" : null}" on:click={() => CheckTimeOver()}>자동 승리</button>
           </td>
         </tr>
+        {/if}
       <!-- {:else} -->
         <tr>
           <td>대전점수</td>
@@ -191,7 +192,6 @@
           <td>{wins}/{loses}</td>
           <td></td>
         </tr>
-      {/if}
       <tr>
         <td>탈퇴</td>
         <td></td>

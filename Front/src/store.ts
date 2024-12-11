@@ -21,8 +21,8 @@ function getCookie(name: string) {
       "Content-Type": "application/json",
     };
   
-    if (token) headers["d2rpvpjwtToken"] = token;
-    if (csrfToken) headers["X-CSRF-Token"] = csrfToken;
+    if (token) {headers["d2rpvpjwttoken"] = token};
+    if (csrfToken) {headers["X-CSRF-Token"] = csrfToken};
   
     const options: RequestInit = {
       method: method,
@@ -36,6 +36,11 @@ function getCookie(name: string) {
   
     try {
       const response = await fetch(endpoint, options);
+
+      const jwt = response.headers.get("d2rpvpjwttoken")
+
+      if (typeof jwt === "string")
+{jwtToken.set(jwt)}
       // 상태 코드에 관계없이 response 반환
       return response;
     } catch (error) {
