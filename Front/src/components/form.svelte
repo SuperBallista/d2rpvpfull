@@ -11,6 +11,7 @@ import Register from "./form/register.svelte";
   import Recordcreate from "./form/recordcreate.svelte";
   import Recordok from "./form/recordok.svelte";
   import Newevent from "./form/Newevent.svelte";
+  import Challenge from "./form/challenge.svelte";
 
 function handleKeydown(event: KeyboardEvent) {
     if (event.key === "Escape") {
@@ -58,6 +59,8 @@ onMount(() => {
 <Recordok/>
 {:else if $form === "newevent"}
 <Newevent/>
+{:else if $form === "challenge"}
+<Challenge/>
 {/if}
 
 

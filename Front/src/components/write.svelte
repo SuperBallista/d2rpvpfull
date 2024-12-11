@@ -97,7 +97,7 @@
   
       quill = new Quill("#editor", {
         theme: "snow",
-        placeholder: "Compose an epic...",
+        placeholder: "",
         modules: {
           toolbar: {
             container: [

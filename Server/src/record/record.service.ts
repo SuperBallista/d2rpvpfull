@@ -191,7 +191,7 @@ export class RecordService {
   }
 
   // 도전 경기 자동 패배 기록
-  async challengeLose(isMUser: string, winner: string, loser: string): Promise<void> {
+  async challengeLose(isMUser: string, winner: string, loser: string): Promise<string> {
     const tempRepository = isMUser === 'm' ? this.mTempRepository : this.bTempRepository;
     const userRepository = isMUser === 'm' ? this.mUserRepository : this.bUserRepository;
 
@@ -214,12 +214,14 @@ export class RecordService {
       await this.approveRecord(latestRecord.orderNum, isMUser);
 
       // 도전 상태 초기화
-      const losingUser = await userRepository.findOneBy({ nickname: loser });
-      if (losingUser) {
-        losingUser.challenge = null;
-        losingUser.challengeDate = null;
-        await (userRepository as Repository<BUser | MUser>).save(losingUser);
+      const winnerUser = await userRepository.findOneBy({ nickname: winner });
+      if (winnerUser) {
+        winnerUser.challenge = null;
+        winnerUser.challengeDate = null;
+        await (userRepository as Repository<BUser | MUser>).save(winnerUser);
       }
+
+      return "ok"
     } catch (error) {
       console.error('Error processing challenge lose:', error);
       throw new HttpException('Failed to process challenge lose', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -227,7 +229,6 @@ export class RecordService {
   }
 
   async challengeWin(isMUser: string, winner: string): Promise<void> {
-    const tempRepository = isMUser === 'm' ? this.mTempRepository : this.bTempRepository;
     const userRepository = isMUser === 'm' ? this.mUserRepository : this.bUserRepository;
 
     const user = await userRepository.findOne({ where: { nickname: winner } });
@@ -236,5 +237,57 @@ export class RecordService {
       user.challengeDate = null;
       await (userRepository as Repository<BUser | MUser>).save(user);
     }
+  }
+
+
+  // 도전 확인
+  async checkChallenge(
+    userNickname: string,
+    challenge: string,
+    tablePrefix: string,
+  ): Promise<string> {
+    const repository =
+      tablePrefix === 'b' ? this.bUserRepository : this.mUserRepository;
+      
+      if (!challenge) {
+        throw new HttpException(
+          '도전 중인 상대가 없습니다.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+    try {
+      const user = await repository.findOne({ where: { nickname: userNickname } });
+  
+      if (!user || !user.challengeDate) {
+        throw new HttpException(
+          '도전 기록이 없거나 유효한 날짜가 아닙니다.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+  
+      const diffInDays =
+        (new Date().getTime() - new Date(user.challengeDate).getTime()) /
+        (1000 * 60 * 60 * 24);
+  
+      if (diffInDays <= 7) {
+        throw new HttpException(
+          '아직 기간이 남았습니다.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return "ok"
+  
+    } catch (error) {
+      if (error instanceof HttpException) {
+        console.log('HTTP Exception 상태 코드:', error.getStatus());
+        throw error;
+      }
+    
+      console.error('예상치 못한 오류:', error);
+      throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
   }
 }

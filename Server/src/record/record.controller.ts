@@ -150,5 +150,43 @@ import {
         throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
-  }
+      // 도전 체크
+      @Post('/challenge/check')
+      async checkChallenge(
+        @User() user: any,
+        @Body() body: { mode: boolean; challenge: string },
+      ) {
+        try {
+          const tablePrefix = body.mode ? 'm' : 'b';
+          const check = await this.recordService.checkChallenge(
+            user.username,
+            body.challenge,
+            tablePrefix,
+          );
+          let result
+          if (check==="ok")
+{          result = await this.recordService.challengeLose(tablePrefix, user.username, body.challenge)
+} else {
+            // 예상치 못한 오류만 처리
+            console.error('기록 도중 오류가 발생하였습니다');
+            throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
+
+
+  
+}
+          return { message: "자동 승리가 기록되었습니다"} ;
+        } catch (error) {
+          if (error instanceof HttpException) {
+            // 서비스에서 발생한 HttpException 그대로 전달
+            throw error;
+          }
+      
+          // 예상치 못한 오류만 처리
+          console.error('도전 확인 오류:', error);
+          throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      }
+      
+    }
+  
   

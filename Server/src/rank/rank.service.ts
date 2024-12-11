@@ -111,14 +111,19 @@ export class RankService {
     await (repository as Repository<BUser | MUser>).save(user);
   }
 
-  async getChallengeData(username: string, mode: boolean): Promise<any> {
+  async getChallengeData(username: string, mode: boolean): Promise<any[]> {
     const repository = mode ? this.mUserRepository : this.bUserRepository;
-    const user = await repository.findOne({ where: { nickname: username } });
-    if (!user) throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
-    
-    return {
-      challenge: user.challenge,
-      challengeDate: user.challengeDate
-    };
+  
+    // 사용자 이름과 관련된 도전 데이터를 리스트로 조회
+    const users = await repository.find({
+      where: { challenge: username }, // 필요한 조건
+    });
+  
+  
+    // 필요한 데이터만 추출하여 리스트로 반환
+    return users.map(user => ({
+      nickname: user.nickname,
+      challengeDate: user.challengeDate,
+    }));
   }
 }

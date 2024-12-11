@@ -49,10 +49,11 @@
   
     async function challengeRank(challengeNickname: string) {
       const data = { nickname: challengeNickname, mode: $mode };
+      const modename = $mode? "/m-user" : "b-user"
       try {
-        const response = await SecurityFetch("/rank/challenge", "POST", data);
+        const response = await SecurityFetch("/rank/challenge"+modename, "POST", data);
   
-        if (response.status === 200) {
+        if (response.status === 201) {
           alert(`${challengeNickname.replace("_m", "")}님에게 도전을 신청하였습니다`);
         } else if (response.status === 400) {
           alert(`당신은 이미 도전 신청을 한 상태입니다`);
@@ -134,11 +135,11 @@
                   순위: {user.rank}<br />
                   Elo: {Math.round(user.Elo * 100) / 100}<br />
                   {user.wins} 승 / {user.losses} 패<br />
-                  <!-- {#if Number(myRank) > Number(user.rank)}
+                  {#if Number(myRank) > Number(user.rank)}
                     <button class="simple-button" on:click={() => challengeRank(user.nickname)}>
                       도전하기
                     </button>
-                  {/if} -->
+                  {/if}
                 </td>
               </tr>
             {/if}
@@ -148,6 +149,14 @@
     {/if}
   
   </div>
+
+  
+  {#if $mode && $myaccount != null && $myaccount != "admin_m"}
+  <div class="fixed-button-div">
+    <button class="simple-button" on:click={() => form.set("challenge")}>도전승인</button>
+  </div>
+{/if}
+
 
   <style>
 

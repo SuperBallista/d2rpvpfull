@@ -223,16 +223,14 @@ function toggleTooltip(dayKey: number): void {
 
   .day-header {
     text-align: center;
-    border-right: 1px solid #444; /* 행 구분선 */
   }
 
   .day-cell {
     position: relative;
     text-align: center;
     vertical-align: top;
-    border-left: 1px solid #444; /* 행 구분선 */
-    border-right: 1px solid #444; /* 행 구분선 */
   }
+  
 
   .calendar-table {
     width: 100%;
@@ -247,6 +245,38 @@ function toggleTooltip(dayKey: number): void {
   .inside-tooltip{
     font-size: 0.8rem;
   }
+  
+  table {
+  border-collapse: collapse; /* 테두리가 겹치지 않도록 설정 */
+  width: 100%; /* 테이블 너비 */
+}
+
+td, th {
+  border: 1px solid #444; /* 내부 셀에만 선을 추가 */
+}
+
+table th, table td {
+  border-left: none; /* 왼쪽 선 제거 */
+  border-top: none; /* 위쪽 선 제거 */
+}
+
+table tr:first-child th {
+  border-top: none; /* 첫 행의 상단 선 제거 */
+}
+table tr:last-child td {
+  border-bottom: none; /* 끝 행의 하단 선 제거 */
+}
+
+
+table tr td:first-child,
+table tr th:first-child {
+  border-left: none; /* 첫 열의 왼쪽 선 제거 */
+}
+
+table tr td:last-child,
+table tr th:last-child {
+  border-right: none; /* 끝 열의 오른쪽 선 제거 */
+}
 
 
 </style>

@@ -5,6 +5,7 @@ import {
     Body,
     HttpException,
     HttpStatus,
+    Delete,
   } from '@nestjs/common';
   import { UserDataService } from './userdata.service';
   import { User } from '../user/user.decorator';
@@ -14,7 +15,7 @@ import {
     constructor(private readonly userDataService: UserDataService) {}
   
     // 사용자 정보 조회 (b_user)
-    @Get('info/b-user')
+    @Get('/info/b-user')
     async getUserDataB(@User() user: any) {
       try {
         const userData = await this.userDataService.getUserData(user.username, 'b_user');
@@ -29,7 +30,7 @@ import {
     }
   
     // 사용자 정보 조회 (m_user)
-    @Get('info/m-user')
+    @Get('/info/m-user')
     async getUserDataM(@User() user: any) {
       try {
         const userData = await this.userDataService.getUserData(user.username, 'm_user');
@@ -44,7 +45,7 @@ import {
     }
   
     // 이메일 변경 (b_user)
-    @Post('change-email/b-user')
+    @Post('/change-email/b-user')
     async changeEmailB(
       @User() user: any,
       @Body() body: { nowpw: string; newemail: string },
@@ -64,7 +65,7 @@ import {
     }
   
     // 이메일 변경 (m_user)
-    @Post('change-email/m-user')
+    @Post('/change-email/m-user')
     async changeEmailM(
       @User() user: any,
       @Body() body: { nowpw: string; newemail: string },
@@ -84,7 +85,7 @@ import {
     }
   
     // 비밀번호 변경 (b_user)
-    @Post('change-pw/b-user')
+    @Post('/change-pw/b-user')
     async changePasswordB(
       @User() user: any,
       @Body() body: { nowpw: string; newpw: string },
@@ -104,7 +105,7 @@ import {
     }
   
     // 비밀번호 변경 (b_user)
-    @Post('change-pw/m-user')
+    @Post('/change-pw/m-user')
     async changePasswordM(
       @User() user: any,
       @Body() body: { nowpw: string; newpw: string },
@@ -122,39 +123,20 @@ import {
         throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
-  }
+  
 
     // 도전 취소
-  //   @Post('challenge/cancel')
-  //   async cancelChallenge(@User() user: any, @Body() body: { mode: boolean }) {
-  //     try {
-  //       const tablePrefix = body.mode ? 'm' : 'b';
-  //       await this.userDataService.cancelChallenge(user.username, tablePrefix);
-  //       return { message: '도전 취소 완료' };
-  //     } catch (error) {
-  //       console.error('도전 취소 오류:', error);
-  //       throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
-  //     }
-  //   }
-  
-  //   // 도전 확인
-  //   @Post('challenge/check')
-  //   async checkChallenge(
-  //     @User() user: any,
-  //     @Body() body: { mode: boolean; challenge: string },
-  //   ) {
-  //     try {
-  //       const tablePrefix = body.mode ? 'm' : 'b';
-  //       const result = await this.userDataService.checkChallenge(
-  //         user.username,
-  //         body.challenge,
-  //         tablePrefix,
-  //       );
-  //       return { message: '도전 완료', result };
-  //     } catch (error) {
-  //       console.error('도전 확인 오류:', error);
-  //       throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
-  //     }
-  //   }
-  // }
-//
+    @Delete('/challenge/cancel')
+    async cancelChallenge(@User() user: any, @Body() body: { mode: boolean }) {
+      try {
+        const tablePrefix = body.mode ? 'm' : 'b';
+        await this.userDataService.cancelChallenge(user.username, tablePrefix);
+        return { message: '도전 취소 완료' };
+      } catch (error) {
+        console.error('도전 취소 오류:', error);
+        throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+
+
+  }

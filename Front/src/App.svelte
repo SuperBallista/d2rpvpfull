@@ -12,8 +12,16 @@
   import Boardlist from "./components/Boardlist.svelte";
   import Post from "./components/post.svelte"
   import Write from "./components/write.svelte";
-    import Pastwinner from "./components/pastwinner.svelte";
-
+  import Pastwinner from "./components/pastwinner.svelte";
+  import Calculater from "./components/calculater.svelte";
+  import Mpkpscore from "./components/calculater/mpkpscore.svelte";
+  import Babapkpscore from "./components/calculater/babapkpscore.svelte";
+import Visio from "./components/calculater/visio.svelte";
+import Ring from "./components/calculater/ring.svelte";
+  import Babapksimul from "./components/calculater/babapksimul.svelte";
+import Elo from "./components/calculater/elo.svelte";
+    import Mpkadmin from "./components/mpkadmin.svelte";
+    import Babapkadmin from "./components/babapkadmin.svelte";
 </script>
 <Router>
 <nav>
@@ -36,6 +44,17 @@
   <Route path="/:type/post/:id" component={Post}/>
   <Route path="/:type/write" component={Write}/>
   <Route path="/:type/winners" component={Pastwinner}/>
+  <Route path="/:type/calculator" component={Calculater}/>
+  <Route path="/mpk/pscore" component={Mpkpscore}/>
+  <Route path="/babapk/pscore" component={Babapkpscore}/>
+  <Route path="/babapk/visio" component={Visio}/>
+  <Route path="/:type/ring" component={Ring}/>
+  <Route path="/babapk/simul" component={Babapksimul}/>
+  <Route path="/mpk/elo" component={Elo}/>
+  <Route path="/mpk/admin" component={Mpkadmin}/>
+  <Route path="/babapk/admin" component={Babapkadmin}/>
+
+  
 
 </main>
 

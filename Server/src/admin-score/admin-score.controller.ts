@@ -20,7 +20,7 @@ import {
     constructor(private readonly adminScoreService: AdminScoreService) {}
   
     // b_user 점수 부여
-    @Post('/submit/b_user')
+    @Post('/b_user/submit')
     async submitAdminScore(@Req() req: Request, @Body() body: { player: string; playerScore: number }) {
       const userNickname = req.user['username'];
   
@@ -35,7 +35,7 @@ import {
     }
   
     // m_user 점수 부여
-    @Post('/submit/m_user')
+    @Post('/m_user/submit')
     async submitAdminScoreM(@Req() req: Request, @Body() body: { player: string; playerScore: number }) {
       const userNickname = req.user['username'];
   
@@ -50,7 +50,7 @@ import {
     }
   
     // b_user 랭킹 리셋
-    @Delete('/reset/b_user')
+    @Delete('/b_user/reset')
     async resetRank(@Req() req: Request) {
       const userNickname = req.user['username'];
   
@@ -73,7 +73,7 @@ import {
     }
   
     // m_user 랭킹 리셋
-    @Delete('/reset/m_user')
+    @Delete('/m_user/reset')
     async resetRankM(@Req() req: Request) {
       const userNickname = req.user['username'];
   

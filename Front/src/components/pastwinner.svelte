@@ -7,8 +7,10 @@
       third: string;
       details: string;
     }
-  
-    let winners: Winner[] = [
+
+    import { mode }  from "../store"
+   
+    let winners: Winner[] = !$mode? [
         {
       season: "2024.10-11 랭킹전",
       first: "마스터",
@@ -88,9 +90,70 @@
       third: "Head",
       details: "정식전 : 1위 Duky 2위 Jay 3위 오찬물",
     },
-  ];
+  ] : 
+  [
+    {
+      season: "2024.10 랭킹전",
+      first: "우리",
+      second: "스티븐",
+      third: "제트",
+      details: "24. 10. 정규대회 인내전 : 1위 스티븐 2위 Hell 3위 Madon<br/>24. 10. 정규대회 비인내전 : 1위 우리 2위 파괴 3위 LoPala",
+    },
+    {
+      season: "2024.9 랭킹전",
+      first: "스티븐",
+      second: "독재",
+      third: "BallistaBB",
+      details: "24. 9. 정규대회 : 1위 스티븐 2위 독재 3위 Art",
+    },
+    {
+      season: "2024.8 랭킹전",
+      first: "스티븐",
+      second: "Art",
+      third: "허경영",
+      details: "-",
+    },
+    {
+      season: "2024.7 랭킹전",
+      first: "카니아",
+      second: "BallistaBB",
+      third: "Art",
+      details: "-",
+    },
+    {
+      season: "2024.6 랭킹전",
+      first: "스티븐",
+      second: "BallistaBB",
+      third: "kissa",
+      details: "-",
+    },
+    {
+      season: "2024.5 랭킹전",
+      first: "BallistaBB",
+      second: "스티븐",
+      third: "MAX",
+      details: "-",
+    },
+    {
+      season: "2024.2 랭킹전",
+      first: "Jay",
+      second: "제트",
+      third: "MAX",
+      details: "-",
+    },
+    {
+      season: "2024.1 랭킹전",
+      first: "Jay",
+      second: "스티븐",
+      third: "제트",
+      details:
+        "23.12 정기전 : 1위 Robe 2위 스티븐 3위 제트<br>23.11 정기전 : 1위 파괴 2위 스티븐 3위 Robe",
+    }
+  ]
   
-    let Pastwinners: Winner[] = [
+  ;
+  
+    let Pastwinners: Winner[] = !$mode? [
         {
       season: "2023.12 랭킹전",
       first: "Duky",
@@ -214,7 +277,30 @@
       details:
         "정식전 1회 : 1위 돌아돌아 2위 FBI멀더 3위 BallistaBB<br/>테마전 1회 : 1위 TOONGTANG 2위 BallistaBB 3위 PK",
     },
-  ];
+  ] : [
+    {
+      season: "2023.10 랭킹전",
+      first: "스티븐",
+      second: "달빛",
+      third: "스티븐",
+      details:
+        "정기전 : 1위 CASINO 2위 Queen 3위 드루<br/>23.7 정기전 : 1위 Edward 2위 스티븐 3위 모팔모",
+    },
+    {
+      season: "2023.6 랭킹전",
+      first: "스티븐",
+      second: "BallistaBB",
+      third: "yakuza",
+      details: "정기전 : 1위 yakuza 2위 BallistaBB 3위 모팔모",
+    },
+    {
+      season: "2023.5 랭킹전",
+      first: "Robe",
+      second: "달건",
+      third: "Boss",
+      details:
+        "정기전 : 1위 달건 2위 Robe 3위 Joy<br/>테마전 : 1위 Robe 2위 Southbank 3위 Art_ist",
+    }];
   
     let showDetails: boolean[] = Array(winners.length).fill(false);
     let showPastDetails: boolean[] = Array(Pastwinners.length).fill(false);

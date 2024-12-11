@@ -64,6 +64,8 @@ let user
           countwin: winCount.toString(),
           countlose: loseCount.toString(),
           countrecord: (winCount + loseCount).toString(),
+          challenge: userTable === 'b_user'? null : user.challenge || "",
+          challengeDate: userTable === 'b_user'? null : user.challengeDate || "",
         }
     } catch (error) {
       console.error('사용자 정보 및 전적 조회 오류:', error);
@@ -156,36 +158,4 @@ let user
     }
   }
 
-  // 도전 확인
-  async checkChallenge(
-    userNickname: string,
-    challenge: string,
-    tablePrefix: string,
-  ): Promise<void> {
-    try {
-      const repository = tablePrefix === 'b' ? this.bUserRepository : this.mUserRepository;
-
-      const user = await repository.findOne({ where: { nickname: userNickname } });
-
-      if (!user || !user.challengeDate) {
-        throw new HttpException('도전 기록이 없거나 유효한 날짜가 아닙니다.', HttpStatus.BAD_REQUEST);
-      }
-
-      const diffInDays = (new Date().getTime() - user.challengeDate.getTime()) / (1000 * 60 * 60 * 24);
-
-      if (diffInDays <= 7) {
-        throw new HttpException('아직 기간이 남았습니다.', HttpStatus.BAD_REQUEST);
-      }
-
-      if (!challenge) {
-        throw new HttpException('도전 중인 상대가 없습니다.', HttpStatus.BAD_REQUEST);
-      }
-
-      // 로직: 도전 경기 기권 처리
-      // 추가적인 기록 업데이트 로직을 구현
-    } catch (error) {
-      console.error('도전 확인 오류:', error);
-      throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
 }

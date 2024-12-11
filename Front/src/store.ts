@@ -13,20 +13,17 @@ function getCookie(name: string) {
     if (parts.length === 2) return parts.pop()?.split(';').shift();
   }
   
-
-export async function SecurityFetch(endpoint: string, method: string, data: any = null) {
-
-  
+  export async function SecurityFetch(endpoint: string, method: string, data: any = null) {
     const token = get(jwtToken) || null;
     const csrfToken = getCookie('csrfToken') || null; // 쿠키에서 CSRF 토큰 가져오기
   
     const headers: Record<string, string> = {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     };
-    
+  
     if (token) headers["d2rpvpjwtToken"] = token;
     if (csrfToken) headers["X-CSRF-Token"] = csrfToken;
-
+  
     const options: RequestInit = {
       method: method,
       headers,
@@ -39,16 +36,14 @@ export async function SecurityFetch(endpoint: string, method: string, data: any 
   
     try {
       const response = await fetch(endpoint, options);
-      if (response.status!=200 && response.status!=201 && response.status!=204) {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
+      // 상태 코드에 관계없이 response 반환
       return response;
     } catch (error) {
-      console.error('Error during fetch:', error);
-      throw error;
+      console.error("Error during fetch:", error);
+      throw error; // 네트워크 오류는 그대로 throw
     }
   }
-
+  
 export const key = writable("");
 
 
