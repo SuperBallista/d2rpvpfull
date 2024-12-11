@@ -44,6 +44,7 @@ import {
 
 <input class="input-text" bind:value={newemail} type="text" placeholder="새 이메일">
 <input class="input-text" bind:value={pw} type="password" placeholder="비밀번호">
+<br/>
 <button class="emphasis-button" on:click={() => changeemail()}>변경하기</button>
     
 </div>

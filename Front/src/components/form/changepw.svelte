@@ -44,7 +44,7 @@
 <div class="message-body">
   <input class="input-text" bind:value={oldpw} type="password" placeholder="현재암호">
 <input class="input-text" bind:value={newpw} type="password" placeholder="새 암호">
-<input class="input-text" bind:value={checkpw} type="password" placeholder="암호확인">
+<input class="input-text" bind:value={checkpw} type="password" placeholder="암호확인"><br/>
 <button class="emphasis-button" on:click={() => changepw()}>변경하기</button>
     
 </div>

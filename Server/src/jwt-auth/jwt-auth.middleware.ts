@@ -13,6 +13,7 @@ export class JwtAuthMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     const accessToken = req.headers['d2rpvpjwttoken'] as string; // 요청 헤더의 액세스 토큰
     const refreshToken = req.cookies['d2rpvprefreshToken']; // 쿠키의 리프레시 토큰
+    console.log("accessToken" , accessToken)
 
     if (accessToken) {
       try {

@@ -56,7 +56,7 @@ import {
         if (result.success) {
           return { message: '이메일 변경 성공' };
         } else {
-          throw new HttpException(result.error, result.status);
+          return result;
         }
       } catch (error) {
         console.error('이메일 변경 오류:', error);
@@ -76,7 +76,7 @@ import {
         if (result.success) {
           return { message: '이메일 변경 성공' };
         } else {
-          throw new HttpException(result.error, result.status);
+          return result;
         }
       } catch (error) {
         console.error('이메일 변경 오류:', error);
@@ -96,7 +96,7 @@ import {
         if (result.success) {
           return { message: '비밀번호 변경 성공' };
         } else {
-          throw new HttpException(result.error, result.status);
+          return result;
         }
       } catch (error) {
         console.error('비밀번호 변경 오류:', error);
@@ -116,7 +116,7 @@ import {
         if (result.success) {
           return { message: '비밀번호 변경 성공' };
         } else {
-          throw new HttpException(result.error, result.status);
+          return result;
         }
       } catch (error) {
         console.error('비밀번호 변경 오류:', error);

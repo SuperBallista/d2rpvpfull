@@ -98,8 +98,7 @@ let user
       }
       return { success: true };
     } catch (error) {
-      console.error('이메일 변경 오류:', error);
-      throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
+      return { success: false };
     }
   }
 
@@ -129,8 +128,7 @@ let user
       
       return { success: true };
     } catch (error) {
-      console.error('비밀번호 변경 오류:', error);
-      throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
+      return { success: false };
     }
   }
 
