@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { myaccount, key, form, SecurityFetch } from "../store";
+    import { myaccount, key, form, SecurityFetch, mode } from "../store";
     import { onMount } from "svelte";
   
     let eventData:any[] = [];
@@ -9,7 +9,7 @@
   
     async function deleteandresetEvent(index:number) {
       try {
-        const endpoint = "/event/m-user/cancel";
+        const endpoint = $mode? "/event/m-user/cancel" : "/event/b-user/cancel" ;
         const response = await SecurityFetch(endpoint, "DELETE", eventData[index]);
   
         if (response && response.ok) {
@@ -24,7 +24,7 @@
   
     async function approveEvent(index:number) {
       try {
-        const endpoint = "/event/m-user/accept";
+        const endpoint = $mode? "/event/m-user/accept" : "/event/b-user/accept";
         const response = await SecurityFetch(endpoint, "POST", eventData[index]);
   
         if (response && response.status === 201) {
@@ -39,7 +39,7 @@
   
     async function deleteEvent(index:number) {
       try {
-        const endpoint = "/event/m-user/delete";
+        const endpoint = $mode? "/event/m-user/delete" : "/event/b-user/delete";
         const data = { eventname: eventData[index].eventname };
         const response = await SecurityFetch(endpoint, "DELETE", data);
   
@@ -55,7 +55,7 @@
   
     async function fetchData() {
       try {
-        const response = await SecurityFetch("/event/m-user/history","GET");
+        const response = await SecurityFetch($mode? "/event/m-user/history" : "/event/b-user/history","GET");
         if (!response.ok) {
           throw new Error("연결 에러입니다");
         }
