@@ -73,6 +73,7 @@ export class RecordService {
 
   // 승인 대기중인 기록 가져오기
   async fetchPendingRecords(nickname: string, isMUser: string): Promise<any[]> {
+    console.log("닉네임",nickname,"모드",isMUser)
     const tempRepository = isMUser === 'm' ? this.mTempRepository : this.bTempRepository;
     try {
       return await tempRepository.find({

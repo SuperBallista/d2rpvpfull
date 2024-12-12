@@ -7,7 +7,7 @@ export class RankController {
   constructor(private readonly rankingService: RankService) {}
 
   // b_user 랭킹 데이터 처리
-  @Get('b-user')
+  @Get('/b-user')
   async getRankData() {
     try {
       return await this.rankingService.getRankDataB();
@@ -18,7 +18,7 @@ export class RankController {
   }
 
   // m_user 랭킹 데이터 처리
-  @Get('m-user')
+  @Get('/m-user')
   async getRankDataM() {
     try {
       return await this.rankingService.getRankDataM();
@@ -29,7 +29,7 @@ export class RankController {
   }
 
   // 도전 등록
-  @Post('challenge/m-user')
+  @Post('/challenge/m-user')
   async challengeRank(
     @User() user: any,
     @Body() body: { nickname: string; mode: boolean },
@@ -45,13 +45,13 @@ export class RankController {
   }
 
   // m_user 도전 데이터 조회
-  @Get('challenge/m-user')
+  @Post('/challenge/show/m-user')
   async challengeDataM(@User() user: any) {
     try {
-      return await this.rankingService.getChallengeData(user.username, true);
+    const data = await  this.rankingService.getChallengeData(user.username, true);
+      return data
     } catch (error) {
-      console.error('도전 데이터 조회 오류:', error);
-      throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+      return error
     }
   }
 }

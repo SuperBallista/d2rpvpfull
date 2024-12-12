@@ -12,10 +12,10 @@
   
     // 게임 데이터를 불러오는 함수
     async function fetchGameData(): Promise<void> {
-      const endpoint: string = $mode ? "/rank/challenge/m-user" : "/rank/challenge/b-user";
+      const endpoint: string = $mode ? "/rank/challenge/show/m-user" : "/rank/challenge/show/b-user";
   
       try {
-        const response = await SecurityFetch(endpoint, "GET");
+        const response = await SecurityFetch(endpoint, "POST");
         if (!response.ok) throw new Error(`오류 발생: ${response.status}`);
         recordData = await response.json();
       } catch (error) {

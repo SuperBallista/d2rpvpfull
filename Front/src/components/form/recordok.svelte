@@ -7,10 +7,11 @@
     // 게임 데이터를 불러오는 함수
     async function fetchGameData() {
   
-      const endpoint = $mode ? "/record/pending?mode=true" : "/record/pending?mode=false"; 
+      const endpoint = "/record/pending";
+      const data = {mode: $mode} 
   
       try {
-        const response = await SecurityFetch(endpoint, "GET");
+        const response = await SecurityFetch(endpoint, "POST", data);
         if (!response.ok) 
         {throw new Error(`오류 발생: ${response.status}`);}
         recordData = await response.json();

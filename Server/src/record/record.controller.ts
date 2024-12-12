@@ -103,11 +103,12 @@ import {
       }
     }
   
-    @Get('/pending')
-    async getPendingRecords(@User() user: any, @Query('mode') mode: string) {
+    @Post('/pending')
+    async getPendingRecords(@User() user: any, @Body() body : {mode:boolean}) {
+      const mode = body.mode;
       try {
         const userNickname = user.username;
-        const tableMode = mode === "true" ? 'm' : 'b'; // boolean -> string 변환
+        const tableMode = mode === true ? 'm' : 'b'; // boolean -> string 변환
         const data = await this.recordService.fetchPendingRecords(userNickname, tableMode);
         return data;
       } catch (error) {

@@ -142,7 +142,7 @@ on:input={validateEmail}
 />
 
  <input class="input-text" bind:value={regipw} type="password" placeholder="비밀번호">
- <input class="input-text" bind:value={regipwcheck} type="password" placeholder="암호확인">
+ <input class="input-text" bind:value={regipwcheck} type="password" placeholder="암호확인"><br/>
  <button class="emphasis-button" on:click={register}>회원가입</button>
 {/if}
     

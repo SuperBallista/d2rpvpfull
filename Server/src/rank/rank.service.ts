@@ -63,7 +63,7 @@ export class RankService {
       const losses = recordLose.find(record => record.nickname === user.nickname)?.TotalLoses || 0;
 
       const totalBScore = Math.round(user.bScore * 100) / 100 +
-        ((user.records > (mode ? 20 : 15) ? (mode ? 20 : 15) : user.records) * RECORD_SCORE);
+        (user.records > 20 ? 20 : user.records * RECORD_SCORE);
 
       return {
         nickname: user.nickname,
