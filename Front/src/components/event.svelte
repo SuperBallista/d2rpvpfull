@@ -55,7 +55,7 @@
   
     async function fetchData() {
       try {
-        const response = await fetch("/event/m-user/history");
+        const response = await SecurityFetch("/event/m-user/history","GET");
         if (!response.ok) {
           throw new Error("연결 에러입니다");
         }

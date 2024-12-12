@@ -28,7 +28,7 @@
       const endpoint = $mode ? "/userdata/info/m-user" : "/userdata/info/b-user";
   
       try {
-        const response = await SecurityFetch(endpoint, "GET");
+        const response = await SecurityFetch(endpoint, "POST");
         if (response.ok) {
           const data = await response.json();
           if ($mode) {

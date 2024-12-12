@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import Calendar from "./calendar.svelte";
-    import { mode } from "../store";
+    import { mode, SecurityFetch } from "../store";
     
     let eventname = {};
     const today = new Date();
@@ -49,12 +49,7 @@
     async function getCalendartext(year: number, month: number) {
       try {
         const eventextEndpoint = `/calendar/event?year=${year}&month=${month + 1}&isM=${$mode}`;
-        const response = await fetch(eventextEndpoint, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await SecurityFetch(eventextEndpoint,"GET");
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }

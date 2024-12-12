@@ -63,7 +63,7 @@ export const myaccount = writable("");
   export async function fetchNicknames(modevalue: boolean) {
     try {
       const endpoint = modevalue ? "/nicknames/m-user" : "/nicknames/b-user";
-      const response = await fetch(endpoint);
+      const response = await SecurityFetch(endpoint,"GET");
       if (response.ok) {
         const data = await response.json();
   

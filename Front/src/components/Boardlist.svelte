@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { Link } from "svelte-routing";
-    import { formatDate, page, category, myaccount, mode } from "../store";
+    import { formatDate, page, category, myaccount, mode, SecurityFetch } from "../store";
   
     interface Post {
       post_id: string;
@@ -65,7 +65,7 @@
     async function fetchList(category: string): Promise<void> {
       try {
         const url = `/board/list?data=${category}&page=${$page}`;
-        const response = await fetch(url);
+        const response = await SecurityFetch(url,"GET");
   
         if (!response.ok) {
           throw new Error("Network response was not ok");
