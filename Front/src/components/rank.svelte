@@ -82,11 +82,7 @@
       };
     });
   </script>
-  
-  <svelte:head>
-    <title>mpk 랭킹</title>
-  </svelte:head>
-  
+    
   <div class="table-outline">
     {#if loading}
       <p>로딩 중...</p>

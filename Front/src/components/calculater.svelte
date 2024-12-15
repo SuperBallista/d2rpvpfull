@@ -47,8 +47,9 @@
     </div>
     
     <style>
-    table th, table td{
+    table tr th, table tr td{
         text-align: left;
+        width: 100%;
     }
     
     </style>

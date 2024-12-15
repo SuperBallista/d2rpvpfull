@@ -54,8 +54,10 @@ href: "https://docs.google.com/document/d/1m50GKaWyszyBSslQn3348Fz1CAp55DFbKNwNy
 </div>
 
 <style>
-table th, table td{
+ tr th, tr td{
     text-align: left;
+    width: 100%;
 }
+
 
 </style>

@@ -106,7 +106,7 @@ h1{
   }
 
   table {
-    max-width: 95vw;
+    width: 95vw;
     border-collapse: separate;
     border-spacing: 0;
     background-color: #1e1e2f; /* 어두운 배경색 */

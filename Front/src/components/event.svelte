@@ -90,10 +90,6 @@
     }
   </script>
   
-  <svelte:head>
-    <title>mpk 토너먼트 기록하기</title>
-  </svelte:head>
-  
   <!-- 테이블 UI -->
   <div class="table-container">
     {#if loading}
@@ -179,7 +175,7 @@ table tr td:nth-child(2), table tr th:nth-child(2) {
   width: 15%; /* 두 번째 열 */
 }
 table tr td:nth-child(3), table tr th:nth-child(3) {
-  width: 25%; /* 세 번째 열 */
+  width: 20%; /* 세 번째 열 */
 }
 table tr td:nth-child(4), table tr th:nth-child(4) {
   width: 30%; /* 네 번째 열 */

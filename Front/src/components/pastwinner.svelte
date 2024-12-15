@@ -382,3 +382,21 @@
       </table>
     {/if}
   </div>
+
+  <style>
+table tr td:first-child, table tr th:first-child {
+  width: 30%; /* 첫 번째 열 */
+  
+}
+table tr td:nth-child(2), table tr th:nth-child(2) {
+  width: 20%; /* 두 번째 열 */
+}
+table tr td:nth-child(3), table tr th:nth-child(3) {
+  width: 20%; /* 세 번째 열 */
+}
+table tr td:nth-child(4), table tr th:nth-child(4) {
+  width: 20%; /* 네 번째 열 */
+}
+
+
+  </style>

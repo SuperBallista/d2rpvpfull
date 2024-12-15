@@ -15,10 +15,6 @@
     };
   </script>
   
-  <svelte:head>
-    <title>mpk Elo점수 예상 계산기</title>
-  </svelte:head>
-  
   <div class="main-container">
     <div class="table-head">Elo점수 예상 계산기</div>
   
