@@ -266,10 +266,10 @@ function myclassChange()
     if ($myclass === 1) {
         myframelist.set(
         [
-        {name: "5/10프레임", value: [5,5,5,5,10]},
-        {name: "5/9프레임", value: [5,5,5,5,9]},
+        {name: "4/8프레임", value: [4,4,4,4,8]},
         {name: "5/8프레임", value: [5,5,5,5,8]},
-        {name: "4/8프레임", value: [4,4,4,4,8]}
+        {name: "5/9프레임", value: [5,5,5,5,9]},
+        {name: "5/10프레임", value: [5,5,5,5,10]}
     ]);
 
     }
@@ -277,13 +277,14 @@ function myclassChange()
     {
         myframelist.set(
             [
-            {name: "15프레임", value: [15]},
-            {name: "14프레임", value: [14]},
-            {name: "13프레임", value: [13]},
-            {name: "12프레임", value: [12]},
-            {name: "11프레임", value: [11]},
+             {name: "9프레임", value: [9]},
             {name: "10프레임", value: [10]},
-            {name: "9프레임", value: [9]}]
+            {name: "11프레임", value: [11]},
+            {name: "12프레임", value: [12]},
+            {name: "13프레임", value: [13]},
+            {name: "14프레임", value: [14]},
+            {name: "15프레임", value: [15]}
+            ]
         );
 
     }
