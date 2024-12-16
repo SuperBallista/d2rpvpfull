@@ -22,6 +22,7 @@ import Ring from "./components/calculater/ring.svelte";
 import Elo from "./components/calculater/elo.svelte";
     import Mpkadmin from "./components/mpkadmin.svelte";
     import Babapkadmin from "./components/babapkadmin.svelte";
+    import Mpksimul from "./components/calculater/mpksimul.svelte";
     
 </script>
 <Router>
@@ -54,6 +55,7 @@ import Elo from "./components/calculater/elo.svelte";
   <Route path="/mpk/elo" component={Elo}/>
   <Route path="/mpk/admin" component={Mpkadmin}/>
   <Route path="/babapk/admin" component={Babapkadmin}/>
+  <Route path="/mpk/simul" component={Mpksimul}/>
 
   
 

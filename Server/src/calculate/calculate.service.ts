@@ -14,6 +14,10 @@ export class CalculateService {
     let wincount = 0;
     let losecount = 0;
 
+    // 인덱스를 관리할 변수 추가
+    let myFrameIndex = 0;
+    let yourFrameIndex = 0;
+
     for (let number = 0; number < params.iterations; number++) {
       let framecount = 0;
       let myframecheck = 0;
@@ -34,8 +38,16 @@ export class CalculateService {
         let mywoundcondition = 0;
         let yourwoundcondition = 0;
 
-        if (myframecheck - params.myframe >= 0) {
-          myframecheck -= params.myframe;
+        // myframe 및 yourframe 값을 배열에서 가져오기
+        const myframe = params.myframe[myFrameIndex];
+        const yourframe = params.yourframe[yourFrameIndex];
+
+        if (myframecheck - myframe >= 0) {
+          myframecheck -= myframe;
+
+          // 배열 인덱스를 업데이트 (순환)
+          myFrameIndex = (myFrameIndex + 1) % params.myframe.length;
+
           if (
             Math.random() <
             0.25 *
@@ -62,8 +74,12 @@ export class CalculateService {
           mygamehp -= params.yourthorns / 6 / params.myreduce;
         }
 
-        if (yourframecheck - params.yourframe >= 0) {
-          yourframecheck -= params.yourframe;
+        if (yourframecheck - yourframe >= 0) {
+          yourframecheck -= yourframe;
+
+          // 배열 인덱스를 업데이트 (순환)
+          yourFrameIndex = (yourFrameIndex + 1) % params.yourframe.length;
+
           if (
             Math.random() <
             0.25 *

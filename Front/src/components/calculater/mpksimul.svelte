@@ -9,7 +9,7 @@
     let mymaxdmg = writable(0);
     let myar = writable(0);
     let mydf = writable(0);
-    let myframe = writable(4);
+    let myframe = writable([4]);
     let mydfoff = writable(0);
     let myreduce = writable(0);
     let mycrush = writable(0);
@@ -19,7 +19,8 @@
     let myopenwound = writable(0);
     let mythorns = writable(0);
     let myclass = writable(1);
-  
+    let myframelist = writable([{value:[1], name:"선택"}]);
+
     // Opponent variables
     let yourcharlv = writable(99);
     let yourhp = writable(0);
@@ -27,7 +28,7 @@
     let yourmaxdmg = writable(0);
     let yourar = writable(0);
     let yourdf = writable(0);
-    let yourframe = writable(4);
+    let yourframe = writable([4]);
     let yourdfoff = writable(0);
     let yourreduce = writable(50);
     let yourcrush = writable(0);
@@ -37,7 +38,8 @@
     let youropenwound = writable(0);
     let yourthorns = writable(0);
     let yourclass = writable(1);
-  
+    let yourframelist = writable([{value:[1], name:"선택"}]);
+
     // Result variables
     let iterations = writable(2000);
     let win = writable(0);
@@ -54,7 +56,7 @@
         mindmg: $mymindmg,
         ar: $myar,
         df: $mydf,
-        frame: [$myframe],
+        frame: $myframe,
         dfoff: $mydfoff,
         reduce: $myreduce,
         crush: $mycrush,
@@ -82,7 +84,7 @@
         mindmg: $yourmindmg,
         ar: $yourar,
         df: $yourdf,
-        frame: [$yourframe],
+        frame: $yourframe,
         dfoff: $yourdfoff,
         reduce: $yourreduce,
         crush: $yourcrush,
@@ -103,73 +105,99 @@
     };
   
     const handleMyStatFile = (event: Event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-  
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const parsedJson = JSON.parse(event.target?.result as string);
-          Object.keys(parsedJson).forEach((key) => {
-            if (parsedJson[key] === undefined) throw Error;
-          });
-          mycharlv.set(parsedJson.charlv);
-          myhp.set(parsedJson.hp);
-          mymaxdmg.set(parsedJson.maxdmg);
-          mymindmg.set(parsedJson.mindmg);
-          myar.set(parsedJson.ar);
-          mydf.set(parsedJson.df);
-          myframe.set(parsedJson.frame[0]);
-          mydfoff.set(parsedJson.dfoff);
-          myreduce.set(parsedJson.reduce);
-          mycrush.set(parsedJson.crush);
-          mycs.set(parsedJson.cs);
-          myds.set(parsedJson.ds);
-          mydodge.set(parsedJson.dodge);
-          myopenwound.set(parsedJson.openwound);
-          mythorns.set(parsedJson.thorns);
-          myclass.set(parsedJson.class);
-        } catch (error) {
-          alert("Invalid JSON file");
-        }
-      };
-      reader.readAsText(file);
-    };
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const parsedJson = JSON.parse(event.target?.result as string);
+      Object.keys(parsedJson).forEach((key) => {
+        if (parsedJson[key] === undefined) throw Error;
+      });
+
+      // JSON 데이터 적용
+      myclass.set(parsedJson.class);
+      myclassChange();
+      mycharlv.set(parsedJson.charlv);
+      myhp.set(parsedJson.hp);
+      mymaxdmg.set(parsedJson.maxdmg);
+      mymindmg.set(parsedJson.mindmg);
+      myar.set(parsedJson.ar);
+      mydf.set(parsedJson.df);
+      mydfoff.set(parsedJson.dfoff);
+      myreduce.set(parsedJson.reduce);
+      mycrush.set(parsedJson.crush);
+      mycs.set(parsedJson.cs);
+      myds.set(parsedJson.ds);
+      mydodge.set(parsedJson.dodge);
+      myopenwound.set(parsedJson.openwound);
+      mythorns.set(parsedJson.thorns);
+
+      // `frame` 처리
+      const frameValue = parsedJson.frame;
+      const matchingOption = $myframelist.find(
+        (option) => JSON.stringify(option.value) === JSON.stringify(frameValue)
+      );
+      if (matchingOption) {
+        myframe.set(matchingOption.value); // 일치하는 옵션 값 설정
+      } else {
+        alert("Frame 값이 목록에 없습니다.");
+      }
+    } catch (error) {
+      alert("Invalid JSON file");
+    }
+  };
+  reader.readAsText(file);
+};
   
 
-    const handleYourStatFile = (event: Event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-  
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const parsedJson = JSON.parse(event.target?.result as string);
-          Object.keys(parsedJson).forEach((key) => {
-            if (parsedJson[key] === undefined) throw Error;
-          });
-          yourcharlv.set(parsedJson.charlv);
-          yourhp.set(parsedJson.hp);
-          yourmaxdmg.set(parsedJson.maxdmg);
-          yourmindmg.set(parsedJson.mindmg);
-          yourar.set(parsedJson.ar);
-          yourdf.set(parsedJson.df);
-          yourframe.set(parsedJson.frame[0]);
-          yourdfoff.set(parsedJson.dfoff);
-          yourreduce.set(parsedJson.reduce);
-          yourcrush.set(parsedJson.crush);
-          yourcs.set(parsedJson.cs);
-          yourds.set(parsedJson.ds);
-          yourdodge.set(parsedJson.dodge);
-          youropenwound.set(parsedJson.openwound);
-          yourthorns.set(parsedJson.thorns);
-          yourclass.set(parsedJson.class);
-        } catch (error) {
-          alert("Invalid JSON file");
-        }
-      };
-      reader.readAsText(file);
-    };
+const handleYourStatFile = (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const parsedJson = JSON.parse(event.target?.result as string);
+      Object.keys(parsedJson).forEach((key) => {
+        if (parsedJson[key] === undefined) throw Error;
+      });
+
+      // JSON 데이터 적용
+      yourclass.set(parsedJson.class);
+      yourclassChange();
+      yourcharlv.set(parsedJson.charlv);
+      yourhp.set(parsedJson.hp);
+      yourmaxdmg.set(parsedJson.maxdmg);
+      yourmindmg.set(parsedJson.mindmg);
+      yourar.set(parsedJson.ar);
+      yourdf.set(parsedJson.df);
+      yourdfoff.set(parsedJson.dfoff);
+      yourreduce.set(parsedJson.reduce);
+      yourcrush.set(parsedJson.crush);
+      yourcs.set(parsedJson.cs);
+      yourds.set(parsedJson.ds);
+      yourdodge.set(parsedJson.dodge);
+      youropenwound.set(parsedJson.openwound);
+      yourthorns.set(parsedJson.thorns);
+
+      // `frame` 처리
+      const frameValue = parsedJson.frame;
+      const matchingOption = $yourframelist.find(
+        (option) => JSON.stringify(option.value) === JSON.stringify(frameValue)
+      );
+      if (matchingOption) {
+        yourframe.set(matchingOption.value); // 일치하는 옵션 값 설정
+      } else {
+        alert("Frame 값이 목록에 없습니다.");
+      }
+    } catch (error) {
+      alert("Invalid JSON file");
+    }
+  };
+  reader.readAsText(file);
+};
 
 
     const handleCalculate = async () => {
@@ -180,8 +208,8 @@
       const requestData = {
         myhp: $myhp,
         yourhp: $yourhp,
-        myframe: [$myframe],
-        yourframe: [$yourframe],
+        myframe: $myframe,
+        yourframe: $yourframe,
         myclass: $myclass,
         yourclass: $yourclass,
         mycharlv: $mycharlv,
@@ -231,6 +259,104 @@
         alert("Calculation failed.");
       }
     };
+
+
+function myclassChange()
+{
+    if ($myclass === 1) {
+        myframelist.set(
+        [
+        {name: "5/10프레임", value: [5,5,5,5,10]},
+        {name: "5/9프레임", value: [5,5,5,5,9]},
+        {name: "5/8프레임", value: [5,5,5,5,8]},
+        {name: "4/8프레임", value: [4,4,4,4,8]}
+    ]);
+
+    }
+    else if($myclass === 2)
+    {
+        myframelist.set(
+            [
+            {name: "15프레임", value: [15]},
+            {name: "14프레임", value: [14]},
+            {name: "13프레임", value: [13]},
+            {name: "12프레임", value: [12]},
+            {name: "11프레임", value: [11]},
+            {name: "10프레임", value: [10]},
+            {name: "9프레임", value: [9]}]
+        );
+
+    }
+    else if($myclass === 3)
+{
+    myframelist.set(
+        [
+        {name: "5/3/6프레임", value:   [5,3,3,3,6]},
+        {name: "5/4/6프레임", value:   [5,4,4,4,6]},
+        {name: "5/4/7프레임", value:     [5,4,4,4,7]},
+        {name: "6/4/7프레임", value:   [6,4,4,4,7]},
+        {name: "6/4/8프레임", value:   [6,4,4,4,8]}]
+    );  
+
+}
+else if($myclass === 4)
+{
+    myframelist.set(
+        [
+        {name: "12프레임", value: [4]},
+    {name: "13프레임", value: [4,4,5]},
+    {name: "14프레임", value: [4,4,6]},
+    {name: "15프레임", value: [4,5,6]},
+    {name: "16프레임", value: [5,5,6]},
+    {name: "17프레임", value: [5,5,6]},
+    {name: "18프레임", value: [5,6,6]}
+]);
+
+}
+}
+
+function yourclassChange()
+{
+    if ($yourclass === 1) {
+        yourframelist.set([
+        {name: "5/10프레임", value: [5,5,5,5,10]},
+        {name: "5/9프레임", value: [5,5,5,5,9]},
+        {name: "5/8프레임", value: [5,5,5,5,8]},
+        {name: "4/8프레임", value: [4,4,4,4,8]}]);
+    }
+    else if($yourclass === 2)
+    {
+        yourframelist.set([
+            {name: "15프레임", value: [15]},
+            {name: "14프레임", value: [14]},
+            {name: "13프레임", value: [13]},
+            {name: "12프레임", value: [12]},
+            {name: "11프레임", value: [11]},
+            {name: "10프레임", value: [10]},
+            {name: "9프레임", value: [9]}]);
+    }
+    else if($yourclass === 3)
+{
+    yourframelist.set([
+        {name: "5/3/6프레임", value:   [5,3,3,3,6]},
+        {name: "5/4/6프레임", value:   [5,4,4,4,6]},
+        {name: "5/4/7프레임", value:     [5,4,4,4,7]},
+        {name: "6/4/7프레임", value:   [6,4,4,4,7]},
+        {name: "6/4/8프레임", value:   [6,4,4,4,8]}]);    
+}
+else if($yourclass === 4)
+{
+    yourframelist.set([
+        {name: "12프레임", value: [4]},
+    {name: "13프레임", value: [4,4,5]},
+    {name: "14프레임", value: [4,4,6]},
+    {name: "15프레임", value: [4,5,6]},
+    {name: "16프레임", value: [5,5,6]},
+    {name: "17프레임", value: [5,5,6]},
+    {name: "18프레임", value: [5,6,6]}]);
+}
+}
+
   </script>
 
 <div class="main_data table-outline">
@@ -259,8 +385,8 @@
       <tr>
         <td>총 생명력</td>
         <td><input type="number" bind:value={$myhp} class="input-text short" /></td>
-        <td>공격 프레임</td>
-        <td><input type="number" bind:value={$myframe} class="input-text short" /></td>
+        <td>회피율(아마존)</td>
+        <td><input type="number" bind:value={$mydodge} class="input-text short" /></td>
       </tr>
       <tr>
         <td>피해 감소 %</td>
@@ -281,9 +407,32 @@
         <td><input type="number" bind:value={$mythorns} class="input-text short" /></td>
       </tr>
       <tr>
-        <td>내 설정 파일로 저장</td>
+        <td>클래스</td>
+        <td><select bind:value={$myclass} on:change={() => myclassChange()} class="input-text short" >
+            <option value={1}>질딘</option>
+            <option value={2}>컨센바바</option>
+            <option value={3}>늑드루</option>
+            <option value={4}>잽마</option>
+            </select>
+        </td>
+
+
+        <td>공격 프레임</td>
+        <td>
+<select bind:value={($myframe)} class="input-text short">
+    {#each $myframelist as list (list.name)}
+        <option value={list.value}>{list.name}</option>
+    {/each}
+</select>
+
+
+        </td>
+      </tr>
+      
+      <tr>
+        <td>세팅 저장</td>
         <td><button class="simple-button" on:click={SaveMyStat}>저장</button></td>
-        <td>파일을 내 스탯으로 불러오기</td>
+        <td>세팅 불러오기</td>
         <td>
           <input
             type="file"
@@ -323,8 +472,8 @@
       <tr>
         <td>총 생명력</td>
         <td><input type="number" bind:value={$yourhp} class="input-text short" /></td>
-        <td>공격 프레임</td>
-        <td><input type="number" bind:value={$yourframe} class="input-text short" /></td>
+        <td>회피율(아마존)</td>
+        <td><input type="number" bind:value={$yourdodge} class="input-text short" /></td>
       </tr>
       <tr>
         <td>피해 감소 %</td>
@@ -344,10 +493,36 @@
         <td>반사데미지</td>
         <td><input type="number" bind:value={$yourthorns} class="input-text short" /></td>
       </tr>
+
       <tr>
-        <td>상대 설정 파일로 저장</td>
+        <td>클래스</td>
+        <td><select bind:value={$yourclass} on:change={() => yourclassChange()} class="input-text short" >
+            <option value={1}>질딘</option>
+            <option value={2}>컨센바바</option>
+            <option value={3}>늑드루</option>
+            <option value={4}>잽마</option>
+            </select>
+        </td>
+
+
+        <td>공격 프레임</td>
+        <td>
+            <select bind:value={$yourframe} class="input-text short">
+                {#each $yourframelist as list (list.name)}
+                    <option value={list.value}>{list.name}</option>
+                {/each}
+            </select>
+            
+
+        </td>
+      </tr>
+
+
+
+      <tr>
+        <td>세팅 저장</td>
         <td><button class="simple-button" on:click={SaveYourStat}>저장</button></td>
-        <td>파일을 상대 스탯으로 불러오기</td>
+        <td>세팅 불러오기</td>
         <td>
           <input
             type="file"

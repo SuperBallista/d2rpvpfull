@@ -12,6 +12,9 @@
     },  {
     href: "/mpk/elo", title: "Elo 점수 예상계산기"
     },
+    {
+    href: "/mpk/simul", title: "시뮬레이터"
+    }
     ]  : [
     {
     href: "/babapk/pscore", title: "파워점수 계산기"
