@@ -109,6 +109,7 @@ export class EventService {
           Place3rd3,
           Place3rd4,
           numberteams,
+          Eventhost,
         } = eventData;
   
         // 참가자의 점수를 업데이트하는 함수
@@ -156,8 +157,10 @@ export class EventService {
             [Place3rd1, Place3rd2, Place3rd3, Place3rd4].filter(Boolean), // null/undefined 제거
             scoreType,
             'Place3rd',
-          );
+          );          
         }
+
+
         const repository = isMUser
           ? this.mEventRecordRepository
           : this.bEventRecordRepository;
@@ -171,6 +174,22 @@ export class EventService {
           eventRecord.accept = 2; // 승인된 상태로 업데이트
           await manager.save(eventRecord);
         }
+
+
+        // 이벤트 호스트 점수
+        if (!isMUser) {
+        const user = await userRepository.findOne({
+          where: { nickname: Eventhost },
+        });
+
+        if (user) {
+          user.lScore = (user.lScore || 0) + EVENT_HOST_SCORE;
+          await manager.save(user);
+        }
+      }
+
+
+
       });
     } catch (error) {
       console.error('이벤트 승인 오류:', error);

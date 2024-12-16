@@ -1,4 +1,4 @@
-export const START_SCORE = 1200;  // 기본 점수 설정
+export const START_SCORE = 800;  // 기본 점수 설정
 export const START_SCORE_B = 800; // m_user 기본 점수 설정
 export const RECORD_SCORE = 20;   // 기록 점수 상수
 export const K_VALUE_B = 32;

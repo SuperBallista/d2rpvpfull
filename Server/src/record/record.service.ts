@@ -153,6 +153,8 @@ export class RecordService {
       // 점수 업데이트
       winner.bScore += addScore;
       loser.bScore -= addScore;
+      winner.records += 1
+      loser.records +=1
 
       await (userRepository as Repository<BUser | MUser>).save([winner, loser]);
 
