@@ -19,7 +19,11 @@
     let myopenwound = writable(0);
     let mythorns = writable(0);
     let myclass = writable(1);
-    let myframelist = writable([{value:[1], name:"선택"}]);
+    let myframelist = writable([        {name: "4/8프레임", value: [4,4,4,4,8]},
+        {name: "5/8프레임", value: [5,5,5,5,8]},
+        {name: "5/9프레임", value: [5,5,5,5,9]},
+        {name: "5/10프레임", value: [5,5,5,5,10]}
+]);
 
     // Opponent variables
     let yourcharlv = writable(99);
@@ -38,7 +42,11 @@
     let youropenwound = writable(0);
     let yourthorns = writable(0);
     let yourclass = writable(1);
-    let yourframelist = writable([{value:[1], name:"선택"}]);
+    let yourframelist = writable([        {name: "4/8프레임", value: [4,4,4,4,8]},
+        {name: "5/8프레임", value: [5,5,5,5,8]},
+        {name: "5/9프레임", value: [5,5,5,5,9]},
+        {name: "5/10프레임", value: [5,5,5,5,10]}
+]);
 
     // Result variables
     let iterations = writable(2000);
