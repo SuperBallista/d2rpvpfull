@@ -10,7 +10,9 @@
   
      function modify_memo(index:number) {
       if ($myaccount === "admin" || $myaccount === "admin_m")
-{
+  {
+      for (let i = 0; i < eventData.length; i++)
+      {eventData[i].modify = false}
       memotext = eventData[index].memo
       eventData[index].modify = true
 }
