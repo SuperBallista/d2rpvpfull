@@ -3,7 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn, Unique } from 'typeorm';
 @Entity('b_eventrecord') // 데이터베이스의 'b_eventrecord' 테이블과 매핑
 @Unique(['eventname']) // eventname의 고유 제약 조건
 export class BEventRecord {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({name: "OrderNum"})
   orderNum: number; // PRIMARY KEY, AUTO_INCREMENT
 
   @Column({ length: 255, nullable: false })
@@ -116,4 +116,7 @@ export class BEventRecord {
 
   @Column({ length: 255, nullable: true })
   Eventhost?: string; // NULL 허용
+
+  @Column({type:"text" , nullable: false})
+  memo?: string
 }

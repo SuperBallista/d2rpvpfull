@@ -295,4 +295,22 @@ export class EventService {
       );
     }
   }
+
+  async modifyMemo(eventData: any): Promise<void> {
+    console.log(eventData)
+  const EventRecordRepository = eventData.mode ? this.mEventRecordRepository : this.bEventRecordRepository;
+  try{
+   await EventRecordRepository.update(
+    { eventname: eventData.eventname }, // 조건
+    { memo: eventData.memotext },     // 업데이트할 필드
+  );  }
+  catch (error){
+    throw new HttpException(
+      "메모에 실패하였습니다", HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+}
+
+
 }

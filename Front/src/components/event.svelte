@@ -6,7 +6,37 @@
     let loading = true;
     let error:any = null;
     let showDetails:boolean[] = [];
+    let memotext:string
   
+     function modify_memo(index:number) {
+      if ($myaccount === "admin" || $myaccount === "admin_m")
+{
+      memotext = eventData[index].memo
+      eventData[index].modify = true
+}
+    }
+
+    async function SaveMemo(index:number) {
+     const data = {eventname: eventData[index].eventname, memotext: memotext, mode: $mode}
+     if ($myaccount === "admin" || $myaccount === "admin_m")
+     {
+     try{
+      const response = await SecurityFetch("/event/memo","PATCH",data);
+      if (response.ok){
+        alert("메모 수정 완료하였습니다")
+        fetchData();
+      }
+    }
+      catch (error)
+      {
+        alert("오류가 발생하였습니다" + error)
+      }
+          finally{
+            eventData[index].modify = false
+     }      
+    }
+  }
+
     async function deleteandresetEvent(index:number) {
       try {
         const endpoint = $mode? "/event/m-user/cancel" : "/event/b-user/cancel" ;
@@ -64,6 +94,7 @@
         eventData = eventData.map((event) => ({
           ...event,
           ok: event.accept === 1 ? "대기" : event.accept === 2 ? "승인" : event.ok,
+          modify: false
         }));
   
         showDetails = new Array(eventData.length).fill(false);
@@ -148,7 +179,11 @@
                     3위: {event.Place3rd1 ? event.Place3rd1.replace("_m", "") : ""}
                     {event.Place3rd2 ? event.Place3rd2.replace("_m", "") : ""}
                     {event.Place3rd3 ? event.Place3rd3.replace("_m", "") : ""}
-                    {event.Place3rd4 ? event.Place3rd4.replace("_m", "") : ""}
+                    {event.Place3rd4 ? event.Place3rd4.replace("_m", "") : ""}<br/>
+                    메모: {#if event.modify}<input type="text" bind:value={memotext} class="memo-input" on:keydown={(e) => {
+                      if (e.key === "Enter") SaveMemo(index);
+                    }}/><button class="simple-button" on:click={() => SaveMemo(index)}>작성</button>
+                    {:else}<span on:click={()=> modify_memo(index)} class={$myaccount === "admin" || $myaccount ==="admin_m" ? "modify" : "" }>{typeof event.memo === "string" ? event.memo : "기록하기" }</span>{/if}
                   </div>
                 </td>
               </tr>
@@ -189,5 +224,19 @@ padding: 3px;
 .details{
 text-align: left;
 }
+
+.modify{
+  cursor: pointer;
+}
+
+.memo-input{
+    border: none; /* 테두리 제거 */
+  background: transparent; /* 배경 투명 */
+  color: inherit; /* 부모 요소의 텍스트 색상 상속 */
+  font-size: inherit; /* 기본 폰트 크기 */
+  width: 60%; /* 셀 너비에 맞추기 */
+  outline: none; /* 포커스 시 파란 테두리 제거 */
+  padding: 0; /* 여백 제거 */
+  }
 
   </style>

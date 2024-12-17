@@ -6,6 +6,8 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  Put,
+  Patch,
 } from '@nestjs/common';
 import { EventService } from './event.service';
 import { User } from '../user/user.decorator';
@@ -152,6 +154,34 @@ export class EventController {
     }
   }
 
+  @Patch('/memo')
+  async modifyMemo(@Body() memoData: any, @User() user: any){
+      if (user.username != "admin" && user.username != "admin_m")
+    {
+      throw new HttpException(
+        '권한 없음',
+        HttpStatus.FORBIDDEN,
+      )
+    }
+      try{
+      await this.eventService.modifyMemo(memoData)
+      return {success: true};
+      }
+      catch (error) {
+        console.error('Error modifying memo event:', error);
+        throw new HttpException(
+          'Internal Server Error',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+  }
+
+
+
+
+
+
+
   @Delete('/b-user/cancel')
   async cancelBUserAcceptedEvent(
     @Body() eventdata: any,
@@ -201,4 +231,5 @@ export class EventController {
       );
     }
   }
+
 }
