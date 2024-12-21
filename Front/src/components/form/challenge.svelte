@@ -91,8 +91,13 @@
   </table>
   </div>
   <style>
+table{
+  width: 100%;
+  max-width: 100%; /* 테이블이 화면 너비를 초과하지 않도록 제한 */
+  table-layout: fixed; /* 테이블 셀 크기를 고정 */
+}
 
-    .record-table-date {
+.record-table-date {
       width: 15%;
     }
   
