@@ -17,6 +17,7 @@
     let filter = "All";
     let filteredData: any[] = [];
     let paginatedData: any[] = [];
+    let newdata:boolean = false
   
     async function fetchData() {
       const endpoint = $mode ? "/record/data?mode=true" : "/record/data?mode=false";
@@ -38,6 +39,7 @@
     onMount(() => {
       const unsubscribe = key.subscribe(() => {
         fetchData();
+        checkRecord();
       });
   
       return () => {
@@ -117,6 +119,31 @@
         alert(`오류 발생: ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
       }
     }
+
+
+    // 게임 데이터를 불러오는 함수
+    async function checkRecord() {
+  
+  const endpoint = "/record/pending";
+  const data = {mode: $mode} 
+if ($myaccount) {
+  try {
+    const response = await SecurityFetch(endpoint, "POST", data);
+    if (!response.ok) 
+    {throw new Error(`오류 발생: ${response.status}`);}
+   const checkData:any[] = await response.json();
+   
+if (checkData.length===0)
+  {newdata = false}
+  else
+  {newdata = true}
+   
+  } catch (error) {
+    console.error("데이터 불러오기 오류:", error);
+  }
+}
+}
+
   </script>
   
   <div class="filter">
@@ -186,10 +213,14 @@
     {/if}
 
 
-    {#if $myaccount != "" && $myaccount != "admin_m" && $myaccount != "admin"}
+    {#if $myaccount && $myaccount != "admin_m" && $myaccount != "admin"}
       <div class="fixed-button-div">
         <button class="simple-button" on:click={() => form.set("recordcreate")}>기록하기</button>
-        <button class="simple-button" on:click={() => form.set("recordok")}>승인하기</button>
+        <button class="simple-button" on:click={() => form.set("recordok")}>승인하기
+         {#if newdata}       
+          <span class="badge">NEW</span>
+        {/if}        
+        </button>
       </div>
     {/if}
 

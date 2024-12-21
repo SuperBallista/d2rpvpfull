@@ -3,9 +3,7 @@
 import { useLocation } from "svelte-routing";
     
     const location = useLocation();
-    let pathname = "";
-    
-    $: pathname = $location.pathname;
+   $: pathname = $location.pathname;
 
 
 
@@ -15,8 +13,8 @@ import { useLocation } from "svelte-routing";
     { label: "이용 약관", href: "/terms.html" }
   ];
 
-  const socialLinks = pathname.includes("mpk") ? [
-    { icon: "/assets/icons/discord.svg", href: "https://discord.gg/QFKDTKqbmy", alt: "mpk Discord" },
+  $: socialLinks = pathname.includes("mpk") ? [
+    { icon: "/assets/icons/discord.svg", href: "https://discord.gg/4tuTA5Uf", alt: "mpk Discord" },
     { icon: "/assets/icons/kakao.svg", href: "https://open.kakao.com/o/gPUHe6kf", alt: "mpk Kakaotalk" },
   ] : [
     { icon: "/assets/icons/discord.svg", href: "https://discord.gg/AqvAJJKCag", alt: "babapk Discord" },

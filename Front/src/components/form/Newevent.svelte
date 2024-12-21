@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onDestroy, onMount } from "svelte";
+    import { onMount } from "svelte";
     import {
       nicknames,
       fetchNicknames,
@@ -8,10 +8,6 @@
       SecurityFetch, key
     } from "../../store";
   
-
-    onDestroy(() => {
-        key.set($key+1)
-    });
 
     onMount(async () => {
       const currentUrl = window.location.href;

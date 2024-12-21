@@ -1,5 +1,5 @@
 <script lang="ts">
-import { form } from "../store";
+import { form, key } from "../store";
 import Login from "./form/login.svelte";
 import FindAccount from "./form/findaccount.svelte";
 import { onMount, onDestroy } from "svelte";
@@ -15,7 +15,7 @@ import Register from "./form/register.svelte";
 
 function handleKeydown(event: KeyboardEvent) {
     if (event.key === "Escape") {
-      form.set("none");
+close();
     }
 }
 
@@ -29,6 +29,10 @@ onMount(() => {
     window.removeEventListener("keydown", handleKeydown);
   });
 
+  function close() {
+key.set($key+1);
+form.set("none");
+  }
 
 
 </script>
@@ -37,7 +41,7 @@ onMount(() => {
 <div class="message-container">
     <div class="message-box">
       <!-- 닫기 버튼 -->
-      <button class="close-button" on:click={() => form.set("none")}>&times;</button>
+      <button class="close-button" on:click={() => close()}>&times;</button>
       <!-- 조건부 렌더링 -->
   {#if $form === "login"}
     <Login />
