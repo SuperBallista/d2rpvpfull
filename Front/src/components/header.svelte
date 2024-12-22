@@ -38,14 +38,14 @@
         titlestring = "";
     }
 
-    $: if ($mode) {
+    $: if ($mode === "mpk") {
         modestring = "밀리PK";
     }   
-    else if (!$mode) {
+    else if ($mode === "babapk") {
         modestring = "정통바바";
     }   
-    else {
-        modestring = "";
+    else if ($mode === "zpke"){
+        modestring = "질딘PK";
     }
 
     $: document.title = "D2RPvP " + modestring + " " + titlestring;

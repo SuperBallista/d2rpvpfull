@@ -1,10 +1,9 @@
-<script>
+<script lang="ts">
 
-import { useLocation } from "svelte-routing";
-    
-    const location = useLocation();
-   $: pathname = $location.pathname;
+import {mode} from "../store"
 
+type LinkType = { icon: string;href: string;alt: string;}    
+let socialLinks: LinkType[] = [];
 
 
   const footerLinks = [
@@ -13,13 +12,25 @@ import { useLocation } from "svelte-routing";
     { label: "이용 약관", href: "/terms.html" }
   ];
 
-  $: socialLinks = pathname.includes("mpk") ? [
+  $: if ($mode === "mpk") {
+  
+  socialLinks = [
     { icon: "/assets/icons/discord.svg", href: "https://discord.gg/4tuTA5Uf", alt: "mpk Discord" },
     { icon: "/assets/icons/kakao.svg", href: "https://open.kakao.com/o/gPUHe6kf", alt: "mpk Kakaotalk" },
-  ] : [
+  ] 
+} else if ($mode === "babapk")
+{ socialLinks = [
     { icon: "/assets/icons/discord.svg", href: "https://discord.gg/AqvAJJKCag", alt: "babapk Discord" },
     { icon: "/assets/icons/kakao.svg", href: "https://open.kakao.com/o/giHO7Mzg", alt: "babapk Kakaotalk" },
   ];
+  }
+  else if ($mode === "zpke")
+  {
+    socialLinks = [
+    { icon: "/assets/icons/discord.svg", href: "https://discord.gg/4tuTA5Uf", alt: "zpke Discord" },
+    { icon: "/assets/icons/kakao.svg", href: "https://open.kakao.com/o/g3ltefWg", alt: "zpke Kakaotalk" },
+  ];
+  }
 </script>
 
 <style>

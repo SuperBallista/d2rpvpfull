@@ -9,7 +9,7 @@ import {
   } from '@nestjs/common';
   import { AdminScoreService } from './admin-score.service'; // 서비스 파일
   import { Request as ExpressRequest } from 'express';
-  import { START_SCORE, START_SCORE_B } from '../config/constants'; // 상수값
+  import { START_SCORE, START_SCORE_M, START_SCORE_Z } from '../config/constants'; // 상수값
   
   interface Request extends ExpressRequest {
     user?: any;
@@ -89,7 +89,7 @@ import {
         'm_oldrecord',
         'm_oldhistory',
         'm_oldtournament',
-        START_SCORE_B,
+        START_SCORE_M,
       );
       console.log('m_user 계정 데이터를 초기화하였습니다');
       return { success: true };

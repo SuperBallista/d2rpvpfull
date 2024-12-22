@@ -8,6 +8,9 @@ import { MOldRecord } from '../entities/m-oldrecord.entity';
 import { MOldHistory } from '../entities/m-oldhistory.entity';
 import { BUser } from '../entities/b-user.entity';
 import { MUser } from '../entities/m-user.entity';
+import { ZOldRecord } from 'src/entities/z-oldrecord.entity';
+import { ZOldHistory } from 'src/entities/z-oldhistory.entity';
+import { ZUser } from 'src/entities/z-user.entity';
 
 @Module({
   imports: [
@@ -16,8 +19,11 @@ import { MUser } from '../entities/m-user.entity';
       BOldHistory,
       MOldRecord,
       MOldHistory,
+      ZOldRecord,
+      ZOldHistory,
       BUser,
       MUser,
+      ZUser
     ]),
   ],
   controllers: [OldRecordController],

@@ -53,9 +53,7 @@
   if (checked_nickname) {
     alert("닉네임을 이미 확인하였습니다");
   } else {
-    const checkEndpoint = $mode
-      ? `/auth/m-user/check-nickname`
-      : `/auth/b-user/check-nickname`;
+    const checkEndpoint = `/auth/${$mode}/check-nickname`;
     const data = { nickname: reginickname };
 
     try {
@@ -81,7 +79,7 @@
     };
 
     try {
-      const endpoint = $mode ? "/auth/m-user/register" : "/auth/b-user/register";
+      const endpoint = `/auth/${$mode}/register`;
       const response = await SecurityFetch(endpoint, "POST",payload);
       if (!response.ok) {
         throw new Error("회원가입에 실패했습니다.");
@@ -102,7 +100,7 @@
 
 
     </script>
-    <h3 class="message-title">{mode ? "밀리PK" : "정통바바"} 가입하기</h3>
+    <h3 class="message-title">{$mode} 가입하기</h3>
     
     <div class="message-body">
 

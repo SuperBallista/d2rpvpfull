@@ -48,7 +48,7 @@
   
     async function getCalendartext(year: number, month: number) {
       try {
-        const eventextEndpoint = `/calendar/event?year=${year}&month=${month + 1}&isM=${$mode}`;
+        const eventextEndpoint = `/calendar/event?year=${year}&month=${month + 1}&mode=${$mode}`;
         const response = await SecurityFetch(eventextEndpoint,"GET");
         if (!response.ok) {
           throw new Error("Network response was not ok");

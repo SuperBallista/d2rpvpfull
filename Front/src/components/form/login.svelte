@@ -10,7 +10,7 @@ let loginnickname = "";
 async function formprocess() {
   let logindata = { nickname: loginnickname, password: loginpw };
   try {
-    const endpoint = $mode ? "/auth/m-user/login" : "/auth/b-user/login";
+    const endpoint = "/auth/"+ $mode + "/login";
     const response = await SecurityFetch(endpoint,"POST",logindata);
 
     if (response.status === 200) {
@@ -35,7 +35,7 @@ async function formprocess() {
 
 
 </script>
-<h3 class="message-title">{$mode ? "밀리PK" : "정통바바"} 로그인하기</h3>
+<h3 class="message-title">{$mode} 로그인하기</h3>
 
 <div class="message-body">
 

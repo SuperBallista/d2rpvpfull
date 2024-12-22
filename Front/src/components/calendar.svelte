@@ -53,7 +53,7 @@
     }
   
     const handleEdit = (day: Date, text: string): void => {
-    if ($myaccount === "admin" || $myaccount === "admin_m") {
+    if ($myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z") {
       editing = day.toDateString();
       eventText = text || ""; // Initialize with existing event text or empty
     }
@@ -175,7 +175,7 @@ function toggleTooltip(dayKey: number): void {
               <td class="day-cell" role="button" tabindex="0">
                 <div
                   on:click={() => handleEdit(dayEntry.day, eventname[dayEntry.dayKey])}
-                  class="day-number {$myaccount==="admin" || $myaccount === "admin_m" ? "pointer" : ""}"
+                  class="day-number {$myaccount==="admin" || $myaccount === "admin_m" || $myaccount === "admin_z" ? "pointer" : ""}"
                 >
                   {dayEntry.day.getDate()}
                 </div>

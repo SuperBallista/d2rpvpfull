@@ -5,6 +5,7 @@ import { BUser } from '../entities/b-user.entity';
 import { MUser } from '../entities/m-user.entity';
 import * as bcrypt from 'bcrypt';
 import * as nodemailer from 'nodemailer';
+import { ZUser } from 'src/entities/z-user.entity';
 
 interface ResetPasswordResult {
   success: boolean;
@@ -19,6 +20,8 @@ export class ResetPasswordService {
     private readonly bUserRepository: Repository<BUser>,
     @InjectRepository(MUser)
     private readonly mUserRepository: Repository<MUser>,
+    @InjectRepository(ZUser)
+    private readonly zUserRepository: Repository<ZUser>,
   ) {}
 
   // 임시 비밀번호 생성 함수
@@ -55,8 +58,14 @@ export class ResetPasswordService {
   }
 
   // 비밀번호 재설정 로직
-  async resetPassword(nickname: string,email: string,userTable: string,): Promise<ResetPasswordResult> {
-    const repository = userTable === 'm_user' ? this.mUserRepository : this.bUserRepository;
+  async resetPassword(nickname: string,email: string, userTable: string,): Promise<ResetPasswordResult> {
+    let repository
+    if (userTable === "b_user") {
+      repository = this.bUserRepository
+    } else if (userTable === "m_user")
+    {repository = this.mUserRepository}
+    else (userTable === "z_uer")
+    {repository = this.zUserRepository}
 
     try {
       // 사용자 이메일 조회
@@ -77,9 +86,11 @@ export class ResetPasswordService {
       // 비밀번호 업데이트
       user.pw = temporaryPasswordHash;
       if (userTable === 'b_user') {
-        await (repository as Repository<BUser | MUser>).save(user);
+        await (repository as Repository<BUser>).save(user);
+      } else if (userTable === 'm_user') {
+        await (repository as Repository<MUser>).save(user);
       } else {
-        await (repository as Repository<BUser | MUser>).save(user);
+        await (repository as Repository<ZUser>).save(user);
       }
 
       // 이메일 전송

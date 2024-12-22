@@ -1,6 +1,6 @@
 import { writable, get } from "svelte/store";
 
-export const mode = writable(false);
+export const mode = writable("babapk");
 
 
 export const jwtToken = writable('');
@@ -60,18 +60,21 @@ export const myaccount = writable("");
   export const nicknames = writable([]);
   
   // 닉네임을 서버에서 가져오는 함수
-  export async function fetchNicknames(modevalue: boolean) {
+  export async function fetchNicknames(mode: string) {
     try {
-      const endpoint = modevalue ? "/nicknames/m-user" : "/nicknames/b-user";
+      const endpoint = "/nicknames/" + mode;
       const response = await SecurityFetch(endpoint,"GET");
       if (response.ok) {
         const data = await response.json();
   
         // 닉네임 리스트 초기화 및 업데이트
-        if (modevalue) {
-          nicknames.set(data.map((name: string) => name.replace("_m", "")));
-        } else {
+        if (mode==="babapk") {
           nicknames.set(data);
+        } else if (mode==="mpk") {
+          nicknames.set(data.map((name: string) => name.replace("_m", "")));
+        } else if (mode==="zpke")
+        {
+          nicknames.set(data.map((name: string) => name.replace("_z", "")));
         }
       } else {
         console.error('닉네임을 가져오는데 실패했습니다.');

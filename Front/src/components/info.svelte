@@ -1,8 +1,13 @@
 <script lang="ts">
 import { mode } from "../store";
 
+type InfoList = { title: string; href: string;}    
 
-const list  = $mode?[
+let list: InfoList[] = [];
+
+if ($mode === "mpk") {
+
+    list = [
 {
     href: "https://docs.google.com/spreadsheets/d/18jJ3WYsWZEdV8oXeJYt1-aMrACN1IHsFnCV3-gir5pk/", title: "후원 내역 및 후원 랭킹 보기"
 },
@@ -12,7 +17,11 @@ href: "https://docs.google.com/document/d/12jpQH4QP7QyPRhLPuXJSuU3lJdA_3SzCE5dBY
 {
 href: "https://docs.google.com/document/d/1Wj31FLkeFLZp-N2Bohkj_ZKoUrJU5LXkUABH7x9zxC8/", title: "대회 및 랭킹 시스템 안내"
 }
-]  : 
+] 
+
+}
+else if ($mode === "babapk")
+{
 [ {
     href: "https://docs.google.com/spreadsheets/d/19a-_44yVj04BnlUK6QQY9U3jXtlDAgOmdHCgdis1toI/", title: "후원 내역 및 후원 랭킹 보기"
 },
@@ -32,6 +41,15 @@ href: "https://docs.google.com/document/d/1m50GKaWyszyBSslQn3348Fz1CAp55DFbKNwNy
     href: "https://docs.google.com/document/d/1_4E8_YqotTmRaVcbthmYuCnQbLKTwhSRPJ8rGk_Nybc/", title: "무기의 분류 안내"
 }
 ]
+}
+else {
+list = [
+{href: "", title: "질딘PK 공지사항"}
+
+]
+
+}
+
 
 </script>
 

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BCalendar } from '../entities/b-calendar.entity';
 import { MCalendar } from '../entities/m-calendar.entity';
+import { ZCalendar } from 'src/entities/z-calendar.entity';
 
 @Injectable()
 export class CalendarService {
@@ -11,6 +12,8 @@ export class CalendarService {
     private readonly bCalendarRepository: Repository<BCalendar>,
     @InjectRepository(MCalendar)
     private readonly mCalendarRepository: Repository<MCalendar>,
+    @InjectRepository(ZCalendar)
+    private readonly zCalendarRepository: Repository<ZCalendar>,
   ) {}
 
   /**
@@ -18,9 +21,17 @@ export class CalendarService {
    * @param yearmonth The year and month to fetch events for.
    * @param isM If true, fetch from m_calendar, otherwise from b_calendar.
    */
-  async fetchEventText(yearmonth: string, isM: boolean): Promise<any> {
+  async fetchEventText(yearmonth: string, mode: string): Promise<any> {
     try {
-      const repository = isM ? this.mCalendarRepository : this.bCalendarRepository;
+      let repository
+      if (mode === "babapk"){
+        repository = this.bCalendarRepository;
+      } else if (mode === "mpk")
+      { repository = this.mCalendarRepository;
+      } else if (mode === "zpke")
+      { repository = this.zCalendarRepository;
+      }
+
 
       const data = await repository.find({
         where: { yearmonth },
@@ -43,10 +54,17 @@ export class CalendarService {
    */
   async saveEventText(
     { yearmonth, yearmonthdate, date, text }: { yearmonth: string; yearmonthdate: string; date: number; text: string },
-    isM: boolean,
+    mode: string,
   ): Promise<void> {
     try {
-      const repository = isM ? this.mCalendarRepository : this.bCalendarRepository;
+      let repository
+      if (mode === "babapk"){
+        repository = this.bCalendarRepository;
+      } else if (mode === "mpk")
+      { repository = this.mCalendarRepository;
+      } else if (mode === "zpke")
+      { repository = this.zCalendarRepository;
+      }
 
       // Check if event already exists for the given yearmonthdate
       const existingEvent = await repository.findOne({ where: { yearmonthdate } });

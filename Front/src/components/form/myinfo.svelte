@@ -25,13 +25,13 @@
     let challengeDate = "";
   
     async function fetchGameData() {
-      const endpoint = $mode ? "/userdata/info/m-user" : "/userdata/info/b-user";
+      const endpoint = `/userdata/${$mode}/info`;
   
       try {
         const response = await SecurityFetch(endpoint, "POST");
         if (response.ok) {
           const data = await response.json();
-          if ($mode) {
+          if ($mode === "mpk") {
           //   email = data.email;
           //   lscore = data.lscore;
           //   clan = data.clan;
@@ -124,7 +124,7 @@
     <tbody>
       <tr>
         <td>계정</td>
-        <td>{$myaccount.replace("_m","")}</td>
+        <td>{$myaccount.replace("_m","").replace("_z","")}</td>
         <td><button class="simple-button" on:click={() => logout()}>로그아웃</button></td>
       </tr>
       <tr>
@@ -163,7 +163,7 @@
         </tr> -->
         <tr> 
           <td>도전 신청</td>
-          <td>{challenge ? challenge.replace("_m", "") : ""}</td>
+          <td>{challenge ? challenge.replace("_m","") : ""}</td>
           <td>
             <button  class="simple-button {challenge===""? "hidden" : null}" on:click={() => cancelChallenge()}>도전 취소</button>
           </td>

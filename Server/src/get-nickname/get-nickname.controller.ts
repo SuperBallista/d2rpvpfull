@@ -1,11 +1,11 @@
 import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { NicknameService } from './get-nickname.service';
 
-@Controller('nicknames')
+@Controller('/nicknames')
 export class NicknameController {
   constructor(private readonly nicknameService: NicknameService) {}
 
-  @Get('/b-user')
+  @Get('/babapk')
   async getBUserNicknames() {
     try {
       const nicknames = await this.nicknameService.getBUserNicknames();
@@ -19,7 +19,7 @@ export class NicknameController {
     }
   }
 
-  @Get('/m-user')
+  @Get('/mpk')
   async getMUserNicknames() {
     try {
       const nicknames = await this.nicknameService.getMUserNicknames();
@@ -32,4 +32,19 @@ export class NicknameController {
       );
     }
   }
+
+
+@Get('/zpke')
+async getZUserNicknames() {
+  try {
+    const nicknames = await this.nicknameService.getZUserNicknames();
+    return nicknames;
+  } catch (error) {
+    console.error('Error fetching ZUser nicknames:', error);
+    throw new HttpException(
+      'Failed to fetch ZUser nicknames.',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+}
 }

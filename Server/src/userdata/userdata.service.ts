@@ -7,14 +7,19 @@ import { BRecord } from '../entities/b-record.entity';
 // import { MClanRecord } from '../entities/m-clanrecord.entity';
 import * as bcrypt from 'bcrypt';
 import { MRecord } from 'src/entities/m-record.entity';
+import { ZUser } from 'src/entities/z-user.entity';
+import { ZOldRecord } from 'src/entities/z-oldrecord.entity';
+import { ZRecord } from 'src/entities/z-record.entity';
 
 @Injectable()
 export class UserDataService {
   constructor(
     @InjectRepository(BUser) private readonly bUserRepository: Repository<BUser>,
     @InjectRepository(MUser) private readonly mUserRepository: Repository<MUser>,
+    @InjectRepository(ZUser) private readonly zUserRepository: Repository<ZUser>,
     @InjectRepository(BRecord) private readonly bRecordRepository: Repository<BRecord>,
     @InjectRepository(MRecord) private readonly mRecordRepository: Repository<MRecord>,
+    @InjectRepository(ZRecord) private readonly zRecordRepository: Repository<ZRecord>,
     // @InjectRepository(MClanRecord) private readonly mClanRecordRepository: Repository<MClanRecord>,
   ) {}
 
@@ -24,8 +29,10 @@ let user
     if (userTable === 'b_user') {
      user = await this.bUserRepository.findOne({ where: { nickname: userNickname } });
       }
-    else {
+    else if (userTable === 'm_user') {
       user = await this.mUserRepository.findOne({ where: { nickname: userNickname } });
+    } else {
+      user = await this.zUserRepository.findOne({where: { nickname: userNickname}});
     }
 
     try {
@@ -34,8 +41,14 @@ let user
           throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
         }
 
-        const recordRepository =
-        userTable === 'b_user' ? this.bRecordRepository : this.mRecordRepository;
+        let recordRepository
+        
+        if (userTable === 'b_user')
+          {recordRepository = this.bRecordRepository }
+        else if (userTable === 'm_user')
+          {recordRepository =  this.mRecordRepository}
+        else
+          {recordRepository = this.zRecordRepository}
       
       const [winCount, loseCount] = await Promise.all([
         recordRepository.count({
@@ -64,8 +77,8 @@ let user
           countwin: winCount.toString(),
           countlose: loseCount.toString(),
           countrecord: (winCount + loseCount).toString(),
-          challenge: userTable === 'b_user'? null : user.challenge || "",
-          challengeDate: userTable === 'b_user'? null : user.challengeDate || "",
+          challenge: userTable === 'm_user'? user.challenge || "" : null,
+          challengeDate: userTable === 'm_user'? user.challengeDate || "" : null,
         }
     } catch (error) {
       console.error('사용자 정보 및 전적 조회 오류:', error);
@@ -76,7 +89,13 @@ let user
   // 이메일 변경
   async changeEmail(userNickname: string, nowpw: string, newemail: string, userTable: string): Promise<any> {
     try {
-      const repository = userTable === 'b_user' ? this.bUserRepository : this.mUserRepository;
+      let repository
+      if (userTable === "b_user")
+{repository = this.bUserRepository}
+      else if (userTable === "m_user")
+        {repository = this.mUserRepository}
+      else
+      {repository = this.zUserRepository}   
 
       const user = await repository.findOne({ where: { nickname: userNickname } });
 
@@ -93,8 +112,10 @@ let user
       user.email = newemail;
       if (userTable === 'b_user') {
         await this.bUserRepository.save(user as BUser);
-      } else {
+      } else if (userTable === 'm_user') {
         await this.mUserRepository.save(user as MUser);
+      } else
+      {await this.zUserRepository.save(user as ZUser);
       }
       return { success: true };
     } catch (error) {
@@ -105,7 +126,14 @@ let user
   // 비밀번호 변경
   async changePassword(userNickname: string, nowpw: string, newpw: string, userTable: string): Promise<any> {
     try {
-      const repository = userTable === 'b_user' ? this.bUserRepository : this.mUserRepository;
+
+      let repository
+      if (userTable === "b_user")
+{repository = this.bUserRepository}
+      else if (userTable === "m_user")
+        {repository = this.mUserRepository}
+      else
+      {repository = this.zUserRepository}   
 
       const user = await repository.findOne({ where: { nickname: userNickname } });
 
@@ -122,10 +150,12 @@ let user
       user.pw = await bcrypt.hash(newpw, 10);
       if (userTable === 'b_user') {
         await this.bUserRepository.save(user as BUser);
-      } else {
+      } else if (userTable === 'm_user') {
         await this.mUserRepository.save(user as MUser);
       }
-      
+      else {
+        await this.zUserRepository.save(user as ZUser);
+      }
       return { success: true };
     } catch (error) {
       return { success: false };

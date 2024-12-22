@@ -21,10 +21,11 @@
       };
   
       try {
-        const endpoint = $mode ? "/userdata/change-pw/m-user" : "/userdata/change-pw/b-user";
+        const endpoint = `/userdata/${$mode}/change-pw`;
         const response = await SecurityFetch(endpoint,"POST",pwdata);
+        const data = await response.json()
   
-        if (response.ok) {
+        if (typeof data.message === 'string') {
           alert("암호 변경 완료");
           form.set("none");
         } else {

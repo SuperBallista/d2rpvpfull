@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { BUser } from '../entities/b-user.entity';
 import { MUser } from '../entities/m-user.entity';
+import { ZUser } from 'src/entities/z-user.entity';
 
 @Injectable()
 export class NicknameService {
@@ -11,6 +12,8 @@ export class NicknameService {
     private readonly bUserRepository: Repository<BUser>,
     @InjectRepository(MUser)
     private readonly mUserRepository: Repository<MUser>,
+    @InjectRepository(ZUser)
+    private readonly zUserRepository: Repository<ZUser>,
   ) {}
 
   // Get nicknames from `b_user` table excluding admin
@@ -40,4 +43,19 @@ export class NicknameService {
       throw new Error('Database error occurred while fetching MUser nicknames.');
     }
   }
+
+  async getZUserNicknames(): Promise<string[]> {
+    try {
+      const users = await this.zUserRepository.find({
+        where: { nickname: Not('admin_z') },
+        select: ['nickname'],
+      });
+      return users.map(user => user.nickname);
+    } catch (error) {
+      console.error('Error fetching ZUser nicknames:', error);
+      throw new Error('Database error occurred while fetching ZUser nicknames.');
+    }
+  }
+
+
 }

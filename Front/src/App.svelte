@@ -23,6 +23,8 @@ import Elo from "./components/calculater/elo.svelte";
     import Mpkadmin from "./components/mpkadmin.svelte";
     import Babapkadmin from "./components/babapkadmin.svelte";
     import Mpksimul from "./components/calculater/mpksimul.svelte";
+    import Zpkesimul from "./components/calculater/zpkesimul.svelte";
+    import Zpkeadmin from "./components/zpkeadmin.svelte";
     
 </script>
 <Router>
@@ -39,6 +41,7 @@ import Elo from "./components/calculater/elo.svelte";
   <Route path="/:type/info" component={Info} />
   <Route path="/" component={Index} />
   <Route path="/mpk" component={Index} />
+  <Route path="/zpke" component={Index} />
   <Route path="/:type/rank" component={Rank} />
   <Route path="/:type/record" component={Record} />
   <Route path="/:type/tournament" component={Event}/>
@@ -56,6 +59,8 @@ import Elo from "./components/calculater/elo.svelte";
   <Route path="/mpk/admin" component={Mpkadmin}/>
   <Route path="/babapk/admin" component={Babapkadmin}/>
   <Route path="/mpk/simul" component={Mpksimul}/>
+  <Route path="/zpke/simul" component={Zpkesimul}/>
+  <Route path="/zpke/admin" component={Zpkeadmin}/>
 
   
 

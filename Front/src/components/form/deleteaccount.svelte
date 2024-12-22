@@ -10,7 +10,7 @@ async function delete_account() {
   };
 
   try {
-    const endpoint = $mode ? "/auth/m-user/delete" : "/auth/b-user/delete";
+    const endpoint = `/auth/${$mode}/delete`;
     const response = await SecurityFetch(endpoint,"DELETE",pwdata);
 
     if (response.status===200) {

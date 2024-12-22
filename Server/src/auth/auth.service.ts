@@ -1,12 +1,14 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { jwtService } from '../jwt/jwt.service';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as moment from 'moment';
 import { BUser } from '../entities/b-user.entity';
 import { MUser } from '../entities/m-user.entity';
 import { ConfigService } from '@nestjs/config';
+import { ZUser } from 'src/entities/z-user.entity';
+import { START_SCORE, START_SCORE_Z, START_SCORE_M } from 'src/config/constants';
 
 @Injectable()
 export class AuthService {
@@ -17,16 +19,23 @@ export class AuthService {
     private readonly bUserRepository: Repository<BUser>,
     @InjectRepository(MUser)
     private readonly mUserRepository: Repository<MUser>,
+    @InjectRepository(ZUser)
+    private readonly zUserRepository: Repository<ZUser>
    ) {}
 
 
   async deleteAccount(
     userNickname: string,
     nowpw: string,
-    tableName: 'b_user' | 'm_user',
+    tableName: 'b_user' | 'm_user' | 'z_user',
   ): Promise<{ success: boolean; error?: string; status?: number }> {
-    const repository =
-      tableName === 'b_user' ? this.bUserRepository : this.mUserRepository;
+    let repository
+    if (tableName === 'b_user')
+    {repository = this.bUserRepository}
+    else if (tableName === 'm_user')
+    {repository = this.mUserRepository}
+    else
+    {repository = this.zUserRepository}
 
     const user = await repository.findOne({ where: { nickname: userNickname } });
     if (!user) {
@@ -61,8 +70,22 @@ export class AuthService {
 
   async processLogin(body: any, mode: string): Promise<any> {
     const { nickname, password } = body;
-    const lowerCaseNickname = mode === "m_user" ? nickname.toLowerCase()+"_m" : nickname.toLowerCase();
-    const UserRepository = mode === "m_user" ? this.mUserRepository : this.bUserRepository
+
+    let lowerCaseNickname:string
+    let UserRepository
+
+    if (mode === "m_user") {
+     lowerCaseNickname = nickname.toLowerCase()+"_m"  
+     UserRepository = this.mUserRepository
+    }
+    else if (mode === "z_user") {
+     lowerCaseNickname = nickname.toLowerCase()+"_z"
+     UserRepository = this.zUserRepository
+    }
+    else{
+      lowerCaseNickname = nickname.toLowerCase()
+      UserRepository = this.bUserRepository
+    }
   
     const user = await UserRepository.findOne({
       where: { nickname: lowerCaseNickname },
@@ -99,7 +122,7 @@ export class AuthService {
     user.nickname = lowerCaseNickname;
     user.pw = hashedPassword;
     user.email = email;
-    user.bScore = 1200;
+    user.bScore = START_SCORE;
     user.lScore = 0;
     user.class = wgrade;
     user.lastgame = new Date(moment().format('YYYY-MM-DD HH:mm:ss'));
@@ -119,7 +142,7 @@ export class AuthService {
     user.nickname = lowerCaseNickname;
     user.pw = hashedPassword;
     user.email = email;
-    user.bScore = 800;
+    user.bScore = START_SCORE_M;
     user.lScore = 0;
     user.class = wgrade;
 
@@ -127,6 +150,29 @@ export class AuthService {
 
     return res.json({ success: true, message: '회원가입이 완료되었습니다.' });
   }
+
+
+  async processRegiZ(body: any, res: any) {
+    const { nickname, password, email, wgrade } = body;
+
+    const lowerCaseNickname = `${nickname.toLowerCase()}_z`;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new ZUser();
+    user.nickname = lowerCaseNickname;
+    user.pw = hashedPassword;
+    user.email = email;
+    user.bScore = START_SCORE_Z;
+    user.lScore = 0;
+    user.class = wgrade;
+
+    await this.zUserRepository.save(user);
+
+    return res.json({ success: true, message: '회원가입이 완료되었습니다.' });
+  }
+
+
+
 
   async processNicknameCheck(body: any, res: any) {
     const { nickname } = body;
@@ -153,6 +199,22 @@ export class AuthService {
     return res.status(200).json({ message: '사용 가능한 닉네임입니다.' });
   }
 
+  async processNicknameCheckZ(body: any, res: any) {
+    const { nickname } = body;
+
+    const lowerCaseNickname = `${nickname.toLowerCase()}_z`;
+    const user = await this.zUserRepository.findOne({
+      where: { nickname: lowerCaseNickname },
+    });
+    if (user) {
+      return res.status(403).json({ error: '중복된 닉네임입니다.' });
+    }
+
+    return res.status(200).json({ message: '사용 가능한 닉네임입니다.' });
+  }
+
+
+
   async checkJwt(req: any, res: any, username: string) {
     
     if (!req.user) {
@@ -160,7 +222,14 @@ export class AuthService {
     }
     const token = this.jwtService.createAccessToken(username);
 
-    const mode = username.includes("_m")
+    let mode
+    if (username.includes("_m")){
+      mode = "mpk"
+    } else if (username.includes("_z")){
+      mode = "zpke"
+    } else {
+      mode = "babapk"
+    }
 
     return res.status(200).json({ authenticated: true, username: username, token: token, mode: mode });
   }

@@ -5,10 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BUser } from '../entities/b-user.entity';
 import { MUser } from '../entities/m-user.entity';
 import { jwtModule } from 'src/jwt/jwt.module';
+import { ZUser } from 'src/entities/z-user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([BUser, MUser]), // BUser 및 MUser 레포지토리 등록
+    TypeOrmModule.forFeature([BUser, MUser, ZUser]), // BUser 및 MUser 레포지토리 등록
     jwtModule
   ],
   controllers: [AuthController],

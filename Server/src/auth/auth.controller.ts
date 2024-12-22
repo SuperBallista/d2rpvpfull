@@ -46,7 +46,7 @@ import { jwtService } from 'src/jwt/jwt.service';
       return '로그아웃 성공';
     }
   
-    @Delete('/b-user/delete')
+    @Delete('/babapk/delete')
     async deleteAccountB(@Req() req: Request, @Res() res: Response) {
       try {
         const userNickname = req.user['username']; // 인증 미들웨어로부터 사용자 정보 추출
@@ -75,7 +75,7 @@ import { jwtService } from 'src/jwt/jwt.service';
       }
     }
   
-    @Delete('/m-user/delete')
+    @Delete('/mpk/delete')
     async deleteAccountM(@Req() req: Request, @Res() res: Response) {
       try {
         const userNickname = req.user['username']; // 인증 미들웨어로부터 사용자 정보 추출
@@ -103,8 +103,38 @@ import { jwtService } from 'src/jwt/jwt.service';
         throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
+
+    @Delete('/zpke/delete')
+    async deleteAccountZ(@Req() req: Request, @Res() res: Response) {
+      try {
+        const userNickname = req.user['username']; // 인증 미들웨어로부터 사용자 정보 추출
+        const { nowpw } = req.body;
   
-    @Post('/b-user/login')
+        const result: DeleteAccountResult = await this.authService.deleteAccount(
+          userNickname,
+          nowpw,
+          'z_user',
+        );
+        if (result.success) {
+          // 계정 삭제 성공 시 쿠키 삭제
+          res.clearCookie('d2rpvprefreshToken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+          });
+          console.log(userNickname, '계정 삭제 성공');
+          return res.json({ success: true });
+        } else {
+          throw new HttpException(result.error, result.status);
+        }
+      } catch (error) {
+        console.error('계정 삭제 오류:', error);
+        throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+
+  
+    @Post('/babapk/login')
     async processLogin(@Body() body: any, @Res() res: Response) {
       // 로그인 처리
     const data = await this.authService.processLogin(body, "b_user");
@@ -121,7 +151,7 @@ import { jwtService } from 'src/jwt/jwt.service';
       res.status(HttpStatus.OK).json({username : data.username, token: data.accessToken});
     }
   
-    @Post('/m-user/login')
+    @Post('/mpk/login')
     async processLoginM(@Body() body: any, @Res() res: Response) {
       // 로그인 처리
     const data = await this.authService.processLogin(body, "m_user");
@@ -138,7 +168,24 @@ import { jwtService } from 'src/jwt/jwt.service';
       // 클라이언트에 토큰 반환
       res.status(HttpStatus.OK).json({username : data.username, token: data.accessToken});
     }
+    @Post('/zpke/login')
+    async processLoginZ(@Body() body: any, @Res() res: Response) {
+      // 로그인 처리
+    const data = await this.authService.processLogin(body, "z_user");
+    
+    
+        // HttpOnly 쿠키에 저장
+        res.cookie('d2rpvprefreshToken', data.refreshToken, {
+          httpOnly: true, // JavaScript에서 접근 불가
+          secure: this.configService.get<boolean>('HTTPS'),   // HTTPS에서만 전송
+          sameSite: 'strict', // CSRF 방지
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7일 (밀리초 단위)
+        });
   
+      // 클라이언트에 토큰 반환
+      res.status(HttpStatus.OK).json({username : data.username, token: data.accessToken});
+    }
+
 
   
     @UseGuards(AuthGuard('jwt'))
@@ -150,26 +197,34 @@ import { jwtService } from 'src/jwt/jwt.service';
     
 
     
-    @Post('/b-user/register')
+    @Post('/babapk/register')
     async processRegi(@Body() body: any, @Res() res: Response) {
       return this.authService.processRegi(body, res);
     }
   
-    @Post('/m-user/register')
+    @Post('/mpk/register')
     async processRegiM(@Body() body: any, @Res() res: Response) {
       return this.authService.processRegiM(body, res);
     }
   
-    @Post('/b-user/check-nickname')
+    @Post('/zpke/register')
+    async processRegiZ(@Body() body: any, @Res() res: Response) {
+      return this.authService.processRegiZ(body, res);
+    }
+    @Post('/babapk/check-nickname')
     async processNicknameCheck(@Body() body: any, @Res() res: Response) {
       return this.authService.processNicknameCheck(body, res);
     }
-  
-    @Post('/m-user/check-nickname')
+      @Post('/mpk/check-nickname')
     async processNicknameCheckM(@Body() body: any, @Res() res: Response) {
       return this.authService.processNicknameCheckM(body, res);
     }
-  
+    @Post('/zpke/check-nickname')
+    async processNicknameCheckZ(@Body() body: any, @Res() res: Response) {
+      return this.authService.processNicknameCheckZ(body, res);
+    }
+
+    
     @Post('/check-jwt')
     async checkJwt(@Req() req: Request, @Res() res: Response) {
       const token = req.cookies['d2rpvprefreshToken'];

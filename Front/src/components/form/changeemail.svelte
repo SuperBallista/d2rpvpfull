@@ -16,12 +16,11 @@ import {
     };
 
     try {
-      const endpoint = $mode
-        ? "/userdata/change-email/m-user"
-        : "/userdata/change-email/b-user";
+      const endpoint = `/userdata/${$mode}/change-email`
       const response = await SecurityFetch(endpoint, "POST",emaildata);
-  
-      if (response.ok) {
+      const data = await response.json();
+      
+      if (typeof data.message === "string") {
         alert("이메일 변경 완료");
         form.set("none")
     } else {

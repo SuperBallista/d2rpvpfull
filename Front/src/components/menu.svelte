@@ -8,7 +8,10 @@
   
   const location = useLocation();
   let pathname = "";
-  
+  let modeName
+  let modeChange = "밀리PK"
+  let modeChangeLink = "/mpk"
+  let modeSrc:string
   $: pathname = $location.pathname;
 
   const toggleMenu = () => {
@@ -28,8 +31,25 @@
       : []),
   ];
 
- $: mode.set(pathname.includes("mpk"))
- $: modeSrc =  $mode ? "/mpk" : "/babapk";
+$: if (pathname.includes("mpk"))
+{mode.set("mpk")
+ modeName = "밀리PK"
+ modeChangeLink = "/zpke"
+ modeChange = "질딘PK"
+}
+else if (pathname.includes("zpke"))
+{mode.set("zpke")
+modeName = "질딘PK"
+modeChangeLink = "/"
+modeChange = "정통바바"
+}
+else
+{mode.set("babapk")
+modeName = "정통바바"
+modeChangeLink = "/mpk"
+modeChange = "밀리PK"
+}
+
 
 async function checkJwt() {
 
@@ -41,14 +61,14 @@ if (data.authenticated)
  myaccount.set(data.username);
  jwtToken.set(data.token);
  mode.set(data.mode);
- navigate(data.mode? "/mpk" : "/")
+ navigate("/" + $mode === "babapk" ? "" : $mode)
+ modeSrc =  "/" + $mode === "babapk" ? "" : $mode;
 }
 else
 {
 myaccount.set("");
 jwtToken.set("");
 }
-console.log($jwtToken)
 
   }
   catch (error)
@@ -188,7 +208,7 @@ onMount(async () => {
   
 
   <div class="menu-container">
-    <div class="menu-logo"><Link class="menu-logo-link" to={modeSrc === "/mpk" ? "/mpk" : "/"}>D2RPvP</Link>   </div>
+    <div class="menu-logo"><Link class="menu-logo-link" to={modeSrc}>D2RPvP</Link>   </div>
   
     <!-- Desktop Menu -->
     <div class="menu-items">
@@ -219,8 +239,8 @@ onMount(async () => {
     <button class="emphasis-button inline-block" on:click={() => form.set("login")}>
       로그인
     </button>
-    <Link class="simple-button" to={$mode ? "/" : "/mpk"}>
-      {$mode ? "정통바바" : "밀리PK"}
+    <Link class="simple-button" to={modeChangeLink}>
+      {modeChange}
     </Link>
     {:else}
     <button class="simple-button" on:click={() => form.set("myinfo")}>나의정보</button>
