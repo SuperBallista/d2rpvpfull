@@ -8,8 +8,8 @@
     // 페이지 로드 시 닉네임 목록을 가져오고 현재 사용자 제외
     onMount(() => {
       fetchNicknames($mode);
-     nicknameexceptme = $mode ?
-     $nicknames.filter(item => item !== $myaccount.replace("_m","")) : $nicknames.filter(item => item !== $myaccount);
+     nicknameexceptme = $mode==="babapk" ?
+     $nicknames.filter(item => item !== $myaccount) : $nicknames.filter(item => item !== $myaccount.replace("_m","").replace("_z",""));
   
     });
   
@@ -32,7 +32,13 @@ function handle_winner_change(event: Event): void {
     // 기록 전송 함수
     async function submitrecord() {
      
-      const data = $mode ? {winner: winner+"_m", mode: $mode} : { winner:winner, mode:$mode };
+      let data
+      if ($mode==="babapk")
+    {data =    { winner:winner, mode:$mode } }
+     else if ($mode === "mpk")
+     {data = {winner: winner+"_m", mode: $mode}}
+     else
+     {data = {winner: winner+"_z", mode: $mode}};
       try {
         const response = await SecurityFetch("/record/submit", "POST", data)
         if (response.ok) {
@@ -47,7 +53,7 @@ function handle_winner_change(event: Event): void {
     }
   </script>
 
-  <h3 class="message-title">{$mode ? "밀리PK" : "정통바바"} 기록 보내기</h3>
+  <h3 class="message-title">{$mode} 기록 보내기</h3>
 
   <div class="message-body">
   

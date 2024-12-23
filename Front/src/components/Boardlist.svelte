@@ -25,7 +25,7 @@
       fetchList($category);
     }
   
-    const modepage: string = $mode ? '/mpk' : '/babapk';
+    const modepage: string = "/" + $mode;
   
     // 검색 기능
     async function fetchSearch(category: string): Promise<void> {

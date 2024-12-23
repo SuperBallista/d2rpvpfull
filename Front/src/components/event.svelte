@@ -9,7 +9,7 @@
     let memotext:string
   
      function modify_memo(index:number) {
-      if ($myaccount === "admin" || $myaccount === "admin_m")
+      if ($myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z")
   {
       for (let i = 0; i < eventData.length; i++)
       {eventData[i].modify = false}
@@ -20,7 +20,7 @@
 
     async function SaveMemo(index:number) {
      const data = {eventname: eventData[index].eventname, memotext: memotext, mode: $mode}
-     if ($myaccount === "admin" || $myaccount === "admin_m")
+     if ($myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z")
      {
      try{
       const response = await SecurityFetch("/event/memo","PATCH",data);
@@ -41,7 +41,7 @@
 
     async function deleteandresetEvent(index:number) {
       try {
-        const endpoint = $mode? "/event/m-user/cancel" : "/event/b-user/cancel" ;
+        const endpoint = `/event/${$mode}/cancel`;
         const response = await SecurityFetch(endpoint, "DELETE", eventData[index]);
   
         if (response && response.ok) {
@@ -56,7 +56,7 @@
   
     async function approveEvent(index:number) {
       try {
-        const endpoint = $mode? "/event/m-user/accept" : "/event/b-user/accept";
+        const endpoint = `/event/${$mode}/accept`;
         const response = await SecurityFetch(endpoint, "POST", eventData[index]);
   
         if (response && response.status === 201) {
@@ -71,10 +71,10 @@
   
     async function deleteEvent(index:number) {
       try {
-        const endpoint = $mode? "/event/m-user/delete" : "/event/b-user/delete";
+        const endpoint = `/event/${$mode}/delete`;
         const data = { eventname: eventData[index].eventname };
         const response = await SecurityFetch(endpoint, "DELETE", data);
-  
+
         if (response && response.status === 200) {
           alert("토너먼트 히스토리를 삭제하였습니다");
         }
@@ -87,7 +87,7 @@
   
     async function fetchData() {
       try {
-        const response = await SecurityFetch($mode? "/event/m-user/history" : "/event/b-user/history","GET");
+        const response = await SecurityFetch(`/event/${$mode}/history`,"GET");
         if (!response.ok) {
           throw new Error("연결 에러입니다");
         }
@@ -150,9 +150,9 @@
                   {event.numberteams}x{event.teamSize}
                 {/if}
               </td>
-              <td>{event.Championship1.replace("_m", "")}</td>
+              <td>{event.Championship1.replace("_m", "").replace("_z","")}</td>
               <td>
-                {#if $myaccount === "admin" || $myaccount === "admin_m"}
+                {#if $myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z"}
                   {#if event.ok === "대기"}
                     <button class="simple-button small" on:click={() => approveEvent(index)}>승인</button>
                     <button class="simple-button small" on:click={() => deleteEvent(index)}>삭제</button>
@@ -169,19 +169,19 @@
                 <td colspan="4">
                   <div class="details">
                     <strong>토너먼트 정보</strong><br />
-                    주최자: {event.Eventhost.replace("_m", "")}<br />
-                    우승: {event.Championship1 ? event.Championship1.replace("_m", "") : ""}
-                    {event.Championship2 ? event.Championship2.replace("_m", "") : ""}
-                    {event.Championship3 ? event.Championship3.replace("_m", "") : ""}
-                    {event.Championship4 ? event.Championship4.replace("_m", "") : ""}<br />
-                    준우승: {event.Runner_up1 ? event.Runner_up1.replace("_m", "") : ""}
-                    {event.Runner_up2 ? event.Runner_up2.replace("_m", "") : ""}
-                    {event.Runner_up3 ? event.Runner_up3.replace("_m", "") : ""}
-                    {event.Runner_up4 ? event.Runner_up4.replace("_m", "") : ""}<br />
-                    3위: {event.Place3rd1 ? event.Place3rd1.replace("_m", "") : ""}
-                    {event.Place3rd2 ? event.Place3rd2.replace("_m", "") : ""}
-                    {event.Place3rd3 ? event.Place3rd3.replace("_m", "") : ""}
-                    {event.Place3rd4 ? event.Place3rd4.replace("_m", "") : ""}<br/>
+                    주최자: {event.Eventhost.replace("_m", "").replace("_z", "")}<br />
+                    우승: {event.Championship1 ? event.Championship1.replace("_m", "").replace("_z", "") : ""}
+                    {event.Championship2 ? event.Championship2.replace("_m", "").replace("_z", "") : ""}
+                    {event.Championship3 ? event.Championship3.replace("_m", "").replace("_z", "") : ""}
+                    {event.Championship4 ? event.Championship4.replace("_m", "").replace("_z", "") : ""}<br />
+                    준우승: {event.Runner_up1 ? event.Runner_up1.replace("_m", "").replace("_z", "") : ""}
+                    {event.Runner_up2 ? event.Runner_up2.replace("_m", "").replace("_z", "") : ""}
+                    {event.Runner_up3 ? event.Runner_up3.replace("_m", "").replace("_z", "") : ""}
+                    {event.Runner_up4 ? event.Runner_up4.replace("_m", "").replace("_z", "") : ""}<br />
+                    3위: {event.Place3rd1 ? event.Place3rd1.replace("_m", "").replace("_z", "") : ""}
+                    {event.Place3rd2 ? event.Place3rd2.replace("_m", "").replace("_z", "") : ""}
+                    {event.Place3rd3 ? event.Place3rd3.replace("_m", "").replace("_z", "") : ""}
+                    {event.Place3rd4 ? event.Place3rd4.replace("_m", "").replace("_z", "") : ""}<br/>
                     메모: {#if event.modify}<input type="text" bind:value={memotext} class="memo-input" on:keydown={(e) => {
                       if (e.key === "Enter") SaveMemo(index);
                     }}/><button class="simple-button" on:click={() => SaveMemo(index)}>작성</button>

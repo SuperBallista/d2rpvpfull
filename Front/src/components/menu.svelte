@@ -26,7 +26,7 @@
     { label: "커뮤니티", href: "/boardlist" },
     { label: "역대우승", href: "/winners" },
     { label: "계산하기", href: "/calculator" },
-    ...($myaccount === "admin" || $myaccount === "admin_m"
+    ...($myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z"
       ? [{ label: "관리설정", href: "/admin" }]
       : []),
   ];
@@ -34,6 +34,7 @@
 $: if (pathname.includes("mpk"))
 {mode.set("mpk")
  modeName = "밀리PK"
+ modeSrc = "/" + $mode
  modeChangeLink = "/zpke"
  modeChange = "질딘PK"
 }
@@ -41,11 +42,13 @@ else if (pathname.includes("zpke"))
 {mode.set("zpke")
 modeName = "질딘PK"
 modeChangeLink = "/"
+modeSrc = "/" + $mode
 modeChange = "정통바바"
 }
 else
 {mode.set("babapk")
 modeName = "정통바바"
+modeSrc = "/" + $mode
 modeChangeLink = "/mpk"
 modeChange = "밀리PK"
 }
@@ -61,8 +64,8 @@ if (data.authenticated)
  myaccount.set(data.username);
  jwtToken.set(data.token);
  mode.set(data.mode);
- navigate("/" + $mode === "babapk" ? "" : $mode)
- modeSrc =  "/" + $mode === "babapk" ? "" : $mode;
+ navigate("/" + $mode)
+ modeSrc =  "/" + $mode;
 }
 else
 {

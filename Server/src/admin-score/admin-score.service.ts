@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { BUser } from '../entities/b-user.entity';
 import { MUser } from '../entities/m-user.entity';
+import { ZUser } from 'src/entities/z-user.entity';
 
 @Injectable()
 export class AdminScoreService {
@@ -11,19 +12,24 @@ export class AdminScoreService {
     private readonly bUserRepository: Repository<BUser>,
     @InjectRepository(MUser)
     private readonly mUserRepository: Repository<MUser>,
+    @InjectRepository(ZUser)
+    private readonly zUserRepository: Repository<ZUser>,
     private readonly dataSource: DataSource, // 트랜잭션에 사용
   ) {}
 
   // 사용자 점수 업데이트
-  async updateUserScore(tableName: 'b_user' | 'm_user', player: string, adminScore: number): Promise<void> {
+  async updateUserScore(mode: string, player: string, adminScore: number): Promise<void> {
     let repository;
 
     // 테이블에 따라 Repository 선택
-    if (tableName === 'b_user') {
+    if (mode === 'babapk') {
       repository = this.bUserRepository;
-    } else if (tableName === 'm_user') {
+    } else if (mode === 'mpk') {
       repository = this.mUserRepository;
-    } else {
+    } else if (mode === "zpke")
+    {repository = this.zUserRepository;}
+    else
+     {
       throw new Error('올바르지 않은 테이블 이름입니다.');
     }
 
@@ -38,7 +44,7 @@ export class AdminScoreService {
 
   // 랭킹 리셋 및 데이터 백업 로직
   async resetRank(
-    userTable: 'b_user' | 'm_user',
+    userTable: string,
     recordTable: string,
     tempTable: string,
     eventRecordTable: string,

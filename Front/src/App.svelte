@@ -14,7 +14,7 @@
   import Write from "./components/write.svelte";
   import Pastwinner from "./components/pastwinner.svelte";
   import Calculater from "./components/calculater.svelte";
-  import Mpkpscore from "./components/calculater/mpkpscore.svelte";
+  import Zpkepscore from "./components/calculater/zpkepscore.svelte";
   import Babapkpscore from "./components/calculater/babapkpscore.svelte";
 import Visio from "./components/calculater/visio.svelte";
 import Ring from "./components/calculater/ring.svelte";
@@ -40,6 +40,7 @@ import Elo from "./components/calculater/elo.svelte";
 <main>
   <Route path="/:type/info" component={Info} />
   <Route path="/" component={Index} />
+  <Route path="/babapk" component={Index} />
   <Route path="/mpk" component={Index} />
   <Route path="/zpke" component={Index} />
   <Route path="/:type/rank" component={Rank} />
@@ -50,12 +51,12 @@ import Elo from "./components/calculater/elo.svelte";
   <Route path="/:type/write" component={Write}/>
   <Route path="/:type/winners" component={Pastwinner}/>
   <Route path="/:type/calculator" component={Calculater}/>
-  <Route path="/mpk/pscore" component={Mpkpscore}/>
+  <Route path="/zpke/pscore" component={Zpkepscore}/>
   <Route path="/babapk/pscore" component={Babapkpscore}/>
   <Route path="/babapk/visio" component={Visio}/>
   <Route path="/:type/ring" component={Ring}/>
   <Route path="/babapk/simul" component={Babapksimul}/>
-  <Route path="/mpk/elo" component={Elo}/>
+  <Route path="/:type/elo" component={Elo}/>
   <Route path="/mpk/admin" component={Mpkadmin}/>
   <Route path="/babapk/admin" component={Babapkadmin}/>
   <Route path="/mpk/simul" component={Mpksimul}/>

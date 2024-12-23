@@ -13,7 +13,7 @@
       let bValidCount;
       let tiedRank = 1;
       let rank = 1;
-      let endpoint = $mode ? "/rank/m-user" : "/rank/b-user";
+      let endpoint = "/rank/" + $mode;
   
       try {
         const response = await fetch(endpoint);
@@ -50,9 +50,8 @@
   
     async function challengeRank(challengeNickname: string) {
       const data = { nickname: challengeNickname, mode: $mode };
-      const modename = $mode? "/m-user" : "b-user"
       try {
-        const response = await SecurityFetch("/rank/challenge"+modename, "POST", data);
+        const response = await SecurityFetch(`/rank/${$mode}/challenge`, "POST", data);
   
         if (response.status === 201) {
           alert(`${challengeNickname.replace("_m", "")}님에게 도전을 신청하였습니다`);
@@ -86,7 +85,7 @@
 
     // 게임 데이터를 불러오는 함수
     async function checkChallenge(): Promise<void> {
-      const endpoint: string = $mode ? "/rank/challenge/show/m-user" : "/rank/challenge/show/b-user";
+      const endpoint: string = `/rank/challenge/${$mode}/show/`;
   if ($myaccount) {
       try {
         const response = await SecurityFetch(endpoint, "POST");
@@ -138,7 +137,7 @@
                 {/if}
               </td>
               <!-- 닉네임 -->
-              <td>{user.nickname.replace("_m", "")}</td>
+              <td>{user.nickname.replace("_m", "").replace("_z","")}</td>
               <!-- 승률 -->
               <td>{user.wins+user.losses > 0 ? (Math.round(10000*(user.wins/(user.wins+user.losses))))/100 : 0 }</td>
               <!-- 점수 -->
@@ -169,7 +168,7 @@
   </div>
 
   
-  {#if $mode && $myaccount && $myaccount != "admin_m"}
+  {#if $mode==="mpk" && $myaccount && $myaccount != "admin_m"}
   <div class="fixed-button-div">
     <button class="simple-button" on:click={() => form.set("challenge")}>도전승인
       {#if newdata}       

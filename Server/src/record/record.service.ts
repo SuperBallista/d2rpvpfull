@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { BRecord } from '../entities/b-record.entity';
 import { MRecord } from '../entities/m-record.entity';
+import { ZRecord } from 'src/entities/z-record.entity';
 import { BUser } from '../entities/b-user.entity';
 import { MUser } from '../entities/m-user.entity';
+import { ZUser } from 'src/entities/z-user.entity';
 import { BTemp } from '../entities/b-temp.entity';
 import { MTemp } from '../entities/m-temp.entity';
+import { ZTemp } from 'src/entities/z-temp.entity';
 import * as moment from 'moment';
-import { K_VALUE_B, E_VALUE_B, K_VALUE_M, E_VALUE_M } from '../config/constants';
+import { K_VALUE_B, E_VALUE_B, K_VALUE_M, E_VALUE_M, K_VALUE_Z, E_VALUE_Z } from '../config/constants';
 
 @Injectable()
 export class RecordService {
@@ -17,27 +20,37 @@ export class RecordService {
     private readonly bRecordRepository: Repository<BRecord>,
     @InjectRepository(MRecord)
     private readonly mRecordRepository: Repository<MRecord>,
+    @InjectRepository(ZRecord)
+    private readonly zRecordRepository: Repository<ZRecord>,
     @InjectRepository(BUser)
     private readonly bUserRepository: Repository<BUser>,
     @InjectRepository(MUser)
     private readonly mUserRepository: Repository<MUser>,
+    @InjectRepository(ZUser)
+    private readonly zUserRepository: Repository<ZUser>,
     @InjectRepository(BTemp)
     private readonly bTempRepository: Repository<BTemp>,
     @InjectRepository(MTemp)
     private readonly mTempRepository: Repository<MTemp>,
+    @InjectRepository(ZTemp)
+    private readonly zTempRepository: Repository<ZTemp>,
     private readonly dataSource: DataSource,
   ) {}
 
   // 기록 삭제
-  async deleteRecord(orderNum: number, isMUser: string, admin: string): Promise<void> {
+  async deleteRecord(orderNum: number, mode: string, admin: string): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
+    let tableName = mode.slice(0,1)
+    if (tableName!="b" && tableName!="m" && tableName!="z")
+    {throw new HttpException('Mode Error', HttpStatus.BAD_REQUEST);}
+
     try {
       const record = await queryRunner.manager.query(
         `SELECT Winner, Win2, Win3, Win4, Loser, Lose2, Lose3, Lose4, AddScore 
-         FROM ${isMUser === 'm' ? 'm_record' : 'b_record'}
+         FROM ${tableName}_record
          WHERE OrderNum = ?`,
         [orderNum],
       );
@@ -52,14 +65,14 @@ export class RecordService {
 
       // 점수 업데이트 및 기록 삭제
       await queryRunner.manager.query(
-        `UPDATE ${isMUser === 'm' ? 'm_user' : 'b_user'} SET BScore = BScore - ? WHERE Nickname IN (?, ?, ?, ?)`,
+        `UPDATE ${tableName}_user SET BScore = BScore - ? WHERE Nickname IN (?, ?, ?, ?)`,
         [addScore, ...winnerNicknames],
       );
       await queryRunner.manager.query(
-        `UPDATE ${isMUser === 'm' ? 'm_user' : 'b_user'} SET BScore = BScore + ? WHERE Nickname IN (?, ?, ?, ?)`,
+        `UPDATE ${tableName}_user SET BScore = BScore + ? WHERE Nickname IN (?, ?, ?, ?)`,
         [addScore, ...loserNicknames],
       );
-      await queryRunner.manager.query(`DELETE FROM ${isMUser === 'm' ? 'm_record' : 'b_record'} WHERE OrderNum = ?`, [orderNum]);
+      await queryRunner.manager.query(`DELETE FROM ${tableName}_record WHERE OrderNum = ?`, [orderNum]);
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -72,9 +85,15 @@ export class RecordService {
   }
 
   // 승인 대기중인 기록 가져오기
-  async fetchPendingRecords(nickname: string, isMUser: string): Promise<any[]> {
-    console.log("닉네임",nickname,"모드",isMUser)
-    const tempRepository = isMUser === 'm' ? this.mTempRepository : this.bTempRepository;
+  async fetchPendingRecords(nickname: string, mode: string): Promise<any[]> {
+    console.log("닉네임",nickname,"모드",mode)
+    let tempRepository
+    if (mode === "babapk")
+    {tempRepository = this.bTempRepository}
+    else if (mode === "mpk")
+    {tempRepository = this.mTempRepository}
+    else
+    {tempRepository = this.zTempRepository}
     try {
       return await tempRepository.find({
         where: { winner: nickname, checked: 0 },
@@ -87,8 +106,15 @@ export class RecordService {
   }
 
   // 기록 제출
-  async submitRecord(winner: string, isMUser: string, submitter: string): Promise<void> {
-    const tempRepository = isMUser === 'm' ? this.mTempRepository : this.bTempRepository;
+  async submitRecord(winner: string, mode: string, submitter: string): Promise<void> {
+    let tempRepository
+    if (mode === "babapk")
+    {tempRepository = this.bTempRepository}
+    else if (mode === "mpk")
+    {tempRepository = this.mTempRepository}
+    else
+    {tempRepository = this.zTempRepository}
+
     const currentDate = moment().utcOffset('+0900').format('YYYY-MM-DD HH:mm:ss');
     const record = tempRepository.create({
       date: new Date(currentDate),
@@ -107,8 +133,14 @@ export class RecordService {
   }
 
     // 기록 취소
-    async cancelRecord(orderNum: number, isMUser: string): Promise<void> {
-      const tempRepository = isMUser === 'm' ? this.mTempRepository : this.bTempRepository;
+    async cancelRecord(orderNum: number, mode: string): Promise<void> {
+let tempRepository
+if (mode === "babapk")
+{tempRepository = this.bTempRepository}
+else if (mode === "mpk")
+{tempRepository = this.mTempRepository}
+else
+{tempRepository = this.zTempRepository}
       const tempRecord = await tempRepository.findOneBy({ orderNum });
       if (!tempRecord) {
         throw new HttpException('Record not found', HttpStatus.NOT_FOUND);
@@ -121,10 +153,37 @@ export class RecordService {
 
 
   // 기록 승인
-  async approveRecord(orderNum: number, isMUser: string): Promise<void> {
-    const tempRepository = isMUser === 'm' ? this.mTempRepository : this.bTempRepository;
-    const recordRepository = isMUser === 'm' ? this.mRecordRepository : this.bRecordRepository;
-    const userRepository = isMUser === 'm' ? this.mUserRepository : this.bUserRepository;
+  async approveRecord(orderNum: number, mode: string): Promise<void> {
+    let tempRepository
+    let recordRepository
+    let userRepository
+    let K_VALUE
+    let E_VALUE
+
+    if (mode === "babapk")
+    {
+      tempRepository = this.bTempRepository
+      recordRepository = this.bRecordRepository
+      userRepository = this.bUserRepository
+      K_VALUE = K_VALUE_B
+      E_VALUE = E_VALUE_B
+    }
+    else if (mode === "mpk")
+    {
+      tempRepository = this.mTempRepository
+      recordRepository = this.mRecordRepository
+      userRepository = this.mUserRepository
+      K_VALUE = K_VALUE_M
+      E_VALUE = E_VALUE_M
+    }
+    else
+    {
+      tempRepository = this.zTempRepository
+      recordRepository = this.zRecordRepository
+      userRepository = this.zUserRepository
+      K_VALUE = K_VALUE_Z
+      E_VALUE = E_VALUE_Z
+    }
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -146,8 +205,7 @@ export class RecordService {
       // 점수 계산
       const winnerScore = Number(winner.bScore);
       const loserScore = Number(loser.bScore);
-      const K_VALUE = isMUser === 'm' ? K_VALUE_M : K_VALUE_B;
-      const E_VALUE = isMUser === 'm' ? E_VALUE_M : E_VALUE_B;
+
       const addScore = K_VALUE * (1 - 1 / (1 + 10 ** ((loserScore - winnerScore) / E_VALUE)));
 
       // 점수 업데이트
@@ -156,7 +214,7 @@ export class RecordService {
       winner.records += 1
       loser.records +=1
 
-      await (userRepository as Repository<BUser | MUser>).save([winner, loser]);
+      await (userRepository as Repository<BUser | MUser | ZUser>).save([winner, loser]);
 
       // 기록 저장
       const record = recordRepository.create({
@@ -165,7 +223,7 @@ export class RecordService {
         lScore: 0,
         addScore: addScore,
         checked: 1,
-      } as Partial<BRecord | MRecord>);
+      } as Partial<BRecord | MRecord | ZRecord>);
       await recordRepository.save(record);
 
       // 승인 상태 업데이트
@@ -184,10 +242,18 @@ export class RecordService {
 
   // 기록 데이터 가져오기
   async fetchRecordData(mode: string): Promise<any[]> {
-    const recordRepository = mode ==="true" ? this.mRecordRepository : this.bRecordRepository;
+    let recordRepository
+    if (mode === "babapk")
+    {recordRepository = this.bRecordRepository}
+    else if (mode === "mpk")
+    {recordRepository = this.mRecordRepository}
+    else
+    {recordRepository = this.zRecordRepository};
+    
     try {
-      return await recordRepository.find({ order: { orderNum: 'DESC' } });
-    } catch (error) {
+    const data = await recordRepository.find({ order: { orderNum: 'DESC' } });
+    return data  
+  } catch (error) {
       console.error('Error fetching record data:', error);
       throw new HttpException('Failed to fetch record data', HttpStatus.INTERNAL_SERVER_ERROR);
     }

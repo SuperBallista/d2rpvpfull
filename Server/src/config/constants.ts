@@ -6,6 +6,8 @@ export const K_VALUE_B = 32;
 export const E_VALUE_B = 400;
 export const K_VALUE_M = 32;
 export const E_VALUE_M = 400;
+export const K_VALUE_Z = 32;
+export const E_VALUE_Z = 400;
 
 
 export const TEAMS_SCORES_B = {

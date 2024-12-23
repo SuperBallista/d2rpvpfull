@@ -16,10 +16,10 @@ import { User } from '../user/user.decorator';
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
-  @Post('/b-user/submit')
+  @Post('/babapk/submit')
   async submitBUserEvent(@Body() eventdata: object) {
     try {
-      await this.eventService.submitEvent(eventdata, false);
+      await this.eventService.submitEvent(eventdata, "babapk");
       console.log(eventdata, 'Barbarian tournament record submitted successfully.');
       return { message: 'Tournament record submitted successfully.' };
     } catch (error) {
@@ -31,10 +31,10 @@ export class EventController {
     }
   }
 
-  @Post('/m-user/submit')
+  @Post('/mpk/submit')
   async submitMUserEvent(@Body() eventdata: object) {
     try {
-      await this.eventService.submitEvent(eventdata, true);
+      await this.eventService.submitEvent(eventdata, "mpk");
       console.log(eventdata, 'Melee tournament record submitted successfully.');
       return { message: 'Tournament record submitted successfully.' };
     } catch (error) {
@@ -46,10 +46,26 @@ export class EventController {
     }
   }
 
-  @Get('/b-user/history')
+  @Post('/zpke/submit')
+  async submitZUserEvent(@Body() eventdata: object) {
+    try {
+      await this.eventService.submitEvent(eventdata, "zpke");
+      console.log(eventdata, 'Zealot tournament record submitted successfully.');
+      return { message: 'Tournament record submitted successfully.' };
+    } catch (error) {
+      console.error('Error submitting record:', error);
+      throw new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+
+  @Get('/babapk/history')
   async getBUserEventHistory() {
     try {
-      return await this.eventService.getEventHistory(false);
+      return await this.eventService.getEventHistory("babapk");
     } catch (error) {
       console.error('Error fetching Barbarian tournament history:', error);
       throw new HttpException(
@@ -59,10 +75,10 @@ export class EventController {
     }
   }
 
-  @Get('/m-user/history')
+  @Get('/mpk/history')
   async getMUserEventHistory() {
     try {
-      return await this.eventService.getEventHistory(true);
+      return await this.eventService.getEventHistory("mpk");
     } catch (error) {
       console.error('Error fetching Melee tournament history:', error);
       throw new HttpException(
@@ -72,7 +88,22 @@ export class EventController {
     }
   }
 
-  @Delete('/b-user/delete')
+  @Get('/zpke/history')
+  async getZUserEventHistory() {
+    try {
+      return await this.eventService.getEventHistory("zpke");
+    } catch (error) {
+      console.error('Error fetching Zealot tournament history:', error);
+      throw new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+
+
+  @Delete('/babapk/delete')
   async deleteBUserEvent(
     @Body('eventname') eventname: string,
     @User('username') username: string,
@@ -82,11 +113,11 @@ export class EventController {
         throw new HttpException('Invalid event name.', HttpStatus.BAD_REQUEST);
       }
 
-      if (!['admin', 'admin_m'].includes(username)) {
+      if (!['admin', 'admin_m', 'admin_z'].includes(username)) {
         throw new HttpException('Unauthorized.', HttpStatus.FORBIDDEN);
       }
 
-      await this.eventService.deleteEvent(eventname, false);
+      await this.eventService.deleteEvent(eventname, "babapk");
       console.log(eventname, 'Barbarian tournament deleted.');
       return { message: 'Tournament record deleted successfully.' };
     } catch (error) {
@@ -98,7 +129,7 @@ export class EventController {
     }
   }
 
-  @Delete('/m-user/delete')
+  @Delete('/mpk/delete')
   async deleteMUserEvent(
     @Body('eventname') eventname: string,
     @User('username') username: string,
@@ -108,11 +139,11 @@ export class EventController {
         throw new HttpException('Invalid event name.', HttpStatus.BAD_REQUEST);
       }
 
-      if (!['admin', 'admin_m'].includes(username)) {
+      if (!['admin', 'admin_m', 'admin_z'].includes(username)) {
         throw new HttpException('Unauthorized.', HttpStatus.FORBIDDEN);
       }
 
-      await this.eventService.deleteEvent(eventname, true);
+      await this.eventService.deleteEvent(eventname, "mpk");
       console.log(eventname, 'Melee tournament deleted.');
       return { message: 'Tournament record deleted successfully.' };
     } catch (error) {
@@ -124,10 +155,37 @@ export class EventController {
     }
   }
 
-  @Post('/b-user/accept')
+  @Delete('/zpke/delete')
+  async deleteZUserEvent(
+    @Body('eventname') eventname: string,
+    @User('username') username: string,
+  ) {
+    try {
+      if (!eventname) {
+        throw new HttpException('Invalid event name.', HttpStatus.BAD_REQUEST);
+      }
+
+      if (!['admin', 'admin_m', 'admin_z'].includes(username)) {
+        throw new HttpException('Unauthorized.', HttpStatus.FORBIDDEN);
+      }
+
+      await this.eventService.deleteEvent(eventname, "zpke");
+      console.log(eventname, 'Melee tournament deleted.');
+      return { message: 'Tournament record deleted successfully.' };
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      throw new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+
+  @Post('/babapk/accept')
   async acceptBUserEvent(@Body() eventdata: any) {
     try {
-      await this.eventService.acceptEvent(eventdata, false);
+      await this.eventService.acceptEvent(eventdata, "babapk");
       console.log(eventdata, 'Barbarian tournament approved.');
       return { message: 'Tournament approved successfully.' };
     } catch (error) {
@@ -139,11 +197,26 @@ export class EventController {
     }
   }
 
-  @Post('/m-user/accept')
+  @Post('/mpk/accept')
   async acceptMUserEvent(@Body() eventdata: any) {
     try {
-      await this.eventService.acceptEvent(eventdata, true);
+      await this.eventService.acceptEvent(eventdata, "mpk");
       console.log(eventdata, 'Melee tournament approved.');
+      return { message: 'Tournament approved successfully.' };
+    } catch (error) {
+      console.error('Error approving event:', error);
+      throw new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('/zpke/accept')
+  async acceptZUserEvent(@Body() eventdata: any) {
+    try {
+      await this.eventService.acceptEvent(eventdata, "zpke");
+      console.log(eventdata, 'Zealot tournament approved.');
       return { message: 'Tournament approved successfully.' };
     } catch (error) {
       console.error('Error approving event:', error);
@@ -156,7 +229,7 @@ export class EventController {
 
   @Patch('/memo')
   async modifyMemo(@Body() memoData: any, @User() user: any){
-      if (user.username != "admin" && user.username != "admin_m")
+      if (user.username != "admin" && user.username != "admin_m" && user.username != "admin_z")
     {
       throw new HttpException(
         '권한 없음',
@@ -182,17 +255,17 @@ export class EventController {
 
 
 
-  @Delete('/b-user/cancel')
+  @Delete('/babapk/cancel')
   async cancelBUserAcceptedEvent(
     @Body() eventdata: any,
     @User('username') username: string,
   ) {
     try {
-      if (!['admin', 'admin_m'].includes(username)) {
+      if (!['admin', 'admin_m','admin_z'].includes(username)) {
         throw new HttpException('Unauthorized.', HttpStatus.FORBIDDEN);
       }
 
-      await this.eventService.cancelAccepted(eventdata, false);
+      await this.eventService.cancelAccepted(eventdata, "babapk");
       console.log(eventdata.eventname, 'Barbarian tournament canceled.');
       return {
         message:
@@ -207,17 +280,17 @@ export class EventController {
     }
   }
 
-  @Delete('/m-user/cancel')
+  @Delete('/mpk/cancel')
   async cancelMUserAcceptedEvent(
     @Body() eventdata: any,
     @User('username') username: string,
   ) {
     try {
-      if (!['admin', 'admin_m'].includes(username)) {
+      if (!['admin', 'admin_m','admin_z'].includes(username)) {
         throw new HttpException('Unauthorized.', HttpStatus.FORBIDDEN);
       }
 
-      await this.eventService.cancelAccepted(eventdata, true);
+      await this.eventService.cancelAccepted(eventdata, "mpk");
       console.log(eventdata.eventname, 'Melee tournament canceled.');
       return {
         message:
@@ -231,5 +304,33 @@ export class EventController {
       );
     }
   }
+
+  @Delete('/zpke/cancel')
+  async cancelZUserAcceptedEvent(
+    @Body() eventdata: any,
+    @User('username') username: string,
+  ) {
+    try {
+      if (!['admin', 'admin_m','admin_z'].includes(username)) {
+        throw new HttpException('Unauthorized.', HttpStatus.FORBIDDEN);
+      }
+
+      await this.eventService.cancelAccepted(eventdata, "zpke");
+      console.log(eventdata.eventname, 'Zealot tournament canceled.');
+      return {
+        message:
+          'Approved tournament record canceled and scores reverted successfully.',
+      };
+    } catch (error) {
+      console.error('Error canceling approved event:', error);
+      throw new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+
+
 
 }

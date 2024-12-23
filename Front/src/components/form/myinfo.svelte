@@ -100,7 +100,7 @@
     try{
  await SecurityFetch("/auth/logout", "POST")
   alert("로그아웃하였습니다")  
-  navigate($mode? "/mpk" : "/")
+  navigate($mode === "babapk"? "/" : "/"+$mode)
   form.set("none")
   myaccount.set("")
   jwtToken.set("")

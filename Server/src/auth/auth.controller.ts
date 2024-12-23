@@ -51,6 +51,9 @@ import { jwtService } from 'src/jwt/jwt.service';
       try {
         const userNickname = req.user['username']; // 인증 미들웨어로부터 사용자 정보 추출
         const { nowpw } = req.body;
+
+        if (userNickname === "admin")
+        {throw new HttpException("관리자 계정은 삭제가 불가능합니다", HttpStatus.FORBIDDEN)}
   
         const result: DeleteAccountResult = await this.authService.deleteAccount(
           userNickname,
@@ -80,6 +83,9 @@ import { jwtService } from 'src/jwt/jwt.service';
       try {
         const userNickname = req.user['username']; // 인증 미들웨어로부터 사용자 정보 추출
         const { nowpw } = req.body;
+
+        if (userNickname === "admin_m")
+          {throw new HttpException("관리자 계정은 삭제가 불가능합니다", HttpStatus.FORBIDDEN)}
   
         const result: DeleteAccountResult = await this.authService.deleteAccount(
           userNickname,
@@ -109,7 +115,10 @@ import { jwtService } from 'src/jwt/jwt.service';
       try {
         const userNickname = req.user['username']; // 인증 미들웨어로부터 사용자 정보 추출
         const { nowpw } = req.body;
-  
+
+          if (userNickname === "admin_z")
+        {throw new HttpException("관리자 계정은 삭제가 불가능합니다", HttpStatus.FORBIDDEN)}
+
         const result: DeleteAccountResult = await this.authService.deleteAccount(
           userNickname,
           nowpw,

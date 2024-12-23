@@ -11,7 +11,7 @@
     let comment: { nickname: string; content: string; createdAt: string; commentId: string }[] = [];
     let comment_content: string = "";
 
-    const modepage: string = $mode ? '/mpk' : '/babapk';
+    const modepage: string = "/" + $mode;
 
     // 게시물 가져오기
     async function fetchPost(id: string): Promise<void> {
@@ -173,7 +173,7 @@
             {#each comment as { nickname, content, createdAt, commentId }}
                 <tr>
                     <td>{nickname}</td>
-                    <td>{content}</td>
+                    <td class="commentContent">{content}</td>
                     <td>{formatDate(createdAt)}</td>
                     <td>
                         {#if nickname === $myaccount || $myaccount === "admin" || $myaccount === "admin_m"}
@@ -273,6 +273,10 @@ table tr td:nth-child(4), table tr th:nth-child(4) {
 
 .table-info-button {
     text-align: right; /* 버튼 정렬 */
+}
+.commentContent{
+    white-space: pre-line;
+    text-align: left;
 }
 
 

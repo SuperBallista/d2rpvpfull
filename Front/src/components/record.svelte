@@ -20,7 +20,7 @@
     let newdata:boolean = false
   
     async function fetchData() {
-      const endpoint = $mode ? "/record/data?mode=true" : "/record/data?mode=false";
+      const endpoint = "/record/data?mode="+ $mode;
       try {
         await fetchNicknames($mode);
         const response = await SecurityFetch(endpoint, "GET");
@@ -59,8 +59,8 @@
   return data.filter((item: any) => 
     item.winner && item.loser && // 속성이 정의된 경우에만 필터링
     (
-      item.winner.replace("_m", "") === filter || 
-      item.loser.replace("_m", "") === filter
+      item.winner.replace("_m", "").replace("_z","") === filter || 
+      item.loser.replace("_m", "").replace("_z","") === filter
     )
   );
 }
@@ -174,7 +174,7 @@ if (checkData.length===0)
             <th>승자</th>
             <th>패자</th>
             <th>날짜</th>
-            {#if $myaccount === "admin_m" || $myaccount === "admin"}
+            {#if $myaccount === "admin_m" || $myaccount === "admin" || $myaccount === "admin_z"}
               <th>관리</th>
             {/if}
           </tr>
@@ -183,10 +183,10 @@ if (checkData.length===0)
           {#each paginatedData as { orderNum, winner, loser, date }}
             <tr>
               <td>{orderNum}</td>
-              <td>{winner.replace("_m", "")}</td>
-              <td>{loser.replace("_m", "")}</td>
+              <td>{winner.replace("_m", "").replace("_z","")}</td>
+              <td>{loser.replace("_m", "").replace("_z","")}</td>
               <td>{date}</td>
-              {#if $myaccount === "admin_m" || $myaccount === "admin"}
+              {#if $myaccount === "admin_m" || $myaccount === "admin" || $myaccount === "admin_z"}
                 <td>
                   <button class="simple-button small" on:click={() => delete_row(orderNum)}>삭제</button>
                 </td>
@@ -213,7 +213,7 @@ if (checkData.length===0)
     {/if}
 
 
-    {#if $myaccount && $myaccount != "admin_m" && $myaccount != "admin"}
+    {#if $myaccount && $myaccount != "admin_m" && $myaccount != "admin" && $myaccount != "admin_z"}
       <div class="fixed-button-div">
         <button class="simple-button" on:click={() => form.set("recordcreate")}>기록하기</button>
         <button class="simple-button" on:click={() => form.set("recordok")}>승인하기

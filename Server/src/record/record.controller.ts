@@ -18,7 +18,7 @@ import {
     @Post('/submit')
     async submitRecord(
       @User() user: any,
-      @Body() body: { winner: string; mode: boolean },
+      @Body() body: { winner: string; mode: string },
     ) {
       try {
         const { winner, mode } = body;
@@ -26,8 +26,7 @@ import {
           throw new HttpException('Invalid Data', HttpStatus.BAD_REQUEST);
         }
         const userNickname = user.username;
-        const tableMode = mode ? 'm' : 'b'; // boolean -> string 변환
-        await this.recordService.submitRecord(winner, tableMode, userNickname);
+        await this.recordService.submitRecord(winner, mode, userNickname);
         console.log(`${userNickname} submitted a record for ${winner}`);
         return { message: 'Record submitted successfully' };
       } catch (error) {
@@ -37,14 +36,13 @@ import {
     }
   
     @Post('/approve')
-    async approveRecord(@Body() body: { orderNum: number; mode: boolean }) {
+    async approveRecord(@Body() body: { orderNum: number; mode: string }) {
       try {
         const { orderNum, mode } = body;
         if (!orderNum || mode === undefined) {
           throw new HttpException('Invalid Data', HttpStatus.BAD_REQUEST);
         }
-        const tableMode = mode ? 'm' : 'b'; // boolean -> string 변환
-        await this.recordService.approveRecord(orderNum, tableMode);
+        await this.recordService.approveRecord(orderNum, mode);
         console.log(`Record ${orderNum} approved`);
         return { message: 'Record approved successfully' };
       } catch (error) {
@@ -53,14 +51,13 @@ import {
       }
     }
     @Delete("/cancel")
-   async cancelRecord(@Body() body: { orderNum: number; mode: boolean }) {
+   async cancelRecord(@Body() body: { orderNum: number; mode: string }) {
       try {
         const { orderNum, mode } = body;
         if (!orderNum || mode === undefined) {
           throw new HttpException('Invalid Data', HttpStatus.BAD_REQUEST);
         }
-        const tableMode = mode ? 'm' : 'b'; // boolean -> string 변환
-        await this.recordService.cancelRecord(orderNum, tableMode);
+        await this.recordService.cancelRecord(orderNum, mode);
         console.log(`Record ${orderNum} cancel`);
         return { message: 'Record canceled successfully' };
       } catch (error) {
@@ -71,7 +68,7 @@ import {
     @Delete('/delete')
     async deleteRecord(
       @User() user: any,
-      @Body() body: { OrderNum: number; mode: boolean },
+      @Body() body: { OrderNum: number; mode: string },
     ) {
       try {
         const { OrderNum, mode } = body;
@@ -79,11 +76,10 @@ import {
           throw new HttpException('Invalid OrderNum', HttpStatus.BAD_REQUEST);
         }
         const userNickname = user.username;
-        if (userNickname !== 'admin' && userNickname !== 'admin_m') {
+        if (userNickname !== 'admin' && userNickname !== 'admin_m' && userNickname !== 'admin_z') {
           throw new HttpException('Permission denied', HttpStatus.FORBIDDEN);
         }
-        const tableMode = mode ? 'm' : 'b'; // boolean -> string 변환
-        await this.recordService.deleteRecord(OrderNum, tableMode, userNickname);
+        await this.recordService.deleteRecord(OrderNum, mode, userNickname);
         console.log(`Record ${OrderNum} deleted by ${userNickname}`);
         return { message: 'Record deleted successfully' };
       } catch (error) {
@@ -104,12 +100,11 @@ import {
     }
   
     @Post('/pending')
-    async getPendingRecords(@User() user: any, @Body() body : {mode:boolean}) {
+    async getPendingRecords(@User() user: any, @Body() body : {mode:string}) {
       const mode = body.mode;
       try {
         const userNickname = user.username;
-        const tableMode = mode === true ? 'm' : 'b'; // boolean -> string 변환
-        const data = await this.recordService.fetchPendingRecords(userNickname, tableMode);
+        const data = await this.recordService.fetchPendingRecords(userNickname, mode);
         return data;
       } catch (error) {
         console.error('Error fetching pending records:', error);

@@ -22,7 +22,7 @@ href: "https://docs.google.com/document/d/1Wj31FLkeFLZp-N2Bohkj_ZKoUrJU5LXkUABH7
 }
 else if ($mode === "babapk")
 {
-[ {
+list = [ {
     href: "https://docs.google.com/spreadsheets/d/19a-_44yVj04BnlUK6QQY9U3jXtlDAgOmdHCgdis1toI/", title: "후원 내역 및 후원 랭킹 보기"
 },
 {

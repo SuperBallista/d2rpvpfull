@@ -5,8 +5,10 @@ import { BEventRecord } from '../entities/b-eventrecord.entity';
 import { BUser } from '../entities/b-user.entity';
 import { MEventRecord } from '../entities/m-eventrecord.entity';
 import { MUser } from '../entities/m-user.entity';
+import { ZEventRecord } from 'src/entities/z-eventrecord.entity';
+import { ZUser } from 'src/entities/z-user.entity';
 import {
-  TEAMS_SCORES_B, TEAMS_SCORES_M, EVENT_HOST_SCORE,
+  TEAMS_SCORES_B, TEAMS_SCORES_M, TEAMS_SCORES_Z, EVENT_HOST_SCORE,
 } from '../config/constants';
 
 @Injectable()
@@ -20,13 +22,21 @@ export class EventService {
     private readonly mEventRecordRepository: Repository<MEventRecord>,
     @InjectRepository(MUser)
     private readonly mUserRepository: Repository<MUser>,
+    @InjectRepository(ZEventRecord)
+    private readonly zEventRecordRepository: Repository<ZEventRecord>,
+    @InjectRepository(ZUser)
+    private readonly zUserRepository: Repository<ZUser>,
     private readonly entityManager: EntityManager,
   ) {}
 
-  async submitEvent(eventData: Record<string, any>, isMUser: boolean): Promise<void> {
-    const repository = isMUser
-      ? this.mEventRecordRepository
-      : this.bEventRecordRepository;
+  async submitEvent(eventData: Record<string, any>, mode:string): Promise<void> {
+let repository
+if (mode === "babapk")
+{repository = this.bEventRecordRepository}
+else if (mode === "mpk")
+{repository = this.mEventRecordRepository}
+else
+{repository = this.zEventRecordRepository}
   
     try {
       // 데이터 변환 및 기본값 설정
@@ -53,11 +63,14 @@ export class EventService {
     }
   }
   
-  async getEventHistory(isMUser: boolean): Promise<any[]> {
-    const repository = isMUser
-      ? this.mEventRecordRepository
-      : this.bEventRecordRepository;
-
+  async getEventHistory(mode: string): Promise<any[]> {
+    let repository
+    if (mode === "babapk")
+    {repository = this.bEventRecordRepository}
+    else if (mode === "mpk")
+    {repository = this.mEventRecordRepository}
+    else
+    {repository = this.zEventRecordRepository}
     try {
       return await repository.find({ order: { orderNum: 'DESC' } });
     } catch (error) {
@@ -69,10 +82,14 @@ export class EventService {
     }
   }
 
-  async deleteEvent(eventname: string, isMUser: boolean): Promise<void> {
-    const repository = isMUser
-      ? this.mEventRecordRepository
-      : this.bEventRecordRepository;
+  async deleteEvent(eventname: string, mode: string): Promise<void> {
+    let repository
+    if (mode === "babapk")
+    {repository = this.bEventRecordRepository}
+    else if (mode === "mpk")
+    {repository = this.mEventRecordRepository}
+    else
+    {repository = this.zEventRecordRepository}
 
     try {
       const deleteResult = await repository.delete({ eventname });
@@ -88,9 +105,26 @@ export class EventService {
     }
   }
 
-  async acceptEvent(eventData: any, isMUser: boolean): Promise<void> {
-    const userRepository = isMUser ? this.mUserRepository : this.bUserRepository;
-    const scores = isMUser ? TEAMS_SCORES_M : TEAMS_SCORES_B;
+  async acceptEvent(eventData: any, mode: string): Promise<void> {
+    let userRepository
+    let scores
+    let repository
+
+    if (mode === "babapk")
+    {userRepository = this.bUserRepository
+      repository = this.bEventRecordRepository
+      scores = TEAMS_SCORES_B
+    }
+    else if (mode === "mpk")
+    {userRepository = this.mUserRepository
+      repository = this.mEventRecordRepository
+      scores = TEAMS_SCORES_M
+    }
+    else
+    {userRepository = this.zUserRepository
+      repository = this.zEventRecordRepository
+      scores = TEAMS_SCORES_Z
+    }
   
     try {
       await this.entityManager.transaction(async (manager) => {
@@ -125,7 +159,7 @@ export class EventService {
   
           for (const participant of participants) {
             const user = await userRepository.findOne({
-              where: { nickname: isMUser? participant+"_m": participant },
+              where: { nickname: mode === "babapk"? participant : participant + "_"+ mode.slice(0,1) },
             });
   
             if (user) {
@@ -161,10 +195,7 @@ export class EventService {
         }
 
 
-        const repository = isMUser
-          ? this.mEventRecordRepository
-          : this.bEventRecordRepository;
-
+     
         // 이벤트 레코드 승인 업데이트
         const eventRecord = await repository.findOne({
           where: { eventname: eventname },
@@ -177,7 +208,7 @@ export class EventService {
 
 
         // 이벤트 호스트 점수
-        if (!isMUser) {
+        if (mode === "babapk") {
         const user = await userRepository.findOne({
           where: { nickname: Eventhost },
         });
@@ -203,10 +234,21 @@ export class EventService {
 
 
   
-  async cancelAccepted(eventData: any, isMUser: boolean): Promise<void> {
-    const userRepository = isMUser ? this.mUserRepository : this.bUserRepository;
-    const scores = isMUser ? TEAMS_SCORES_M : TEAMS_SCORES_B;
-  
+  async cancelAccepted(eventData: any, mode: string): Promise<void> {
+    let userRepository
+    let scores
+
+    if (mode === "babapk")
+    {userRepository = this.bUserRepository
+     scores = TEAMS_SCORES_B
+    } else if (mode === "mpk")
+    {userRepository = this.mUserRepository
+      scores = TEAMS_SCORES_M
+    } else
+      {userRepository = this.zUserRepository
+        scores = TEAMS_SCORES_Z
+      }
+    
     try {
       await this.entityManager.transaction(async (manager) => {
         const {
@@ -239,7 +281,7 @@ export class EventService {
   
           for (const participant of participants) {
             const user = await userRepository.findOne({
-              where: { nickname: isMUser? participant+"_m": participant },
+              where: { nickname: mode === "babapk" ? participant: participant + "_" + mode.slice(0,1) },
             });
   
             if (user) {
@@ -275,9 +317,13 @@ export class EventService {
         }
   
         // 승인된 이벤트 삭제
-        const repository = isMUser
-          ? this.mEventRecordRepository
-          : this.bEventRecordRepository;
+        let repository
+        if (mode === "babapk")
+        {repository = this.bEventRecordRepository}
+        else if (mode === "mpk")
+        {repository = this.mEventRecordRepository}
+        else
+        {repository = this.zEventRecordRepository}
   
         const eventRecord = await repository.findOne({
           where: { eventname },
@@ -297,8 +343,14 @@ export class EventService {
   }
 
   async modifyMemo(eventData: any): Promise<void> {
-    console.log(eventData)
-  const EventRecordRepository = eventData.mode ? this.mEventRecordRepository : this.bEventRecordRepository;
+  
+  let EventRecordRepository
+  if (eventData.memo === "babapk")
+  {EventRecordRepository = this.bEventRecordRepository}
+  else if (eventData.memo === "mpk")
+  {EventRecordRepository = this.mEventRecordRepository}
+  else
+  {EventRecordRepository = this.zEventRecordRepository}
   try{
    await EventRecordRepository.update(
     { eventname: eventData.eventname }, // 조건

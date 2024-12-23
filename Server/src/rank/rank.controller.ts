@@ -7,7 +7,7 @@ export class RankController {
   constructor(private readonly rankingService: RankService) {}
 
   // b_user 랭킹 데이터 처리
-  @Get('/b-user')
+  @Get('/babapk')
   async getRankData() {
     try {
       return await this.rankingService.getRankDataB();
@@ -18,7 +18,7 @@ export class RankController {
   }
 
   // m_user 랭킹 데이터 처리
-  @Get('/m-user')
+  @Get('/mpk')
   async getRankDataM() {
     try {
       return await this.rankingService.getRankDataM();
@@ -28,11 +28,24 @@ export class RankController {
     }
   }
 
+    // m_user 랭킹 데이터 처리
+    @Get('/zpke')
+    async getRankDataZ() {
+      try {
+        return await this.rankingService.getRankDataZ();
+      } catch (error) {
+        console.error('데이터베이스 오류:', error);
+        throw new HttpException('DB Error', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+  
+
+
   // 도전 등록
-  @Post('/challenge/m-user')
+  @Post('/mpk/challenge')
   async challengeRank(
     @User() user: any,
-    @Body() body: { nickname: string; mode: boolean },
+    @Body() body: { nickname: string; mode: string },
   ) {
     const { nickname, mode } = body;
     try {
@@ -45,10 +58,10 @@ export class RankController {
   }
 
   // m_user 도전 데이터 조회
-  @Post('/challenge/show/m-user')
+  @Post('/challenge/mpk/show')
   async challengeDataM(@User() user: any) {
     try {
-    const data = await  this.rankingService.getChallengeData(user.username, true);
+    const data = await  this.rankingService.getChallengeData(user.username, "mpk");
       return data
     } catch (error) {
       return error

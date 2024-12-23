@@ -133,10 +133,14 @@ export class BoardService {
 
   async deletePost(postId: number, nickname: string): Promise<void> {
     try {
-      const post = await this.postRepository.findOne({ where: { postId: Number(postId), nickname } });
+      
+       const post = await this.postRepository.findOne({ where: { postId: Number(postId) } });
       if (!post) {
         throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
       }
+
+      if (nickname !== "admin" && nickname !== "admin_m" && nickname !=="admin_z" && nickname !== post.nickname )
+      {throw new HttpException('삭제 권한이 없습니다', HttpStatus.FORBIDDEN);}
 
       await this.postRepository.delete({ postId });
     } catch (error) {
@@ -160,10 +164,14 @@ export class BoardService {
 
   async deleteComment(commentId: number, nickname: string): Promise<void> {
     try {
-      const comment = await this.commentRepository.findOne({ where: { commentId: Number(commentId), nickname } });
+      const comment = await this.commentRepository.findOne({ where: { commentId: Number(commentId)} });
+      
       if (!comment) {
         throw new HttpException('Comment not found', HttpStatus.NOT_FOUND);
       }
+
+      if (nickname !== "admin" && nickname !== "admin_m" && nickname !=="admin_z" && nickname !== comment.nickname )
+        {throw new HttpException('삭제 권한이 없습니다', HttpStatus.FORBIDDEN);}
 
       await this.commentRepository.delete({ commentId });
     } catch (error) {

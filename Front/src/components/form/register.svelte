@@ -61,7 +61,11 @@
       if (response.status === 200) {
         alert("해당 닉네임은 사용 가능합니다");
         checked_nickname = true;
+      } else if (response.status === 403)
+      {
+        alert("해당 닉네임은 사용이 불가능합니다");
       }
+      
     } catch (error) {
       console.error("Error occurred while checking nickname:", error);
       alert(error);

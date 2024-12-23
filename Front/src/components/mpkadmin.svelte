@@ -49,7 +49,7 @@
     async function submit_bonus_score() {
       const data = { player: player, playerScore: playerscore };
       try {
-        const response = await SecurityFetch("/admin-score/m_user/submit", "POST", data);
+        const response = await SecurityFetch("/admin-score/mpk/submit", "POST", data);
 
       if  (response.status===201) {
         alert("점수 부여 완료")
@@ -70,7 +70,7 @@
   
       if (userResponse) {
         try {
-         const response = await SecurityFetch("/admin-score/m_user/reset", "DELETE");
+         const response = await SecurityFetch("/admin-score/mpk/reset", "DELETE");
           if (response && response.status === 200) {
           alert("점수를 초기화하였습니다");
         } else {

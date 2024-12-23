@@ -31,7 +31,7 @@
     const data = { player: player, playerScore: playerscore };
 
     try {
-      const response = await SecurityFetch("/admin-score/b_user/submit", "POST", data);
+      const response = await SecurityFetch("/admin-score/babapk/submit", "POST", data);
 
       if (response && response.status === 201) {
         alert("점수 부여 완료");
@@ -50,7 +50,7 @@
 
     if (userResponse) {
       try {
-        const response = await SecurityFetch("/admin-score/b_user/reset", "DELETE");
+        const response = await SecurityFetch("/admin-score/babapk/reset", "DELETE");
 
         if (response && response.status === 200) {
           alert("점수를 초기화하였습니다");

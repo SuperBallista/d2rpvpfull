@@ -13,7 +13,7 @@
     let content: string = "";
     let quill: Quill;
     let category: "free" | "trade" | "setting" = "free";
-    const modepage: string = $mode ? "/mpk" : "/babapk";
+    const modepage: string = "/" + $mode;
   
     // 이미지 업로드 핸들러
     async function imageHandler(): Promise<void> {
@@ -97,11 +97,10 @@
   
       quill = new Quill("#editor", {
         theme: "snow",
-        placeholder: "",
         modules: {
           toolbar: {
             container: [
-              [{ header: [1, 2, false] }],
+              [{ header: [1, 2, false], class: "custom-header" }],
               ["bold", "italic", "underline"],
               ["image", "code-block"],
             ],
@@ -214,6 +213,4 @@
   gap: 10px;
   margin-top: 20px;
 }
-
-
 </style>

@@ -10,7 +10,7 @@
 
     import { mode }  from "../store"
    
-    let winners: Winner[] = !$mode? [
+    let babapkwinner = [
         {
       season: "2024.10-11 랭킹전",
       first: "마스터",
@@ -90,8 +90,8 @@
       third: "Head",
       details: "정식전 : 1위 Duky 2위 Jay 3위 오찬물",
     },
-  ] : 
-  [
+  ]
+  let mpkwinner =  [
     {
       season: "2024.10 랭킹전",
       first: "우리",
@@ -153,7 +153,7 @@
   
   ;
   
-    let Pastwinners: Winner[] = !$mode? [
+    let babapkPastwinner = [
         {
       season: "2023.12 랭킹전",
       first: "Duky",
@@ -277,7 +277,9 @@
       details:
         "정식전 1회 : 1위 돌아돌아 2위 FBI멀더 3위 BallistaBB<br/>테마전 1회 : 1위 TOONGTANG 2위 BallistaBB 3위 PK",
     },
-  ] : [
+  ]
+  
+  let mpkPastWinner = [
     {
       season: "2023.10 랭킹전",
       first: "스티븐",
@@ -301,7 +303,30 @@
       details:
         "정기전 : 1위 달건 2위 Robe 3위 Joy<br/>테마전 : 1위 Robe 2위 Southbank 3위 Art_ist",
     }];
-  
+
+    let zpkewinner:Winner[] = []
+    let zpkePastWinner:Winner[] = []
+
+    
+        let winners: Winner[] = []
+        let Pastwinners: Winner[] = []
+        
+
+        if ($mode === "babapk")
+        {winners = babapkwinner
+        Pastwinners = babapkPastwinner
+        }
+        else if ($mode === "mpk")
+        {winners = mpkwinner
+         Pastwinners = mpkPastWinner          
+        }
+        else
+        {
+          winners = zpkewinner
+          Pastwinners = zpkePastWinner
+        }    
+
+
     let showDetails: boolean[] = Array(winners.length).fill(false);
     let showPastDetails: boolean[] = Array(Pastwinners.length).fill(false);
     let showPastWinner: boolean = false;

@@ -9,7 +9,7 @@
     let mymaxdmg = writable(0);
     let myar = writable(0);
     let mydf = writable(0);
-    let myframe = writable([4]);
+    let myframe = writable([4,4,4,4,8]);
     let mydfoff = writable(0);
     let myreduce = writable(0);
     let mycrush = writable(0);
@@ -394,8 +394,8 @@ else if($yourclass === 4)
       <tr>
         <td>총 생명력</td>
         <td><input type="number" bind:value={$myhp} class="input-text short" /></td>
-        <td>회피율(아마존)</td>
-        <td><input type="number" bind:value={$mydodge} class="input-text short" /></td>
+        <td>-</td>
+        <td>-</td>
       </tr>
       <tr>
         <td>피해 감소 %</td>
@@ -414,28 +414,6 @@ else if($yourclass === 4)
         <td><input type="number" bind:value={$myopenwound} class="input-text short" /></td>
         <td>반사데미지</td>
         <td><input type="number" bind:value={$mythorns} class="input-text short" /></td>
-      </tr>
-      <tr>
-        <td>클래스</td>
-        <td><select bind:value={$myclass} on:change={() => myclassChange()} class="input-text short" >
-            <option value={1}>질딘</option>
-            <option value={2}>컨센바바</option>
-            <option value={3}>늑드루</option>
-            <option value={4}>잽마</option>
-            </select>
-        </td>
-
-
-        <td>공격 프레임</td>
-        <td>
-<select bind:value={($myframe)} class="input-text short">
-    {#each $myframelist as list (list.name)}
-        <option value={list.value}>{list.name}</option>
-    {/each}
-</select>
-
-
-        </td>
       </tr>
       
       <tr>
@@ -481,8 +459,8 @@ else if($yourclass === 4)
       <tr>
         <td>총 생명력</td>
         <td><input type="number" bind:value={$yourhp} class="input-text short" /></td>
-        <td>회피율(아마존)</td>
-        <td><input type="number" bind:value={$yourdodge} class="input-text short" /></td>
+        <td>-</td>
+        <td>-</td>
       </tr>
       <tr>
         <td>피해 감소 %</td>
@@ -501,29 +479,6 @@ else if($yourclass === 4)
         <td><input type="number" bind:value={$youropenwound} class="input-text short" /></td>
         <td>반사데미지</td>
         <td><input type="number" bind:value={$yourthorns} class="input-text short" /></td>
-      </tr>
-
-      <tr>
-        <td>클래스</td>
-        <td><select bind:value={$yourclass} on:change={() => yourclassChange()} class="input-text short" >
-            <option value={1}>질딘</option>
-            <option value={2}>컨센바바</option>
-            <option value={3}>늑드루</option>
-            <option value={4}>잽마</option>
-            </select>
-        </td>
-
-
-        <td>공격 프레임</td>
-        <td>
-            <select bind:value={$yourframe} class="input-text short">
-                {#each $yourframelist as list (list.name)}
-                    <option value={list.value}>{list.name}</option>
-                {/each}
-            </select>
-            
-
-        </td>
       </tr>
 
 

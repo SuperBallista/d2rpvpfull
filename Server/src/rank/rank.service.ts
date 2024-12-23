@@ -6,6 +6,8 @@ import { MUser } from '../entities/m-user.entity';
 import { BRecord } from '../entities/b-record.entity';
 import { MRecord } from '../entities/m-record.entity';
 import { RECORD_SCORE } from '../config/constants';
+import { ZUser } from 'src/entities/z-user.entity';
+import { ZRecord } from 'src/entities/z-record.entity';
 
 @Injectable()
 export class RankService {
@@ -14,10 +16,14 @@ export class RankService {
     private readonly bUserRepository: Repository<BUser>,
     @InjectRepository(MUser)
     private readonly mUserRepository: Repository<MUser>,
+    @InjectRepository(ZUser)
+    private readonly zUserRepository: Repository<ZUser>,
     @InjectRepository(BRecord)
     private readonly bRecordRepository: Repository<BRecord>,
     @InjectRepository(MRecord)
     private readonly mRecordRepository: Repository<MRecord>,
+    @InjectRepository(ZRecord)
+    private readonly zRecordRepository: Repository<ZRecord>,
   ) {}
 
   // 승리 기록 쿼리
@@ -101,8 +107,23 @@ export class RankService {
     return this.createResultArray(rankdb, recordWin, recordLose, true);
   }
 
-  async challengeRank(username: string, nickname: string, mode: boolean): Promise<void> {
-    const repository = mode ? this.mUserRepository : this.bUserRepository;
+    // z_user 랭킹 데이터 가져오기
+    async getRankDataZ() {
+      const rankdb = await this.zUserRepository.find({ where: { nickname: Not('admin_z') } });
+      const [recordWin, recordLose] = await Promise.all([
+        this.getWinCount(this.zUserRepository, this.zRecordRepository, false),
+        this.getLoseCount(this.zUserRepository, this.zRecordRepository, false),
+      ]);
+  
+      return this.createResultArray(rankdb, recordWin, recordLose, false);
+    }
+  
+
+
+
+
+  async challengeRank(username: string, nickname: string, mode: string): Promise<void> {
+    const repository = mode==="mpk" ? this.mUserRepository : this.bUserRepository;
     const user = await repository.findOne({ where: { nickname: username } });
     if (!user) throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
     
@@ -111,8 +132,8 @@ export class RankService {
     await (repository as Repository<BUser | MUser>).save(user);
   }
 
-  async getChallengeData(username: string, mode: boolean): Promise<any[]> {
-    const repository = mode ? this.mUserRepository : this.bUserRepository;
+  async getChallengeData(username: string, mode: string): Promise<any[]> {
+    const repository = mode==="mpk" ? this.mUserRepository : this.bUserRepository;
   
     // 사용자 이름과 관련된 도전 데이터를 리스트로 조회
     const users = await repository.find({

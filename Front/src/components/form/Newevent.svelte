@@ -5,14 +5,11 @@
       fetchNicknames,
       mode,
       myaccount,
-      SecurityFetch, key
+      SecurityFetch
     } from "../../store";
   
 
     onMount(async () => {
-      const currentUrl = window.location.href;
-      mode.set(currentUrl.includes("/mpk"));
-  
       fetchNicknames($mode);
     });
   
@@ -20,7 +17,7 @@
     let Runner_up1:string, Runner_up2:string, Runner_up3:string, Runner_up4:string;
     let Place3rd1:string, Place3rd2:string, Place3rd3:string, Place3rd4:string;
     let teamSize:number, numberteams:number, eventname:string;
-    $: Eventhost = $mode === true ? $myaccount.replace("_m","") : $myaccount;
+    $: Eventhost = $mode === "babapk" ? $myaccount : $myaccount.replace("_m","").replace("_z","");
   
     function validateInput(value:string, options:string[]) {
       return options.includes(value) ? value : "";
@@ -57,7 +54,7 @@
       };
   
       try {
-        const response = await SecurityFetch($mode ? "/event/m-user/submit" : "/event/b-user/submit", "POST", data);
+        const response = await SecurityFetch(`/event/${$mode}/submit`, "POST", data);
   
         if (response.status===201)
   {        alert("대회 기록 전송 완료")}
@@ -84,7 +81,7 @@
     function Handlenumberteams(event:any) { numberteams = event.target.value; }
     function HandleteamSize(event:any) { teamSize = event.target.value; }
   </script>
-  <h3 class="message-title">{$mode ? "밀리PK" : "정통바바"} 토너먼트 기록</h3>
+  <h3 class="message-title">{$mode} 토너먼트 기록</h3>
 
   <div class="message-body">
     <input
