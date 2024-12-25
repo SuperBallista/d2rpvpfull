@@ -18,7 +18,7 @@ export class ClanService {
 SELECT 
   b_clan.*, 
   GROUP_CONCAT(user.Nickname) AS members,
-  SUM(user.Records) AS records
+  SUM(CASE WHEN user.Records > 20 THEN 20 ELSE user.Records END ) AS records
 FROM 
   b_clan
 LEFT JOIN 
@@ -33,8 +33,8 @@ GROUP BY
       BScore: row.BScore,
       LScore: row.LScore,
       name: row.name,
-      members: row.members ? row.members.split(',') : [],
-      TScore: Number(row.BScore) + Number(row.LScore) + (Number(row.records) > 20? 20:Number(row.records))*4
+      members: row.members ? row.members.split(', ') : [],
+      TScore: Number(row.BScore) + Number(row.LScore) + (Number(row.records) > 100? 100:Number(row.records))*4
     }));
   }
 
