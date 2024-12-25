@@ -8,6 +8,8 @@ export const K_VALUE_M = 32;
 export const E_VALUE_M = 400;
 export const K_VALUE_Z = 32;
 export const E_VALUE_Z = 400;
+export const START_CLAN_SCORE_B = 800
+export const K_VALUE_CLAN_B_RATIO = 0.25
 
 
 export const TEAMS_SCORES_B = {

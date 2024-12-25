@@ -2,14 +2,12 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClanService } from './clan.service';
 import { ClanController } from './clan.controller';
-import { MUser } from '../entities/m-user.entity';
-import { MClan } from '../entities/m-clan.entity';
-import { MClanRecord } from '../entities/m-clanrecord.entity';
-import { MClanRecordTemp } from '../entities/m-clanrecordtemp.entity';
+import { BClan } from 'src/entities/b-clan.entity';
+import { BUser } from 'src/entities/b-user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([MUser, MClan, MClanRecord, MClanRecordTemp]),
+    TypeOrmModule.forFeature([BClan, BUser]),
   ],
   controllers: [ClanController],
   providers: [ClanService],

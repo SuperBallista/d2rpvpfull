@@ -113,7 +113,7 @@ import {
     }
   
   
-      // b_user 랭킹 리셋
+      // z_user 랭킹 리셋
       @Delete('/zpke/reset')
       async resetRankZ(@Req() req: Request) {
         const userNickname = req.user['username'];

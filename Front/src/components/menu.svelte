@@ -23,6 +23,7 @@
     { label: "랭킹조회", href: "/rank" },
     { label: "대전기록", href: "/record" },
     { label: "대회기록", href: "/tournament" },
+    ...($mode === "babapk" ? [{ label: "클랜목록", href: "/clan" }] : []),
     { label: "커뮤니티", href: "/boardlist" },
     { label: "역대우승", href: "/winners" },
     { label: "계산하기", href: "/calculator" },

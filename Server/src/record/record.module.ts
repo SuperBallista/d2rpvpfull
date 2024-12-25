@@ -14,11 +14,12 @@ import { ZEventRecord } from 'src/entities/z-eventrecord.entity';
 import { ZUser } from 'src/entities/z-user.entity';
 import { ZTemp } from 'src/entities/z-temp.entity';
 import { ZRecord } from 'src/entities/z-record.entity';
+import { BClan } from 'src/entities/b-clan.entity';
 
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([BEventRecord, BUser, MEventRecord, MUser, ZEventRecord, ZUser, BTemp, MTemp, ZTemp, BRecord, MRecord, ZRecord]), // 엔티티 등록
+    TypeOrmModule.forFeature([BEventRecord, BUser, BClan, MEventRecord, MUser, ZEventRecord, ZUser, BTemp, MTemp, ZTemp, BRecord, MRecord, ZRecord]), // 엔티티 등록
   ],
   controllers: [RecordController],
   providers: [RecordService]

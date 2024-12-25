@@ -11,7 +11,8 @@ import { BTemp } from '../entities/b-temp.entity';
 import { MTemp } from '../entities/m-temp.entity';
 import { ZTemp } from 'src/entities/z-temp.entity';
 import * as moment from 'moment';
-import { K_VALUE_B, E_VALUE_B, K_VALUE_M, E_VALUE_M, K_VALUE_Z, E_VALUE_Z } from '../config/constants';
+import { K_VALUE_B, E_VALUE_B, K_VALUE_M, E_VALUE_M, K_VALUE_Z, E_VALUE_Z, K_VALUE_CLAN_B_RATIO } from '../config/constants';
+import { BClan } from 'src/entities/b-clan.entity';
 
 @Injectable()
 export class RecordService {
@@ -34,6 +35,8 @@ export class RecordService {
     private readonly mTempRepository: Repository<MTemp>,
     @InjectRepository(ZTemp)
     private readonly zTempRepository: Repository<ZTemp>,
+    @InjectRepository(BClan)
+    private readonly bClanRepository: Repository<BClan>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -65,14 +68,40 @@ export class RecordService {
 
       // 점수 업데이트 및 기록 삭제
       await queryRunner.manager.query(
-        `UPDATE ${tableName}_user SET BScore = BScore - ? WHERE Nickname IN (?, ?, ?, ?)`,
+        `UPDATE ${tableName}_user SET BScore = BScore - ?, Records = Records - 1  WHERE Nickname IN (?, ?, ?, ?)`,
         [addScore, ...winnerNicknames],
       );
       await queryRunner.manager.query(
-        `UPDATE ${tableName}_user SET BScore = BScore + ? WHERE Nickname IN (?, ?, ?, ?)`,
+        `UPDATE ${tableName}_user SET BScore = BScore + ?, Records = Records - 1 WHERE Nickname IN (?, ?, ?, ?)`,
         [addScore, ...loserNicknames],
       );
       await queryRunner.manager.query(`DELETE FROM ${tableName}_record WHERE OrderNum = ?`, [orderNum]);
+
+
+      if (mode === "babapk") {
+        // Winner와 Loser를 데이터베이스에서 조회
+        const winner = await this.bUserRepository.findOne({where: {nickname: record[0].Winner}})
+        const loser = await this.bUserRepository.findOne({where: {nickname: record[0].Loser}})
+      
+        // Winner와 Loser가 유효하고, 각 사용자가 클랜에 속해 있는 경우
+        if (winner?.clan != "none" && loser?.clan != "none") {
+          // Winner 클랜 처리
+          const WinClan = await this.bClanRepository.findOne({ where: { name: winner.clan } });
+          if (WinClan) {
+            WinClan.Bscore += addScore * K_VALUE_CLAN_B_RATIO;
+            await this.bClanRepository.save(WinClan);
+          } 
+      
+          // Loser 클랜 처리
+          const LoseClan = await this.bClanRepository.findOne({ where: { name: loser.clan } });
+          if (LoseClan) {
+            LoseClan.Bscore -= addScore * K_VALUE_CLAN_B_RATIO;
+            await this.bClanRepository.save(LoseClan);
+          } 
+        }
+      }
+
+
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -159,12 +188,14 @@ else
     let userRepository
     let K_VALUE
     let E_VALUE
+    let clanRepository
 
     if (mode === "babapk")
     {
       tempRepository = this.bTempRepository
       recordRepository = this.bRecordRepository
       userRepository = this.bUserRepository
+      clanRepository = this.bClanRepository
       K_VALUE = K_VALUE_B
       E_VALUE = E_VALUE_B
     }
@@ -230,6 +261,27 @@ else
       tempRecord.checked = 1;
       await tempRepository.save(tempRecord);
 
+      if (mode === "babapk") {
+        // Winner와 Loser를 데이터베이스에서 조회
+      
+        // Winner와 Loser가 유효하고, 각 사용자가 클랜에 속해 있는 경우
+        if (winner?.clan != "none" && loser?.clan != "none") {
+          // Winner 클랜 처리
+          const WinClan = await clanRepository.findOne({ where: { name: winner.clan } });
+          if (WinClan) {
+            WinClan.Bscore -= addScore * K_VALUE_CLAN_B_RATIO;
+            await clanRepository.save(WinClan);
+          } 
+      
+          // Loser 클랜 처리
+          const LoseClan = await clanRepository.findOne({ where: { name: loser.clan } });
+          if (LoseClan) {
+            LoseClan.Bscore += addScore * K_VALUE_CLAN_B_RATIO;
+            await clanRepository.save(LoseClan);
+          } 
+        }
+      }
+      
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();

@@ -92,11 +92,11 @@ export class AdminScoreService {
         })
         .execute();
 
-      if (userTable === 'm_user') {
-        await queryRunner.manager.query(`UPDATE m_clan SET Score = 0`);
-        await queryRunner.manager.query(`DELETE FROM m_clanrecord`);
-        await queryRunner.manager.query(`DELETE FROM m_clanrecordtemp`);
+      if (userTable === 'b_user') {
+        await queryRunner.manager.query(`UPDATE b_user SET clan = "none"`);
+        await queryRunner.manager.query(`DELETE FROM b_clan`);
       }
+
 
       // 기록 및 임시 테이블 초기화
       await queryRunner.manager.query(`DELETE FROM ${recordTable};`);
