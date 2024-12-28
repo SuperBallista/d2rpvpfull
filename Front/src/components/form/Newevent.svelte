@@ -16,7 +16,7 @@
     let Championship1:string, Championship2:string, Championship3:string, Championship4:string;
     let Runner_up1:string, Runner_up2:string, Runner_up3:string, Runner_up4:string;
     let Place3rd1:string, Place3rd2:string, Place3rd3:string, Place3rd4:string;
-    let teamSize:number, numberteams:number, eventname:string;
+    let teamSize:number = 1, numberteams:number, eventname:string;
     $: Eventhost = $mode === "babapk" ? $myaccount : $myaccount.replace("_m","").replace("_z","");
   
     function validateInput(value:string, options:string[]) {
@@ -102,12 +102,14 @@
       <option value="16">12팀 이상(16강)</option>
       <option value="24">정식전</option>
     </select>
+    {#if $mode != "zpke"}
     <select bind:value={teamSize} on:change={HandleteamSize} class="optionwidth input-text">
       <option value="1">1인 1팀</option>
       <option value="2">2인 1팀</option>
       <option value="3">3인 1팀</option>
       <option value="4">4인 1팀</option>
     </select>
+    {/if}
     <br/>
     우승
     <input list="nicknames1" bind:value={Championship1} on:blur={HandleChampionship1} class="namewidth input-text" placeholder="선택하세요" />

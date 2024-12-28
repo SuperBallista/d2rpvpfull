@@ -87,7 +87,12 @@ export class RankService {
 
   // b_user 랭킹 데이터 가져오기
   async getRankDataB() {
-    const rankdb = await this.bUserRepository.find({ where: { nickname: Not('admin') } });
+    const rankdb = await this.bUserRepository
+    .createQueryBuilder('user')
+    .where('user.nickname != :nickname', { nickname: 'admin' })
+    .andWhere('(user.records + user.lScore) > 0')
+    .getMany();
+
     const [recordWin, recordLose] = await Promise.all([
       this.getWinCount(this.bUserRepository, this.bRecordRepository, false),
       this.getLoseCount(this.bUserRepository, this.bRecordRepository, false),
@@ -98,7 +103,11 @@ export class RankService {
 
   // m_user 랭킹 데이터 가져오기
   async getRankDataM() {
-    const rankdb = await this.mUserRepository.find({ where: { nickname: Not('admin_m') } });
+    const rankdb = await this.mUserRepository
+    .createQueryBuilder('user')
+    .where('user.nickname != :nickname', { nickname: 'admin_m' })
+    .andWhere('(user.records + user.lScore) > 0')
+    .getMany();
     const [recordWin, recordLose] = await Promise.all([
       this.getWinCount(this.mUserRepository, this.mRecordRepository, true),
       this.getLoseCount(this.mUserRepository, this.mRecordRepository, true),
@@ -109,7 +118,12 @@ export class RankService {
 
     // z_user 랭킹 데이터 가져오기
     async getRankDataZ() {
-      const rankdb = await this.zUserRepository.find({ where: { nickname: Not('admin_z') } });
+      const rankdb = await this.zUserRepository
+      .createQueryBuilder('user')
+    .where('user.nickname != :nickname', { nickname: 'admin_z' })
+    .andWhere('(user.records + user.lScore) > 0')
+    .getMany();
+    
       const [recordWin, recordLose] = await Promise.all([
         this.getWinCount(this.zUserRepository, this.zRecordRepository, false),
         this.getLoseCount(this.zUserRepository, this.zRecordRepository, false),

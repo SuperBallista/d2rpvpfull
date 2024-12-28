@@ -124,6 +124,7 @@
             <tr on:click={() => toggleDetails(index)}>
               <!-- 등급 -->
               <td>
+                {#if $mode != "zpke"}
                 {#if user.rank / rankData.length <= 0.1}
                   <img class="ranksize" src="/img/diamond.png" alt="10%" />
                 {:else if user.rank / rankData.length <= 0.25}
@@ -134,6 +135,19 @@
                   <img class="ranksize" src="/img/silver.png" alt="70%" />
                 {:else}
                   <img class="ranksize" src="/img/bronze.png" alt="100%" />
+                {/if}
+                {:else}
+                {#if user.rank <= 3}
+                  <img class="ranksize" src="/img/zpke-challenger.jpg" alt="Top3" />
+                {:else if user.rank / rankData.length <= 0.25}
+                  <img class="ranksize" src="/img/zpke-diamond.jpg" alt="25%" />
+                {:else if user.rank / rankData.length <= 0.5}
+                  <img class="ranksize" src="/img/zpke-gold.jpg" alt="50%" />
+                {:else if user.rank / rankData.length <= 0.75}
+                  <img class="ranksize" src="/img/zpke-silver.jpg" alt="75%" />
+                {:else}
+                  <img class="ranksize" src="/img/zpke-bronze.jpg" alt="100%" />
+                {/if}
                 {/if}
               </td>
               <!-- 닉네임 -->

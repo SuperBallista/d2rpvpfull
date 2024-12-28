@@ -25,7 +25,7 @@
     { label: "대회기록", href: "/tournament" },
     ...($mode === "babapk" ? [{ label: "클랜목록", href: "/clan" }] : []),
     { label: "커뮤니티", href: "/boardlist" },
-    { label: "역대우승", href: "/winners" },
+    ...($mode === "zpke" ? [] : [{ label: "역대우승", href: "/winners" }]),
     { label: "계산하기", href: "/calculator" },
     ...($myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z"
       ? [{ label: "관리설정", href: "/admin" }]
