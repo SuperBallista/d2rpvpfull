@@ -161,7 +161,7 @@
             {#if showDetails[index]}
               <tr>
                 <td colspan="5" class="detail-row">
-                  대전점수: {Math.round(user.BScore * 100) / 100}<br />
+                  대전점수: {(Math.round(user.BScore * 100) / 100).toFixed(2)}<br />
                   대회점수: {user.LScore}<br />
                   순위: {user.rank}<br />
                   Elo: {(Math.round(user.Elo * 100) / 100).toFixed(2)}<br />
