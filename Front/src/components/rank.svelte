@@ -153,7 +153,7 @@
               <!-- 닉네임 -->
               <td>{user.nickname.replace("_m", "").replace("_z","")}</td>
               <!-- 승률 -->
-              <td>{user.wins+user.losses > 0 ? ((Math.round(10000*(user.wins/(user.wins+user.losses))))/100).toFixed(2) : 0.00 }%</td>
+              <td>{user.wins+user.losses > 0 ? ((Math.round(10000*(user.wins/(user.wins+user.losses))))/100).toFixed(2) : "0.00" }%</td>
               <!-- 점수 -->
               <td>{(Math.round(user.TScore * 100) / 100).toFixed(2)}</td>
               <!-- 상세보기 -->
