@@ -153,9 +153,9 @@
               <!-- 닉네임 -->
               <td>{user.nickname.replace("_m", "").replace("_z","")}</td>
               <!-- 승률 -->
-              <td>{user.wins+user.losses > 0 ? (Math.round(10000*(user.wins/(user.wins+user.losses))))/100 : 0 }</td>
+              <td>{user.wins+user.losses > 0 ? ((Math.round(10000*(user.wins/(user.wins+user.losses))))/100).toFixed(2) : 0.00 }%</td>
               <!-- 점수 -->
-              <td>{Math.round(user.TScore * 100) / 100}</td>
+              <td>{(Math.round(user.TScore * 100) / 100).toFixed(2)}</td>
               <!-- 상세보기 -->
             </tr>
             {#if showDetails[index]}
@@ -164,7 +164,7 @@
                   대전점수: {Math.round(user.BScore * 100) / 100}<br />
                   대회점수: {user.LScore}<br />
                   순위: {user.rank}<br />
-                  Elo: {Math.round(user.Elo * 100) / 100}<br />
+                  Elo: {(Math.round(user.Elo * 100) / 100).toFixed(2)}<br />
                   {user.wins} 승 / {user.losses} 패<br />
                   {#if Number(myRank) > Number(user.rank)}
                     <button class="simple-button" on:click={() => challengeRank(user.nickname)}>
