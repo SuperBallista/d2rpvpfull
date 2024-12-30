@@ -67,6 +67,8 @@
    async function clanJoin(clanname:string){
     const data = {clanname: clanname}
     const endpoint = `/clan/${$mode}/join`
+    const userResponse = confirm(`${clanname} 클랜에 가입합니다. 계속하시겠습니까?`);
+    if (userResponse) {
     try{
         const response = await SecurityFetch(endpoint, "PATCH", data)
         if (response.status===200)
@@ -80,7 +82,7 @@
     {
 alert("오류 발생 :" + error)
     }
-
+  }
    }
 
   </script>

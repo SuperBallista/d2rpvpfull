@@ -12,13 +12,42 @@
   let modeChange = "밀리PK"
   let modeChangeLink = "/mpk"
   let modeSrc:string
+  let menuItems:any[]
   $: pathname = $location.pathname;
 
   const toggleMenu = () => {
     isOpen = !isOpen;
   };
 
-  $: menuItems = [
+
+$: if (pathname.includes("mpk"))
+{mode.set("mpk")
+ modeName = "밀리PK"
+ modeSrc = "/" + $mode
+ modeChangeLink = "/zpke"
+ modeChange = "질딘PK"
+ menuSet()
+}
+else if (pathname.includes("zpke"))
+{mode.set("zpke")
+modeName = "질딘PK"
+modeChangeLink = "/"
+modeSrc = "/" + $mode
+modeChange = "정통바바"
+menuSet()
+}
+else
+{mode.set("babapk")
+modeName = "정통바바"
+modeSrc = "/" + $mode
+modeChangeLink = "/mpk"
+modeChange = "밀리PK"
+menuSet()
+}
+
+
+function menuSet() {
+  menuItems = [
     { label: "공지사항", href: "/info" },
     { label: "랭킹조회", href: "/rank" },
     { label: "대전기록", href: "/record" },
@@ -31,28 +60,9 @@
       ? [{ label: "관리설정", href: "/admin" }]
       : []),
   ];
+}
 
-$: if (pathname.includes("mpk"))
-{mode.set("mpk")
- modeName = "밀리PK"
- modeSrc = "/" + $mode
- modeChangeLink = "/zpke"
- modeChange = "질딘PK"
-}
-else if (pathname.includes("zpke"))
-{mode.set("zpke")
-modeName = "질딘PK"
-modeChangeLink = "/"
-modeSrc = "/" + $mode
-modeChange = "정통바바"
-}
-else
-{mode.set("babapk")
-modeName = "정통바바"
-modeSrc = "/" + $mode
-modeChangeLink = "/mpk"
-modeChange = "밀리PK"
-}
+
 
 
 async function checkJwt() {

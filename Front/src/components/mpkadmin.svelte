@@ -82,19 +82,6 @@
       }
     }
   
-
-    // // 클랜소속 초기화
-    // async function submit_clan_reset() {
-    //   const data = { player: playerclan };
-    //   try {
-    //     const response = await SecurityFetch("/admin-score/reset/m-user", "POST", data);
-    //     alert("해당 선수 클랜 리셋 완료");
-    //   } catch (error) {
-    //     alert("오류 발생 :", error);
-    //   }
-    // }
-  
-  
   
   
 //    async function submit_clan_score() {

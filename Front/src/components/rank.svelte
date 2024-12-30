@@ -125,14 +125,14 @@
               <!-- 등급 -->
               <td>
                 {#if $mode != "zpke"}
-                {#if user.rank / rankData.length <= 0.1}
-                  <img class="ranksize" src="/img/diamond.png" alt="10%" />
-                {:else if user.rank / rankData.length <= 0.25}
-                  <img class="ranksize" src="/img/platinum.png" alt="25%" />
-                {:else if user.rank / rankData.length <= 0.45}
-                  <img class="ranksize" src="/img/gold.png" alt="45%" />
-                {:else if user.rank / rankData.length <= 0.7}
-                  <img class="ranksize" src="/img/silver.png" alt="70%" />
+                {#if user.rank === 1}
+                  <img class="ranksize" src="/img/diamond.png" alt="1st" />
+                {:else if user.rank / rankData.length <= 0.1}
+                  <img class="ranksize" src="/img/platinum.png" alt="10%" />
+                {:else if user.rank / rankData.length <= 0.2}
+                  <img class="ranksize" src="/img/gold.png" alt="30%" />
+                {:else if user.rank / rankData.length <= 0.6}
+                  <img class="ranksize" src="/img/silver.png" alt="60%" />
                 {:else}
                   <img class="ranksize" src="/img/bronze.png" alt="100%" />
                 {/if}
@@ -203,8 +203,8 @@
       cursor: pointer;
     }
     .ranksize{
-      width: 20px;
-      height: 20px;
+      width: 30px;
+      height: 30px;
       border-radius: 15%;
       border: 1px solid #ffffff;
     }
