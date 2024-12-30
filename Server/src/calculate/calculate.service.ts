@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CalculateService {
@@ -17,6 +17,8 @@ export class CalculateService {
     // 인덱스를 관리할 변수 추가
     let myFrameIndex = 0;
     let yourFrameIndex = 0;
+    let myreduce = params.myreduce / 100
+    let yourreduce = params.yourreduce / 100
 
     for (let number = 0; number < params.iterations; number++) {
       let framecount = 0;
@@ -24,6 +26,8 @@ export class CalculateService {
       let yourframecheck = 0;
       let mygamehp = params.myhp;
       let yourgamehp = params.yourhp;
+      let mywoundcondition = 0;
+      let yourwoundcondition = 0;
 
       let mylv = params.mycharlv;
       mylv += params.myclass < 3 ? 20 : 5;
@@ -31,12 +35,24 @@ export class CalculateService {
       let yourlv = params.yourcharlv;
       yourlv += params.yourclass < 3 ? 20 : 5;
 
+
+
       while (mygamehp > 0 && yourgamehp > 0) {
         framecount++;
         myframecheck++;
         yourframecheck++;
-        let mywoundcondition = 0;
-        let yourwoundcondition = 0;
+
+        
+        if (mywoundcondition > 0) {
+          mywoundcondition-=1;
+          mygamehp = Math.max(1, mygamehp - (45 * params.yourcharlv - 1319) / 256);
+        }
+
+        if (yourwoundcondition > 0) {
+          yourwoundcondition-=1;
+          yourgamehp = Math.max(1, yourgamehp - (45 * params.mycharlv - 1319) / 256);
+        }
+        
 
         // myframe 및 yourframe 값을 배열에서 가져오기
         const myframe = params.myframe[myFrameIndex];
@@ -59,19 +75,19 @@ export class CalculateService {
               )
           ) {
             if (Math.random() * 100 < params.mycrush) {
-              yourgamehp -= this.roundFloatToInt((yourgamehp / 10 / params.yourreduce) * 100);
-            }
+              yourgamehp -= this.roundFloatToInt(yourgamehp / 10 * yourreduce);
+               }
             if (Math.random() * 100 < params.myopenwound) {
               yourwoundcondition = 200;
             }
             const damage =
               Math.random() *
-                (params.mymaxdmg / 6 / params.yourreduce - params.mymindmg / 6 / params.yourreduce) +
-              params.mymindmg / 6 / params.yourreduce;
+                (params.mymaxdmg / 6 * yourreduce - params.mymindmg / 6 * yourreduce) +
+              params.mymindmg / 6 * yourreduce;
             const isCrit = Math.random() * 100 < params.mycs + (params.myds * (100 - params.mycs)) / 100;
             yourgamehp -= this.roundFloatToInt(isCrit ? damage * 2 : damage);
           }
-          mygamehp -= params.yourthorns / 6 / params.myreduce;
+          mygamehp -= params.yourthorns / 6 * myreduce;
         }
 
         if (yourframecheck - yourframe >= 0) {
@@ -90,31 +106,25 @@ export class CalculateService {
                   (yourlv + mylv),
               )
           ) {
+
             if (Math.random() * 100 < params.yourcrush) {
-              mygamehp -= this.roundFloatToInt((mygamehp / 10 / params.myreduce) * 100);
+              mygamehp -= this.roundFloatToInt(mygamehp / 10 * myreduce);
             }
             if (Math.random() * 100 < params.youropenwound) {
               mywoundcondition = 200;
             }
             const damage =
               Math.random() *
-                (params.yourmaxdmg / 6 / params.myreduce - params.yourmindmg / 6 / params.myreduce) +
-              params.yourmindmg / 6 / params.myreduce;
+                (params.yourmaxdmg / 6 * myreduce - params.yourmindmg / 6 * myreduce) +
+              params.yourmindmg / 6 * myreduce;
             const isCrit = Math.random() * 100 < params.yourcs + (params.yourds * (100 - params.yourcs)) / 100;
             mygamehp -= this.roundFloatToInt(isCrit ? damage * 2 : damage);
+
           }
-          yourgamehp -= params.mythorns / 6 / params.yourreduce;
+          yourgamehp -= params.mythorns / 6 * yourreduce;
+
         }
 
-        if (mywoundcondition > 0) {
-          mywoundcondition--;
-          mygamehp = Math.max(1, mygamehp - (45 * params.yourcharlv - 1319) / 256);
-        }
-
-        if (yourwoundcondition > 0) {
-          yourwoundcondition--;
-          yourgamehp = Math.max(1, yourgamehp - (45 * params.mycharlv - 1319) / 256);
-        }
 
         if (mygamehp <= 0 && yourgamehp > 0) {
           losecount++;
