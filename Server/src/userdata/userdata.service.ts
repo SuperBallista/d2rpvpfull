@@ -77,8 +77,8 @@ let user
           countwin: winCount.toString(),
           countlose: loseCount.toString(),
           countrecord: (winCount + loseCount).toString(),
-          challenge: userTable === 'm_user'? user.challenge || "" : null,
-          challengeDate: userTable === 'm_user'? user.challengeDate || "" : null,
+          challenge: userTable != 'b_user'? user.challenge || "" : null,
+          challengeDate: userTable != 'b_user'? user.challengeDate || "" : null,
         }
     } catch (error) {
       console.error('사용자 정보 및 전적 조회 오류:', error);
@@ -165,12 +165,12 @@ let user
   // 도전 취소
   async cancelChallenge(userNickname: string, tablePrefix: string): Promise<void> {
     try {
-      if (tablePrefix === 'b') {
-        const user = await this.bUserRepository.findOne({ where: { nickname: userNickname } });
+      if (tablePrefix === 'z') {
+        const user = await this.zUserRepository.findOne({ where: { nickname: userNickname } });
         if (user) {
           user.challenge = null;
           user.challengeDate = null;
-          await this.bUserRepository.save(user);
+          await this.zUserRepository.save(user);
         }
       } else {
         const user = await this.mUserRepository.findOne({ where: { nickname: userNickname } });

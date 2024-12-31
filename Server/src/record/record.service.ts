@@ -313,8 +313,8 @@ else
 
   // 도전 경기 자동 패배 기록
   async challengeLose(isMUser: string, winner: string, loser: string): Promise<string> {
-    const tempRepository = isMUser === 'm' ? this.mTempRepository : this.bTempRepository;
-    const userRepository = isMUser === 'm' ? this.mUserRepository : this.bUserRepository;
+    const tempRepository = isMUser === 'm' ? this.mTempRepository : this.zTempRepository;
+    const userRepository = isMUser === 'm' ? this.mUserRepository : this.zUserRepository;
 
     const currentDate = moment().utcOffset('+0900').format('YYYY-MM-DD HH:mm:ss');
     const record = tempRepository.create({
@@ -339,7 +339,7 @@ else
       if (winnerUser) {
         winnerUser.challenge = null;
         winnerUser.challengeDate = null;
-        await (userRepository as Repository<BUser | MUser>).save(winnerUser);
+        await (userRepository as Repository<ZUser | MUser>).save(winnerUser);
       }
 
       return "ok"
@@ -350,13 +350,13 @@ else
   }
 
   async challengeWin(isMUser: string, winner: string): Promise<void> {
-    const userRepository = isMUser === 'm' ? this.mUserRepository : this.bUserRepository;
+    const userRepository = isMUser === 'm' ? this.mUserRepository : this.zUserRepository;
 
     const user = await userRepository.findOne({ where: { nickname: winner } });
     if (user) {
       user.challenge = null;
       user.challengeDate = null;
-      await (userRepository as Repository<BUser | MUser>).save(user);
+      await (userRepository as Repository<ZUser | MUser>).save(user);
     }
   }
 
@@ -368,7 +368,7 @@ else
     tablePrefix: string,
   ): Promise<string> {
     const repository =
-      tablePrefix === 'b' ? this.bUserRepository : this.mUserRepository;
+      tablePrefix === 'm' ? this.mUserRepository : this.zUserRepository;
       
       if (!challenge) {
         throw new HttpException(

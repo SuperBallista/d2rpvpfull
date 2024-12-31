@@ -43,4 +43,7 @@ export class BUser {
 
   @Column({length: 255, default: "none", nullable: true})
   clan: string
+
+  @Column({length: 255})
+  memo: string
 }

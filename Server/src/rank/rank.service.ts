@@ -137,17 +137,17 @@ export class RankService {
 
 
   async challengeRank(username: string, nickname: string, mode: string): Promise<void> {
-    const repository = mode==="mpk" ? this.mUserRepository : this.bUserRepository;
+    const repository = mode==="mpk" ? this.mUserRepository : this.zUserRepository;
     const user = await repository.findOne({ where: { nickname: username } });
     if (!user) throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
     
     user.challenge = nickname;
     user.challengeDate = new Date();
-    await (repository as Repository<BUser | MUser>).save(user);
+    await (repository as Repository<ZUser | MUser>).save(user);
   }
 
   async getChallengeData(username: string, mode: string): Promise<any[]> {
-    const repository = mode==="mpk" ? this.mUserRepository : this.bUserRepository;
+    const repository = mode==="mpk" ? this.mUserRepository : this.zUserRepository;
   
     // 사용자 이름과 관련된 도전 데이터를 리스트로 조회
     const users = await repository.find({

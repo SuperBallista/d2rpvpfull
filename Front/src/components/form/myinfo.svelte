@@ -31,7 +31,7 @@
         const response = await SecurityFetch(endpoint, "POST");
         if (response.ok) {
           const data = await response.json();
-          if ($mode === "mpk") {
+          if ($mode != "babapk") {
           //   email = data.email;
           //   lscore = data.lscore;
           //   clan = data.clan;
@@ -141,7 +141,7 @@
           <button class="simple-button" on:click={() => form.set("changepw")}>변경</button>
         </td>
       </tr>
-      {#if $mode}
+      {#if $mode != "babapk"}
         <!-- <tr>
           <td>대회점수</td>
           <td>{lscore}</td>

@@ -184,9 +184,9 @@ import {
   
     // 도전 취소
     @Delete('/challenge/cancel')
-    async cancelChallenge(@User() user: any, @Body() body: { mode: boolean }) {
+    async cancelChallenge(@User() user: any, @Body() body: { mode: string }) {
       try {
-        const tablePrefix = body.mode ? 'm' : 'b';
+        const tablePrefix = body.mode.slice(0,1);
         await this.userDataService.cancelChallenge(user.username, tablePrefix);
         return { message: '도전 취소 완료' };
       } catch (error) {

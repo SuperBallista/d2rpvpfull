@@ -40,4 +40,8 @@ export class ZUser {
 
   @Column({ type: 'tinyint', width: 1, default: 0 })
   playStop: boolean; // 기본값 0
+
+  @Column({length: 255})
+  memo: string
+
 }

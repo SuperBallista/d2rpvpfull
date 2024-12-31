@@ -60,6 +60,13 @@ function menuSet() {
       ? [{ label: "관리설정", href: "/admin" }]
       : []),
   ];
+
+  if ($mode === "mpk")
+{ document.body.style.backgroundColor = "#2a1e2e"}
+else if ($mode === "zpke")
+{document.body.style.backgroundColor = "#102a2d"}
+else
+{document.body.style.backgroundColor = "#0d0d0d"}
 }
 
 
@@ -77,6 +84,7 @@ if (data.authenticated)
  mode.set(data.mode);
  navigate("/" + $mode)
  modeSrc =  "/" + $mode;
+ menuSet()
 }
 else
 {

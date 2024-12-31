@@ -42,7 +42,7 @@ export class RankController {
 
 
   // 도전 등록
-  @Post('/mpk/challenge')
+  @Post('/challenge')
   async challengeRank(
     @User() user: any,
     @Body() body: { nickname: string; mode: string },
@@ -67,4 +67,17 @@ export class RankController {
       return error
     }
   }
+
+    // m_user 도전 데이터 조회
+    @Post('/challenge/zpke/show')
+    async challengeDataZ(@User() user: any) {
+      try {
+      const data = await  this.rankingService.getChallengeData(user.username, "zpke");
+        return data
+      } catch (error) {
+        return error
+      }
+    }
+  
+
 }

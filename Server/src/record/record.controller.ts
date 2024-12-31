@@ -115,11 +115,11 @@ import {
     @Post('/challenge/lose')
     async challengeLose(
       @User() user: any,
-      @Body() body: { challenger: string; mode: boolean },
+      @Body() body: { challenger: string; mode: string },
     ) {
       try {
         const { challenger, mode } = body;
-        const tableMode = mode ? 'm' : 'b'; // boolean -> string 변환
+        const tableMode = mode.slice(0,1); // boolean -> string 변환
         const loser = user.username;
         await this.recordService.challengeLose(tableMode, challenger, loser);
         console.log(`Challenge lost: ${loser} lost to ${challenger}`);
@@ -133,11 +133,11 @@ import {
     @Post('/challenge/win')
     async challengeWin(
       @User() user: any,
-      @Body() body: { challenger: string; mode: boolean },
+      @Body() body: { challenger: string; mode: string },
     ) {
       try {
         const { challenger, mode } = body;
-        const tableMode = mode ? 'm' : 'b'; // boolean -> string 변환
+        const tableMode = mode.slice(0,1); // boolean -> string 변환
         await this.recordService.challengeWin(tableMode, challenger);
         console.log(`Challenge won by ${challenger}, recorded by ${user.username}`);
         return { message: 'Challenge win recorded successfully' };
@@ -150,10 +150,10 @@ import {
       @Post('/challenge/check')
       async checkChallenge(
         @User() user: any,
-        @Body() body: { mode: boolean; challenge: string },
+        @Body() body: { mode: string; challenge: string },
       ) {
         try {
-          const tablePrefix = body.mode ? 'm' : 'b';
+          const tablePrefix = body.mode.slice(0,1);
           const check = await this.recordService.checkChallenge(
             user.username,
             body.challenge,

@@ -12,7 +12,7 @@
   
     // 게임 데이터를 불러오는 함수
     async function fetchGameData(): Promise<void> {
-      const endpoint: string = $mode ? "/rank/challenge/show/m-user" : "/rank/challenge/show/b-user";
+      const endpoint: string = `/rank/challenge/${$mode}/show`;
   
       try {
         const response = await SecurityFetch(endpoint, "POST");

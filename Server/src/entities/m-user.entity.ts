@@ -46,4 +46,7 @@ export class MUser {
   @Column({ name: "PlayStop", type: 'tinyint', width: 1, default: 0, nullable: true })
   playStop?: boolean; // 기본값 0, NULL 허용
 
+  @Column({length: 255})
+  memo: string
+
 }
