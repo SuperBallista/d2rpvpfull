@@ -208,9 +208,9 @@ else
 
 
         // 이벤트 호스트 점수
-        if (mode === "babapk") {
+        if (mode != "zpke") {
         const user = await userRepository.findOne({
-          where: { nickname: Eventhost },
+          where: { nickname: mode === "babapk" ? Eventhost : Eventhost + "_m" },
         });
 
         if (user) {
@@ -266,6 +266,7 @@ else
           Place3rd3,
           Place3rd4,
           numberteams,
+          Eventhost
         } = eventData;
   
         // 참가자의 점수를 업데이트하는 함수
@@ -332,6 +333,20 @@ else
         if (eventRecord) {
           await manager.remove(eventRecord);
         }
+
+        // 이벤트 호스트 점수
+        if (mode != "zpke") {
+          const user = await userRepository.findOne({
+            where: { nickname: mode === "babapk" ? Eventhost : Eventhost + "_m" },
+          });
+  
+          if (user) {
+            user.lScore = (user.lScore || 0) - EVENT_HOST_SCORE;
+            await manager.save(user);
+          }
+        }
+  
+
       });
     } catch (error) {
       console.error('승인된 이벤트 취소 오류:', error);
