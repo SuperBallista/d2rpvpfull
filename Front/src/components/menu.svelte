@@ -48,7 +48,7 @@ menuSet()
 
 function menuSet() {
   menuItems = [
-    { label: "공지사항", href: "/info" },
+    ...($mode != "zpke" ? [{ label: "공지사항", href: "/info" }] : []),
     { label: "랭킹조회", href: "/rank" },
     { label: "대전기록", href: "/record" },
     { label: "대회기록", href: "/tournament" },
