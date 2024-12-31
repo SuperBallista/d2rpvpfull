@@ -93,6 +93,13 @@
   ]
   let mpkwinner =  [
     {
+      season: "2024.11-12 랭킹전",
+      first: "제트",
+      second: "우리",
+      third: "Hyeonmin",
+      details: "정규대회 자유전 : 1위 Hyeonmin 2위 Mopalmo 3위 우리<br/>정규대회 FP2전 : 1위 BallistaBB 2위 Hyeonmin 3위 우리",
+    },
+    {
       season: "2024.10 랭킹전",
       first: "우리",
       second: "스티븐",
