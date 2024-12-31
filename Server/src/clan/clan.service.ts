@@ -33,7 +33,7 @@ GROUP BY
       BScore: row.BScore,
       LScore: row.LScore,
       name: row.name,
-      members: row.members ? row.members.split(', ') : [],
+      members: row.members ? row.members.split(',') : [],
       TScore: Number(row.BScore) + Number(row.LScore) + (Number(row.records) > 100? 100:Number(row.records))*4
     }));
   }
