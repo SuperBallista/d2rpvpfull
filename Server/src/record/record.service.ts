@@ -88,14 +88,14 @@ export class RecordService {
           // Winner 클랜 처리
           const WinClan = await this.bClanRepository.findOne({ where: { name: winner.clan } });
           if (WinClan) {
-            WinClan.Bscore += addScore * K_VALUE_CLAN_B_RATIO;
+            WinClan.Bscore -= addScore * K_VALUE_CLAN_B_RATIO;
             await this.bClanRepository.save(WinClan);
           } 
       
           // Loser 클랜 처리
           const LoseClan = await this.bClanRepository.findOne({ where: { name: loser.clan } });
           if (LoseClan) {
-            LoseClan.Bscore -= addScore * K_VALUE_CLAN_B_RATIO;
+            LoseClan.Bscore += addScore * K_VALUE_CLAN_B_RATIO;
             await this.bClanRepository.save(LoseClan);
           } 
         }
@@ -269,14 +269,14 @@ else
           // Winner 클랜 처리
           const WinClan = await clanRepository.findOne({ where: { name: winner.clan } });
           if (WinClan) {
-            WinClan.Bscore -= addScore * K_VALUE_CLAN_B_RATIO;
+            WinClan.Bscore += addScore * K_VALUE_CLAN_B_RATIO;
             await clanRepository.save(WinClan);
           } 
       
           // Loser 클랜 처리
           const LoseClan = await clanRepository.findOne({ where: { name: loser.clan } });
           if (LoseClan) {
-            LoseClan.Bscore += addScore * K_VALUE_CLAN_B_RATIO;
+            LoseClan.Bscore -= addScore * K_VALUE_CLAN_B_RATIO;
             await clanRepository.save(LoseClan);
           } 
         }
