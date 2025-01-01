@@ -112,7 +112,7 @@ alert("오류 발생 :" + error)
               <!-- 닉네임 -->
               <td>{clan.name}</td>
               <!-- 점수 -->
-              <td>{clan.TScore}</td>
+              <td>{clan.TScore.toFixed(2)}</td>
               <!-- 점수 -->
               <td>{(clan.members).length}</td>
               <!-- 상세보기 -->
@@ -120,7 +120,7 @@ alert("오류 발생 :" + error)
             {#if showDetails[index]}
               <tr>
                 <td colspan="5" class="detail-row">
-                  대전점수: {clan.BScore}<br />
+                  대전점수: {clan.BScore.toFixed(2)}<br />
                   대회점수: {clan.LScore}<br />
                   클랜원: {clan.members}
                   {#if myclan === "none"}
