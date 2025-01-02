@@ -41,7 +41,7 @@ href: "https://docs.google.com/document/d/1m50GKaWyszyBSslQn3348Fz1CAp55DFbKNwNy
 }
 else {
 list = [
-{href: "", title: "질딘PK 공지사항"}
+{href: "https://docs.google.com/document/d/1FFuQPQYJJKBcpKM5VaBijzsf1Zg-bW1iy9R8vM9OPkA/", title: "질딘PK 공지사항"}
 
 ]
 
