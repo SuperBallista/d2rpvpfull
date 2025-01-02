@@ -1,4 +1,10 @@
 <script lang="ts">
+
+let checkframe = 0
+    let simulframeResult = 0
+    let simulCheck:any = []
+
+
     import { writable } from "svelte/store";
     import { SecurityFetch } from "../../store";
   
@@ -254,11 +260,13 @@ const handleYourStatFile = (event: Event) => {
   
         if (response.ok) {
           const data = await response.json();
-          win.set(data.winCount);
-          lose.set(data.loseCount);
-          draw.set(data.drawCount);
-          const roundedWinRate = Number(data.winRate.toFixed(2));
+          win.set(data[0].winCount);
+          lose.set(data[0].loseCount);
+          draw.set(data[0].drawCount);
+          const roundedWinRate = Number(data[0].winRate.toFixed(2));
           winRate.set(roundedWinRate);
+          simulframeResult = data[1].length;
+          simulCheck = data[1];
         } else {
           console.error("Error calculating:", response.statusText);
         }
@@ -538,6 +546,34 @@ else if($yourclass === 4)
           안됩니다. 또한 대전 시뮬은 최소 2천번 이상 돌리는 것을 추천드립니다.
         </td>
       </tr>
+
+      {#if simulCheck.length > 0}
+      <tr>
+        <td>프레임 단위 시뮬레이션 결과 검증</td>
+        <td><input class="input-text short" type="number" bind:value={checkframe} max={simulframeResult} min="0"></td>
+      </tr>
+      <tr>
+        <td>
+          내 체력 : {simulCheck[checkframe].myLife}<br/>
+          {simulCheck[checkframe].myTriedAttack ? "공격시도" : null} <br/>
+          {simulCheck[checkframe].myAttackSuccess ? `공격성공 : ${simulCheck[checkframe].myAttackSuccess }` : null} <br/>
+          {simulCheck[checkframe].myCrushSuccess ? "강타발동" : null} <br/>
+          {simulCheck[checkframe].myDeadlySuccess ? "치타발동" : null} <br/>
+          {simulCheck[checkframe].myOpenedWoundSuccess ? "상악발동" : null} <br/>
+        </td>
+        <td>
+          상대 체력 : {simulCheck[checkframe].yourLife}<br/>
+          {simulCheck[checkframe].yourTriedAttack ? "공격시도" : null} <br/>
+          {simulCheck[checkframe].yourAttackSuccess ? `공격성공: ${simulCheck[checkframe].yourAttackSuccess}` : null} <br/>
+          {simulCheck[checkframe].yourCrushSuccess ? "강타발동" : null} <br/>
+          {simulCheck[checkframe].yourDeadlySuccess ? "치타발동" : null} <br/>
+          {simulCheck[checkframe].yourOpenedWoundSuccess ? "상악발동" : null} <br/>
+        </td>
+      </tr>
+      {/if}
+
+
+
     </tbody>
     </table>
   </div>
