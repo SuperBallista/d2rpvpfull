@@ -79,36 +79,45 @@ export class ConnectService {
 
     const lowerCaseNickname = nickname.toLowerCase();
     const userData = await this.AccountRepository.findOne({where: {account}})
-       
+    let isUser   
     let user
     let UserRepository
     if (mode === "babapk")
     {
     UserRepository = this.bUserRepository;
+   isUser = UserRepository.findOne({where:{nickname}})
+  if (!isUser) {
     userData.babapk = nickname
     user = new BUser();
     user.nickname = lowerCaseNickname;
     user.bScore = START_SCORE;
     user.lScore = 0;
-  }
+  }}
   if (mode === "mpk")
     {
     UserRepository = this.mUserRepository;
+     isUser = UserRepository.findOne({where:{nickname}})
+    if (!isUser) {  
     userData.mpk = nickname
     user = new MUser();
     user.nickname = lowerCaseNickname;
     user.bScore = START_SCORE_M;
     user.lScore = 0;
-  }
+  }}
   if (mode === "zpke")
     {
     UserRepository = this.zUserRepository;
+     isUser = UserRepository.findOne({where:{nickname}})
+    if (!isUser) { 
     userData.zpke = nickname
     user = new ZUser();
     user.nickname = lowerCaseNickname;
     user.bScore = START_SCORE_Z;
     user.lScore = 0;
-  }
+  }}
+
+  if (isUser)
+  {throw new HttpException('계정이 이미 있습니다', HttpStatus.CONFLICT)}
   
     await UserRepository.save(user);
     await this.AccountRepository.save(userData);

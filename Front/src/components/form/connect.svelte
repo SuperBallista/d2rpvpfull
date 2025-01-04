@@ -18,7 +18,7 @@
         else if (data.mode==="zpke")
         {myzpke.set(makenickname)}
         }
-        else if (response.status===400){
+        else if (response.status===409){
             alert("캐릭터 이름을 사용할 수 없습니다")
         } else if (response.status===403){
             alert("수정이 불가능합니다")
