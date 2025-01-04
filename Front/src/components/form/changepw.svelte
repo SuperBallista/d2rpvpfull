@@ -21,7 +21,7 @@
       };
   
       try {
-        const endpoint = `/userdata/${$mode}/change-pw`;
+        const endpoint = `/userdata/change-pw`;
         const response = await SecurityFetch(endpoint,"POST",pwdata);
         const data = await response.json()
   
@@ -49,4 +49,3 @@
 <button class="emphasis-button" on:click={() => changepw()}>변경하기</button>
     
 </div>
-<button class="message-button" on:click={() => form.set("myinfo")}>돌아가기</button>

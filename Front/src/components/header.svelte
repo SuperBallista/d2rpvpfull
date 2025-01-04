@@ -47,6 +47,9 @@
     else if ($mode === "zpke"){
         modestring = "질딘PK";
     }
+    else if ($mode === ""){
+        modestring = ""
+    }
 
     $: document.title = "D2RPvP " + modestring + " " + titlestring;
 

@@ -26,6 +26,7 @@ import Elo from "./components/calculater/elo.svelte";
     import Zpkesimul from "./components/calculater/zpkesimul.svelte";
     import Zpkeadmin from "./components/zpkeadmin.svelte";
     import Clanrank from "./components/clanrank.svelte";
+    import Home from "./components/home.svelte";
     
 </script>
 <Router>
@@ -40,7 +41,7 @@ import Elo from "./components/calculater/elo.svelte";
 
 <main>
   <Route path="/:type/info" component={Info} />
-  <Route path="/" component={Index} />
+  <Route path="/" component={Home} />
   <Route path="/babapk" component={Index} />
   <Route path="/mpk" component={Index} />
   <Route path="/zpke" component={Index} />

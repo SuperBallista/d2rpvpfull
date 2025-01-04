@@ -3,12 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { jwtService } from '../jwt/jwt.service';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import * as moment from 'moment';
 import { BUser } from '../entities/b-user.entity';
 import { MUser } from '../entities/m-user.entity';
 import { ConfigService } from '@nestjs/config';
 import { ZUser } from 'src/entities/z-user.entity';
-import { START_SCORE, START_SCORE_Z, START_SCORE_M } from 'src/config/constants';
+import { Account } from 'src/entities/account.entity';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -20,24 +20,19 @@ export class AuthService {
     @InjectRepository(MUser)
     private readonly mUserRepository: Repository<MUser>,
     @InjectRepository(ZUser)
-    private readonly zUserRepository: Repository<ZUser>
+    private readonly zUserRepository: Repository<ZUser>,
+    @InjectRepository(Account)
+    private readonly AccountRepository: Repository<Account>
    ) {}
 
 
   async deleteAccount(
     userNickname: string,
     nowpw: string,
-    tableName: 'b_user' | 'm_user' | 'z_user',
   ): Promise<{ success: boolean; error?: string; status?: number }> {
-    let repository
-    if (tableName === 'b_user')
-    {repository = this.bUserRepository}
-    else if (tableName === 'm_user')
-    {repository = this.mUserRepository}
-    else
-    {repository = this.zUserRepository}
+    let repository = this.AccountRepository
 
-    const user = await repository.findOne({ where: { nickname: userNickname } });
+    const user = await repository.findOne({ where: { account: userNickname } });
     if (!user) {
       return {
         success: false,
@@ -46,7 +41,7 @@ export class AuthService {
       };
     }
 
-    const isPasswordValid = await bcrypt.compare(nowpw, user.pw);
+    const isPasswordValid = await bcrypt.compare(nowpw, user.password);
     if (!isPasswordValid) {
       return {
         success: false,
@@ -55,7 +50,11 @@ export class AuthService {
       };
     }
 
-    const deleteResult = await repository.delete({ nickname: userNickname });
+    const deleteResult = await repository.delete({ account: userNickname });
+    await this.bUserRepository.delete({nickname: user.babapk})
+    await this.mUserRepository.delete({nickname: user.mpk})
+    await this.zUserRepository.delete({nickname: user.zpke})
+    
     if (deleteResult.affected === 1) {
       return { success: true };
     } else {
@@ -68,34 +67,18 @@ export class AuthService {
   }
 
 
-  async processLogin(body: any, mode: string): Promise<any> {
+  async processLogin(body: any): Promise<any> {
     const { nickname, password } = body;
 
-    let lowerCaseNickname:string
-    let UserRepository
+    const lowerCaseNickname = nickname.toLowerCase()
 
-    if (mode === "m_user") {
-     lowerCaseNickname = nickname.toLowerCase()+"_m"  
-     UserRepository = this.mUserRepository
-    }
-    else if (mode === "z_user") {
-     lowerCaseNickname = nickname.toLowerCase()+"_z"
-     UserRepository = this.zUserRepository
-    }
-    else{
-      lowerCaseNickname = nickname.toLowerCase()
-      UserRepository = this.bUserRepository
-    }
-  
-    const user = await UserRepository.findOne({
-      where: { nickname: lowerCaseNickname },
-    });
+    const user = await this.AccountRepository.findOne({where: {account: lowerCaseNickname}})
   
     if (!user) {
       throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.UNAUTHORIZED);
     }
-  
-    const isPasswordValid = await bcrypt.compare(password, user.pw);
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new HttpException('비밀번호가 일치하지 않습니다.', HttpStatus.UNAUTHORIZED);
     }
@@ -103,115 +86,152 @@ export class AuthService {
     //  엑세스토큰 생성, 리프레시토큰 생성 및 저장은 컨트롤러영역에서 따로 지정
     const token = this.jwtService.createAccessToken(lowerCaseNickname);
     const refreshToken = this.jwtService.createRefreshToken(lowerCaseNickname);
-
      
-    return {
-      username: lowerCaseNickname,
+    return [{
+      username: nickname,
       accessToken: token,
-      refreshToken: refreshToken
-    };
+      babapk: user.babapk,
+      mpk: user.mpk,
+      zpke: user.zpke,
+      how: user.how,
+      email: user.email,
+      origin: user.how
+    },{      refreshToken: refreshToken,    }];
   }
+
+
+  async processRegiU(body: any, res: any) {
+    const { nickname, password, email } = body;
+
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const UnionUser = new Account();
+    UnionUser.account = nickname.toLowerCase();
+    UnionUser.password = hashedPassword
+    UnionUser.how = "d2rpvp"
+    UnionUser.email = email
+    
+    await this.AccountRepository.save(UnionUser);
+
+    return res.json({ success: true, message: '회원가입이 완료되었습니다.' });
+  }
+
+
   
-  async processRegi(body: any, res: any) {
-    const { nickname, password, email, wgrade } = body;
+  // async processRegi(body: any, res: any) {
+  //   const { nickname, password, email, wgrade } = body;
 
-    const lowerCaseNickname = nickname.toLowerCase();
-    const hashedPassword = await bcrypt.hash(password, 10);
+  //   const lowerCaseNickname = nickname.toLowerCase();
+  //   const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = new BUser();
-    user.nickname = lowerCaseNickname;
-    user.pw = hashedPassword;
-    user.email = email;
-    user.bScore = START_SCORE;
-    user.lScore = 0;
-    user.class = wgrade;
-    user.lastgame = new Date(moment().format('YYYY-MM-DD HH:mm:ss'));
+  //   const user = new BUser();
+  //   user.nickname = lowerCaseNickname;
+  //   user.pw = hashedPassword;
+  //   user.email = email;
+  //   user.bScore = START_SCORE;
+  //   user.lScore = 0;
+  //   user.class = wgrade;
+  //   user.lastgame = new Date(moment().format('YYYY-MM-DD HH:mm:ss'));
 
-    await this.bUserRepository.save(user);
+  //   await this.bUserRepository.save(user);
 
-    return res.json({ success: true, message: '회원가입이 완료되었습니다.' });
-  }
+  //   return res.json({ success: true, message: '회원가입이 완료되었습니다.' });
+  // }
 
-  async processRegiM(body: any, res: any) {
-    const { nickname, password, email, wgrade } = body;
+  // async processRegiM(body: any, res: any) {
+  //   const { nickname, password, email, wgrade } = body;
 
-    const lowerCaseNickname = `${nickname.toLowerCase()}_m`;
-    const hashedPassword = await bcrypt.hash(password, 10);
+  //   const lowerCaseNickname = `${nickname.toLowerCase()}_m`;
+  //   const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = new MUser();
-    user.nickname = lowerCaseNickname;
-    user.pw = hashedPassword;
-    user.email = email;
-    user.bScore = START_SCORE_M;
-    user.lScore = 0;
-    user.class = wgrade;
+  //   const user = new MUser();
+  //   user.nickname = lowerCaseNickname;
+  //   user.pw = hashedPassword;
+  //   user.email = email;
+  //   user.bScore = START_SCORE_M;
+  //   user.lScore = 0;
+  //   user.class = wgrade;
 
-    await this.mUserRepository.save(user);
+  //   await this.mUserRepository.save(user);
 
-    return res.json({ success: true, message: '회원가입이 완료되었습니다.' });
-  }
-
-
-  async processRegiZ(body: any, res: any) {
-    const { nickname, password, email, wgrade } = body;
-
-    const lowerCaseNickname = `${nickname.toLowerCase()}_z`;
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = new ZUser();
-    user.nickname = lowerCaseNickname;
-    user.pw = hashedPassword;
-    user.email = email;
-    user.bScore = START_SCORE_Z;
-    user.lScore = 0;
-    user.class = wgrade;
-
-    await this.zUserRepository.save(user);
-
-    return res.json({ success: true, message: '회원가입이 완료되었습니다.' });
-  }
+  //   return res.json({ success: true, message: '회원가입이 완료되었습니다.' });
+  // }
 
 
+  // async processRegiZ(body: any, res: any) {
+  //   const { nickname, password, email, wgrade } = body;
+
+  //   const lowerCaseNickname = `${nickname.toLowerCase()}_z`;
+  //   const hashedPassword = await bcrypt.hash(password, 10);
+
+  //   const user = new ZUser();
+  //   user.nickname = lowerCaseNickname;
+  //   user.pw = hashedPassword;
+  //   user.email = email;
+  //   user.bScore = START_SCORE_Z;
+  //   user.lScore = 0;
+  //   user.class = wgrade;
+
+  //   await this.zUserRepository.save(user);
+
+  //   return res.json({ success: true, message: '회원가입이 완료되었습니다.' });
+  // }
 
 
-  async processNicknameCheck(body: any, res: any) {
+
+
+  // async processNicknameCheck(body: any, res: any) {
+  //   const { nickname } = body;
+
+  //   const user = await this.bUserRepository.findOne({ where: { nickname } });
+  //   if (user) {
+  //     return res.status(403).json({ error: '중복된 닉네임입니다.' });
+  //   }
+
+  //   return res.status(200).json({ message: '사용 가능한 닉네임입니다.' });
+  // }
+
+  // async processNicknameCheckM(body: any, res: any) {
+  //   const { nickname } = body;
+
+  //   const lowerCaseNickname = `${nickname.toLowerCase()}_m`;
+  //   const user = await this.mUserRepository.findOne({
+  //     where: { nickname: lowerCaseNickname },
+  //   });
+  //   if (user) {
+  //     return res.status(403).json({ error: '중복된 닉네임입니다.' });
+  //   }
+
+  //   return res.status(200).json({ message: '사용 가능한 닉네임입니다.' });
+  // }
+
+  // async processNicknameCheckZ(body: any, res: any) {
+  //   const { nickname } = body;
+
+  //   const lowerCaseNickname = `${nickname.toLowerCase()}_z`;
+  //   const user = await this.zUserRepository.findOne({
+  //     where: { nickname: lowerCaseNickname },
+  //   });
+  //   if (user) {
+  //     return res.status(403).json({ error: '중복된 닉네임입니다.' });
+  //   }
+
+  //   return res.status(200).json({ message: '사용 가능한 닉네임입니다.' });
+  // }
+
+
+  async processNicknameCheckU(body: any, res: any) {
     const { nickname } = body;
 
-    const user = await this.bUserRepository.findOne({ where: { nickname } });
+    const user = await this.AccountRepository.findOne({ where: { account: nickname } });
     if (user) {
-      return res.status(403).json({ error: '중복된 닉네임입니다.' });
+      return res.status(403).json({ error: '중복된 이메일 계정입니다.' });
     }
 
-    return res.status(200).json({ message: '사용 가능한 닉네임입니다.' });
+    return res.status(200).json({ message: '사용 가능한 이메일입니다.' });
   }
 
-  async processNicknameCheckM(body: any, res: any) {
-    const { nickname } = body;
-
-    const lowerCaseNickname = `${nickname.toLowerCase()}_m`;
-    const user = await this.mUserRepository.findOne({
-      where: { nickname: lowerCaseNickname },
-    });
-    if (user) {
-      return res.status(403).json({ error: '중복된 닉네임입니다.' });
-    }
-
-    return res.status(200).json({ message: '사용 가능한 닉네임입니다.' });
-  }
-
-  async processNicknameCheckZ(body: any, res: any) {
-    const { nickname } = body;
-
-    const lowerCaseNickname = `${nickname.toLowerCase()}_z`;
-    const user = await this.zUserRepository.findOne({
-      where: { nickname: lowerCaseNickname },
-    });
-    if (user) {
-      return res.status(403).json({ error: '중복된 닉네임입니다.' });
-    }
-
-    return res.status(200).json({ message: '사용 가능한 닉네임입니다.' });
-  }
 
 
 
@@ -221,16 +241,54 @@ export class AuthService {
       return res.status(200).json({ authenticated: false });
     }
     const token = this.jwtService.createAccessToken(username);
+    const userData = await this.AccountRepository.findOne({where: {account: username}})
 
-    let mode
-    if (username.includes("_m")){
-      mode = "mpk"
-    } else if (username.includes("_z")){
-      mode = "zpke"
-    } else {
-      mode = "babapk"
+    return res.status(200).json({ authenticated: true, username: username, token: token, babapk: userData.babapk, mpk: userData.mpk, zpke: userData.zpke, email: userData.email, origin: userData.how });
+  }
+
+  async validateGoolge(email: string): Promise<any> {
+    try {
+      let user = await this.AccountRepository.findOne({where: {account: email, how: "Google"}});
+
+      if (!user) {
+        user = this.AccountRepository.create({
+          account: email,
+          how: "Google"
+        })
+        await this.AccountRepository.save(user);
+      }
+
+    //  엑세스토큰 생성, 리프레시토큰 생성 및 저장은 컨트롤러영역에서 따로 지정
+    const refreshToken = this.jwtService.createRefreshToken(user.account);
+
+      return [user, refreshToken];
+    } catch (error) {
+      return false;
+    }
+  }
+
+
+  async validateKakao(id: string): Promise<any>{
+
+    try {
+      let user = await this.AccountRepository.findOne({where: {account: id, how: "Kakao"}});
+
+      if (!user) {
+        user = this.AccountRepository.create({
+          account: id,
+          how: "Kakao"
+        })
+        await this.AccountRepository.save(user);
+      }
+
+    //  엑세스토큰 생성, 리프레시토큰 생성 및 저장은 컨트롤러영역에서 따로 지정
+    const refreshToken = this.jwtService.createRefreshToken(user.account);
+
+      return [user, refreshToken];
+    } catch (error) {
+      return false;
     }
 
-    return res.status(200).json({ authenticated: true, username: username, token: token, mode: mode });
   }
+
 }

@@ -6,6 +6,7 @@ import { MUser } from '../entities/m-user.entity';
 import * as bcrypt from 'bcrypt';
 import * as nodemailer from 'nodemailer';
 import { ZUser } from 'src/entities/z-user.entity';
+import { Account } from 'src/entities/account.entity';
 
 interface ResetPasswordResult {
   success: boolean;
@@ -16,12 +17,8 @@ interface ResetPasswordResult {
 @Injectable()
 export class ResetPasswordService {
   constructor(
-    @InjectRepository(BUser)
-    private readonly bUserRepository: Repository<BUser>,
-    @InjectRepository(MUser)
-    private readonly mUserRepository: Repository<MUser>,
-    @InjectRepository(ZUser)
-    private readonly zUserRepository: Repository<ZUser>,
+    @InjectRepository(Account)
+    private readonly AccountRepository: Repository<Account>
   ) {}
 
   // 임시 비밀번호 생성 함수
@@ -58,18 +55,12 @@ export class ResetPasswordService {
   }
 
   // 비밀번호 재설정 로직
-  async resetPassword(nickname: string,email: string, userTable: string,): Promise<ResetPasswordResult> {
-    let repository
-    if (userTable === "b_user") {
-      repository = this.bUserRepository
-    } else if (userTable === "m_user")
-    {repository = this.mUserRepository}
-    else (userTable === "z_uer")
-    {repository = this.zUserRepository}
+  async resetPassword(nickname: string,email: string): Promise<ResetPasswordResult> {
+    let repository = this.AccountRepository
 
     try {
       // 사용자 이메일 조회
-      const user = await repository.findOne({ where: { nickname } });
+      const user = await repository.findOne({ where: { account: nickname } });
 
       if (!user) {
         throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
@@ -84,14 +75,8 @@ export class ResetPasswordService {
       const temporaryPasswordHash = await bcrypt.hash(temporaryPassword, 10);
 
       // 비밀번호 업데이트
-      user.pw = temporaryPasswordHash;
-      if (userTable === 'b_user') {
-        await (repository as Repository<BUser>).save(user);
-      } else if (userTable === 'm_user') {
-        await (repository as Repository<MUser>).save(user);
-      } else {
-        await (repository as Repository<ZUser>).save(user);
-      }
+      user.password = temporaryPasswordHash;
+        await (repository as Repository<Account>).save(user);
 
       // 이메일 전송
       await this.sendEmail(email, temporaryPassword);

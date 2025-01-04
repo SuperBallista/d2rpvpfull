@@ -23,6 +23,8 @@ import * as cookieParser from 'cookie-parser';
 import { JwtAuthMiddleware } from './jwt-auth/jwt-auth.middleware';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtService } from './jwt/jwt.service';
+import { ConnectModule } from './connect/connect.module';
+import { Account } from './entities/account.entity';
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import { jwtService } from './jwt/jwt.service';
         synchronize: false,
       }),
     }),
+    TypeOrmModule.forFeature([Account]), // Account 엔티티 등록
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'front'), // 정적 파일 경로 수정
     }),
@@ -58,10 +61,11 @@ import { jwtService } from './jwt/jwt.service';
     ResetPwModule,
     RankModule,
     RecordModule,
-    JwtModule
+    JwtModule,
+    ConnectModule
   ],
   controllers: [],
-  providers: [jwtService],
+  providers: [jwtService, JwtAuthMiddleware],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

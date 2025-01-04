@@ -1,30 +1,31 @@
-<script>
-import { myaccount, form, mode, jwtToken, SecurityFetch } from "../../store";
+<script lang="ts">
+import { form, modeinput, SecurityFetch, mybabapk, mympk, myzpke } from "../../store";
 
 
 let loginnickname = "";
   let loginpw = "";
 
 
-// 로그인 프로세스 함수 (클라이언트 코드)
+// 계정 연동을 위한 구 계정 로그인
 async function formprocess() {
-  let logindata = { nickname: loginnickname, password: loginpw };
+  let logindata = { nickname: loginnickname, password: loginpw, mode: $modeinput };
   try {
-    const endpoint = "/auth/"+ $mode + "/login";
+    const endpoint = "/connect/login";
     const response = await SecurityFetch(endpoint,"POST",logindata);
 
-    if (response.status === 200) {
+    if (response.status === 201) {
       const data = await response.json();
       
-      // JWT 토큰을 본문에서 가져오기
-      const jwtTokenFromHeader = data.accessToken;
-      if (jwtTokenFromHeader) {
-        jwtToken.set(jwtTokenFromHeader); // JWT 토큰 설정
-      }
-      myaccount.set(data.username); // 서버에서 사용자 정보를 받아서 설정
+      if ($modeinput === "babapk")
+    {mybabapk.set(data.nickname)}
+    else if ($modeinput === "mpk")
+    {mympk.set(data.nickname)}
+    else if ($modeinput === "zpke")
+    {myzpke.set(data.nickname)}
       form.set("none");
+    alert(data.nickname + " 계정을 연동하였습니다");
     } else {
-      alert("로그인 실패"); // 에러 메시지 출력
+      alert("로그인 실패 혹은 수정이 불가합니다"); // 에러 메시지 출력
     }
   } catch (error) {
     alert(error);
@@ -35,7 +36,7 @@ async function formprocess() {
 
 
 </script>
-<h3 class="message-title">{$mode} 로그인하기</h3>
+<h3 class="message-title">{$modeinput} 로그인하여 캐릭터 연동</h3>
 
 <div class="message-body">
 
@@ -44,5 +45,3 @@ async function formprocess() {
 <button class="emphasis-button block" on:click={() => formprocess()}>로그인</button>
     
 </div>
-<button class="message-button" on:click={() => form.set("findaccount")}>계정찾기</button>
-<button class="message-button" on:click={() => form.set("register")}>회원가입</button>

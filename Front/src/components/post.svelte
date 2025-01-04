@@ -151,7 +151,7 @@
                     {#if List_data.nickname === $myaccount}
                         <button class="simple-button" on:click={modify_post}>수정하기</button>
                     {/if}
-                    {#if $myaccount === "admin" || $myaccount === "admin_m" || List_data.writter === myaccount}
+                    {#if $myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z" || List_data.nickname === $myaccount}
                         <button class="simple-button" on:click={() => delete_post(id)}>삭제하기</button>
                     {/if}
                     <Link class="simple-button" to={`${modepage}/boardlist`}>목록보기</Link>
@@ -176,7 +176,7 @@
                     <td class="commentContent">{content}</td>
                     <td>{formatDate(createdAt)}</td>
                     <td>
-                        {#if nickname === $myaccount || $myaccount === "admin" || $myaccount === "admin_m"}
+                        {#if nickname === $myaccount || $myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z"}
                             <button class="simple-button small" on:click={() => delete_comment(id, commentId)}>삭제</button>
                         {/if}
                     </td>

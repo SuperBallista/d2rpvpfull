@@ -2,7 +2,9 @@
     import { onMount } from "svelte";
     import Calendar from "./calendar.svelte";
     import { mode, SecurityFetch } from "../store";
-    
+    import { useLocation } from "svelte-routing"
+
+    const location = useLocation()
     let eventname = {};
     const today = new Date();
     const currentYear = today.getFullYear();
@@ -13,6 +15,8 @@
     let month = currentMonth;
     let date: number | null = currentDate;
     let events = {};
+    $: pathname = $location.pathname;
+
   
     const clicknext = () => {
       let newMonth = month + 1;
@@ -66,6 +70,12 @@
     }
   
     onMount(() => {
+// if (pathname.includes("mpk"))
+// {mode.set("mpk")}
+// else if (pathname.includes("zpke"))
+// {mode.set("zpke")}
+// else if (pathname.includes("babapk"))
+// {mode.set("babapk")} 
       getCalendartext(today.getFullYear(), today.getMonth()); // 현재 달의 데이터를 가져옵니다
     });
   </script>

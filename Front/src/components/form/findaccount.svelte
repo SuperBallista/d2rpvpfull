@@ -18,7 +18,7 @@
     };
 
     try {
-      const endpoint = "/reset-pw/" + $mode
+      const endpoint = "/reset-pw"
       const response = await SecurityFetch(endpoint,"POST",findpwdata);
 
       if (response.ok) {
@@ -38,7 +38,7 @@
 
 <h3 class="message-title">{$mode} 계정찾기</h3>
 <div class="message-body">
-    <input class="input-text" type="text" bind:value={findnickname} placeholder="닉네임">
+    <input class="input-text" type="text" bind:value={findnickname} placeholder="계정 입력">
     <input
     type="text" 
     bind:value={findemail}

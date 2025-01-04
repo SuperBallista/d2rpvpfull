@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { mode, SecurityFetch, form } from "../../store";
+    import { SecurityFetch, form } from "../../store";
     import Terms from "./terms.svelte";
     import Privacy from "./privacy.svelte";
 
@@ -51,19 +51,19 @@
   }
 
   if (checked_nickname) {
-    alert("닉네임을 이미 확인하였습니다");
+    alert("계정을 이미 확인하였습니다");
   } else {
-    const checkEndpoint = `/auth/${$mode}/check-nickname`;
+    const checkEndpoint = `/auth/check-nickname`;
     const data = { nickname: reginickname };
 
     try {
       const response = await SecurityFetch(checkEndpoint, "POST", data);
       if (response.status === 200) {
-        alert("해당 닉네임은 사용 가능합니다");
+        alert("해당 계정은 사용 가능합니다");
         checked_nickname = true;
       } else if (response.status === 403)
       {
-        alert("해당 닉네임은 사용이 불가능합니다");
+        alert("해당 계정은 사용이 불가능합니다");
       }
       
     } catch (error) {
@@ -83,7 +83,7 @@
     };
 
     try {
-      const endpoint = `/auth/${$mode}/register`;
+      const endpoint = `/auth/register`;
       const response = await SecurityFetch(endpoint, "POST",payload);
       if (!response.ok) {
         throw new Error("회원가입에 실패했습니다.");
@@ -104,7 +104,7 @@
 
 
     </script>
-    <h3 class="message-title">{$mode} 가입하기</h3>
+    <h3 class="message-title">가입하기</h3>
     
     <div class="message-body">
 
@@ -129,7 +129,7 @@
 
 
  <input class="input-text" bind:value={reginickname} type="text" placeholder="닉네임">
- <button class="emphasis-button" on:click={checkNickname}>닉네임 확인</button>
+ <button class="emphasis-button" on:click={checkNickname}>계정 확인</button>
 
 {:else}
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { mode, form, myaccount, SecurityFetch, jwtToken } from "../../store";
+  import { form, myaccount, SecurityFetch, jwtToken, mybabapk, mympk, myUnionAccount, myzpke, email} from "../../store";
 
 let pw = "";
 
@@ -10,13 +10,18 @@ async function delete_account() {
   };
 
   try {
-    const endpoint = `/auth/${$mode}/delete`;
+    const endpoint = `/auth/delete`;
     const response = await SecurityFetch(endpoint,"DELETE",pwdata);
 
     if (response.status===200) {
       alert("계정 삭제 완료");
       form.set("none");
       myaccount.set("");
+      mybabapk.set("");
+      mympk.set("");
+      myzpke.set("");
+      myUnionAccount.set("");
+      email.set("");
       jwtToken.set("");
     } else {
       alert(`오류 발생: ${response.status}`);
@@ -32,7 +37,7 @@ async function delete_account() {
 </script>
 
 
-<h3 class="message-title">{mode ? "밀리PK" : "정통바바"} 계정 삭제</h3>
+<h3 class="message-title">계정 삭제</h3>
 
 <div class="message-body">
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { form, key } from "../store";
+import { form, key, modeinput } from "../store";
 import Login from "./form/login.svelte";
 import FindAccount from "./form/findaccount.svelte";
 import { onMount, onDestroy } from "svelte";
@@ -12,6 +12,9 @@ import Register from "./form/register.svelte";
   import Recordok from "./form/recordok.svelte";
   import Newevent from "./form/Newevent.svelte";
   import Challenge from "./form/challenge.svelte";
+  import Unionlogin from "./form/unionlogin.svelte";
+  import Connect from "./form/connect.svelte";
+
 
 function handleKeydown(event: KeyboardEvent) {
     if (event.key === "Escape") {
@@ -27,6 +30,7 @@ onMount(() => {
   onDestroy(() => {
     // 컴포넌트가 언마운트되었을 때 이벤트 리스너 제거
     window.removeEventListener("keydown", handleKeydown);
+    modeinput.set("");
   });
 
   function close() {
@@ -43,8 +47,10 @@ form.set("none");
       <!-- 닫기 버튼 -->
       <button class="close-button" on:click={() => close()}>&times;</button>
       <!-- 조건부 렌더링 -->
-  {#if $form === "login"}
+  {#if $form === "add"}
     <Login />
+  {:else if $form === "unionlogin"}
+  <Unionlogin/>
   {:else if $form === "findaccount"}
     <FindAccount />
   {:else if $form === "register"}
@@ -65,6 +71,8 @@ form.set("none");
 <Newevent/>
 {:else if $form === "challenge"}
 <Challenge/>
+{:else if $form === "connect"}
+<Connect/>
 {/if}
 
 

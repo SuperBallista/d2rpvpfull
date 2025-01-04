@@ -5,13 +5,14 @@
       mode,
       form,
       SecurityFetch,
-
-      jwtToken
-
+      jwtToken, email,
+      myUnionAccount,
+      mybabapk,
+      mympk,
+      myzpke
     } from "../../store";
   import { navigate } from "svelte-routing";
   
-    let email = "Loading";
     let rscore = "Loading";
     let bscore = "Loading";
     let lscore = "Loading";
@@ -25,10 +26,10 @@
     let challengeDate = "";
   
     async function fetchGameData() {
-      const endpoint = `/userdata/${$mode}/info`;
+      const endpoint = `/userdata/info`;
   
       try {
-        const response = await SecurityFetch(endpoint, "POST");
+        const response = await SecurityFetch(endpoint, "POST", {mode: $mode, nickname: $myaccount});
         if (response.ok) {
           const data = await response.json();
           if ($mode != "babapk") {
@@ -41,7 +42,6 @@
             challenge = data.challenge;
             challengeDate = data.challengeDate;
           } 
-            email = data.email;
             bscore = data.bscore;
             lscore = data.lscore;
             // rscore = data.rscore;
@@ -103,7 +103,12 @@
   navigate($mode === "babapk"? "/" : "/"+$mode)
   form.set("none")
   myaccount.set("")
+  myUnionAccount.set("")
+  mybabapk.set("")
+  mympk.set("")
+  myzpke.set("")
   jwtToken.set("")
+  email.set("")
   }
     catch (error)
     {
@@ -123,24 +128,17 @@
   <table class="info-table">
     <tbody>
       <tr>
-        <td>계정</td>
+        <td>캐릭터</td>
         <td>{$myaccount.replace("_m","").replace("_z","")}</td>
         <td><button class="simple-button" on:click={() => logout()}>로그아웃</button></td>
       </tr>
-      <tr>
-        <td>메일</td>
-        <td>{email}</td>
-        <td>
-          <button class="simple-button" on:click={() => form.set("changeemail")}>변경</button>
-        </td>
-      </tr>
-      <tr>
+      <!-- <tr>
         <td>암호</td>
         <td>********</td>
         <td>
           <button class="simple-button" on:click={() => form.set("changepw")}>변경</button>
         </td>
-      </tr>
+      </tr> -->
       {#if $mode != "babapk"}
         <!-- <tr>
           <td>대회점수</td>
@@ -192,13 +190,13 @@
           <td>{wins}/{loses}</td>
           <td></td>
         </tr>
-      <tr>
+      <!-- <tr>
         <td>탈퇴</td>
         <td></td>
         <td>
           <button class="simple-button" on:click={() => form.set("deleteaccount")}>탈퇴</button>
         </td>
-      </tr>
+      </tr> -->
     </tbody>
   </table>
   </div>

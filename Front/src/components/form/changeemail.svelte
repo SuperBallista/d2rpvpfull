@@ -1,7 +1,7 @@
 <script lang="ts">
 
 import {
-    mode,
+    email,
     form, SecurityFetch
   } from "../../store";
 
@@ -16,12 +16,13 @@ import {
     };
 
     try {
-      const endpoint = `/userdata/${$mode}/change-email`
+      const endpoint = `/userdata/change-email`
       const response = await SecurityFetch(endpoint, "POST",emaildata);
       const data = await response.json();
       
       if (typeof data.message === "string") {
         alert("이메일 변경 완료");
+        email.set(newemail)
         form.set("none")
     } else {
         alert(`오류 발생: ${response.status}`);

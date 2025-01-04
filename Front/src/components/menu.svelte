@@ -1,6 +1,6 @@
 <script lang="ts">
-      import { Link, useLocation, navigate } from "svelte-routing";
-      import { mode, form, myaccount, SecurityFetch, jwtToken } from "../store";
+      import { Link, useLocation } from "svelte-routing";
+      import { mode, form, myaccount, SecurityFetch, jwtToken, mybabapk, mympk, myzpke, myUnionAccount, email, myorigin } from "../store";
   import { onMount } from "svelte";
       
 
@@ -11,8 +11,8 @@
   let modeName
   let modeChange = "밀리PK"
   let modeChangeLink = "/mpk"
-  let modeSrc:string
-  let menuItems:any[]
+  let modeSrc = "/"
+  let menuItems:{label:string, href:string}[]
   $: pathname = $location.pathname;
 
   const toggleMenu = () => {
@@ -23,31 +23,43 @@
 $: if (pathname.includes("mpk"))
 {mode.set("mpk")
  modeName = "밀리PK"
- modeSrc = "/" + $mode
  modeChangeLink = "/zpke"
  modeChange = "질딘PK"
+ modeSrc = "/" + $mode
  menuSet()
+ myaccount.set($mympk || "")
 }
 else if (pathname.includes("zpke"))
 {mode.set("zpke")
 modeName = "질딘PK"
-modeChangeLink = "/"
-modeSrc = "/" + $mode
+modeChangeLink = "/babapk"
 modeChange = "정통바바"
+modeSrc = "/" + $mode
 menuSet()
+myaccount.set($myzpke || "")
 }
-else
+else if (pathname.includes("babapk"))
 {mode.set("babapk")
 modeName = "정통바바"
-modeSrc = "/" + $mode
 modeChangeLink = "/mpk"
 modeChange = "밀리PK"
+modeSrc = "/" + $mode
+menuSet()
+myaccount.set($mybabapk || "")
+}
+else
+{mode.set("")
+modeSrc = ""
 menuSet()
 }
 
 
 function menuSet() {
-  menuItems = [
+  menuItems = $mode === "" ? [
+    { label: "정통바바", href: "/babapk" },
+    { label: "통합밀리", href: "/mpk" },
+    { label: "질딘PK", href: "/zpke" },
+  ] : [
     { label: "공지사항", href: "/info" },
     { label: "랭킹조회", href: "/rank" },
     { label: "대전기록", href: "/record" },
@@ -65,9 +77,12 @@ function menuSet() {
 { document.body.style.backgroundColor = "#2a1e2e"}
 else if ($mode === "zpke")
 {document.body.style.backgroundColor = "#102a2d"}
+else if ($mode === "babapk")
+{document.body.style.backgroundColor = "#2a2d21"}
 else
 {document.body.style.backgroundColor = "#0d0d0d"}
 }
+
 
 
 
@@ -79,11 +94,13 @@ const response = await SecurityFetch("/auth/check-jwt", "POST")
 const data =  await response.json()
 if (data.authenticated)
 {
- myaccount.set(data.username);
+ myUnionAccount.set(data.username);
+ mybabapk.set(data.babapk);
+ mympk.set(data.mpk);
+ myzpke.set(data.zpke);
  jwtToken.set(data.token);
- mode.set(data.mode);
- navigate("/" + $mode)
- modeSrc =  "/" + $mode;
+ email.set(data.email);
+ myorigin.set(data.origin);
  menuSet()
 }
 else
@@ -230,7 +247,7 @@ onMount(async () => {
   
 
   <div class="menu-container">
-    <div class="menu-logo"><Link class="menu-logo-link" to={modeSrc}>D2RPvP</Link>   </div>
+    <div class="menu-logo"><Link class="menu-logo-link" to="/">D2RPvP</Link>   </div>
   
     <!-- Desktop Menu -->
     <div class="menu-items">
@@ -257,16 +274,20 @@ onMount(async () => {
 
   
   <div class="floating-button">
-    {#if ($myaccount === "")}
-    <button class="emphasis-button inline-block" on:click={() => form.set("login")}>
+    {#if $mode !== ""}
+    {#if $myUnionAccount === ""}
+    <Link class="emphasis-button inline-block" to="/">
       로그인
-    </button>
+    </Link>
+    {/if}
+    {#if $myaccount !==""}
+    <button class="simple-button" on:click={() => form.set("myinfo")}>나의정보</button>
+    {:else if $myUnionAccount !== ""}
+    <button class="simple-button" on:click={() => form.set("connect")}>등록하기</button>
+    {/if}
     <Link class="simple-button" to={modeChangeLink}>
       {modeChange}
     </Link>
-    {:else}
-    <button class="simple-button" on:click={() => form.set("myinfo")}>나의정보</button>
-    
-    {/if}
+{/if}
   </div>
   

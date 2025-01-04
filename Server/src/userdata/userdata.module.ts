@@ -9,12 +9,13 @@ import { BRecord } from '../entities/b-record.entity';
 import { MRecord } from 'src/entities/m-record.entity';
 import { ZUser } from 'src/entities/z-user.entity';
 import { ZRecord } from 'src/entities/z-record.entity';
+import { Account } from 'src/entities/account.entity';
 
 
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([BUser, MUser, ZUser, BRecord, MRecord, ZRecord]), // 엔티티 등록
+    TypeOrmModule.forFeature([BUser, MUser, ZUser, BRecord, MRecord, ZRecord, Account]), // 엔티티 등록
   ],
   controllers: [UserDataController],
   providers: [UserDataService]

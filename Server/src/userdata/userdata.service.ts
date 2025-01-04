@@ -10,6 +10,7 @@ import { MRecord } from 'src/entities/m-record.entity';
 import { ZUser } from 'src/entities/z-user.entity';
 import { ZOldRecord } from 'src/entities/z-oldrecord.entity';
 import { ZRecord } from 'src/entities/z-record.entity';
+import { Account } from 'src/entities/account.entity';
 
 @Injectable()
 export class UserDataService {
@@ -20,19 +21,20 @@ export class UserDataService {
     @InjectRepository(BRecord) private readonly bRecordRepository: Repository<BRecord>,
     @InjectRepository(MRecord) private readonly mRecordRepository: Repository<MRecord>,
     @InjectRepository(ZRecord) private readonly zRecordRepository: Repository<ZRecord>,
+    @InjectRepository(Account) private readonly AccountRepository: Repository<Account>
     // @InjectRepository(MClanRecord) private readonly mClanRecordRepository: Repository<MClanRecord>,
   ) {}
 
   // 사용자 정보 및 전적 조회
-  async getUserData(userNickname: string, userTable: string): Promise<any> {
+  async getUserData(nickname: string, userTable: string): Promise<any> {
 let user
-    if (userTable === 'b_user') {
-     user = await this.bUserRepository.findOne({ where: { nickname: userNickname } });
+    if (userTable === 'babapk') {
+     user = await this.bUserRepository.findOne({ where: { nickname } });
       }
-    else if (userTable === 'm_user') {
-      user = await this.mUserRepository.findOne({ where: { nickname: userNickname } });
-    } else {
-      user = await this.zUserRepository.findOne({where: { nickname: userNickname}});
+    else if (userTable === 'mpk') {
+      user = await this.mUserRepository.findOne({ where: { nickname } });
+    } else if (userTable === 'zpke') {
+      user = await this.zUserRepository.findOne({where: { nickname}});
     }
 
     try {
@@ -43,9 +45,9 @@ let user
 
         let recordRepository
         
-        if (userTable === 'b_user')
+        if (userTable === 'babapk')
           {recordRepository = this.bRecordRepository }
-        else if (userTable === 'm_user')
+        else if (userTable === 'mpk')
           {recordRepository =  this.mRecordRepository}
         else
           {recordRepository = this.zRecordRepository}
@@ -53,18 +55,18 @@ let user
       const [winCount, loseCount] = await Promise.all([
         recordRepository.count({
           where: [
-            { winner: userNickname },
-            { win2: userNickname },
-            { win3: userNickname },
-            { win4: userNickname },
+            { winner: nickname },
+            { win2: nickname },
+            { win3: nickname },
+            { win4: nickname },
           ],
         }),
         recordRepository.count({
           where: [
-            { loser: userNickname },
-            { lose2: userNickname },
-            { lose3: userNickname },
-            { lose4: userNickname },
+            { loser: nickname },
+            { lose2: nickname },
+            { lose3: nickname },
+            { lose4: nickname },
           ],
         }),
       ]);
@@ -77,8 +79,8 @@ let user
           countwin: winCount.toString(),
           countlose: loseCount.toString(),
           countrecord: (winCount + loseCount).toString(),
-          challenge: userTable != 'b_user'? user.challenge || "" : null,
-          challengeDate: userTable != 'b_user'? user.challengeDate || "" : null,
+          challenge: userTable != 'babapk'? user.challenge || "" : null,
+          challengeDate: userTable != 'babapk'? user.challengeDate || "" : null,
         }
     } catch (error) {
       console.error('사용자 정보 및 전적 조회 오류:', error);
@@ -87,36 +89,23 @@ let user
   }
 
   // 이메일 변경
-  async changeEmail(userNickname: string, nowpw: string, newemail: string, userTable: string): Promise<any> {
+  async changeEmail(userNickname: string, nowpw: string, newemail: string): Promise<any> {
     try {
-      let repository
-      if (userTable === "b_user")
-{repository = this.bUserRepository}
-      else if (userTable === "m_user")
-        {repository = this.mUserRepository}
-      else
-      {repository = this.zUserRepository}   
-
-      const user = await repository.findOne({ where: { nickname: userNickname } });
+      let repository = this.AccountRepository
+      const user = await repository.findOne({ where: { account: userNickname } });
 
       if (!user) {
         throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
       }
 
-      const passwordMatch = await bcrypt.compare(nowpw, user.pw);
+      const passwordMatch = await bcrypt.compare(nowpw, user.password);
 
       if (!passwordMatch) {
         throw new HttpException('현재 암호가 일치하지 않습니다.', HttpStatus.UNAUTHORIZED);
       }
 
       user.email = newemail;
-      if (userTable === 'b_user') {
-        await this.bUserRepository.save(user as BUser);
-      } else if (userTable === 'm_user') {
-        await this.mUserRepository.save(user as MUser);
-      } else
-      {await this.zUserRepository.save(user as ZUser);
-      }
+        await this.AccountRepository.save(user);
       return { success: true };
     } catch (error) {
       return { success: false };
@@ -124,38 +113,24 @@ let user
   }
 
   // 비밀번호 변경
-  async changePassword(userNickname: string, nowpw: string, newpw: string, userTable: string): Promise<any> {
+  async changePassword(userNickname: string, nowpw: string, newpw: string): Promise<any> {
     try {
 
-      let repository
-      if (userTable === "b_user")
-{repository = this.bUserRepository}
-      else if (userTable === "m_user")
-        {repository = this.mUserRepository}
-      else
-      {repository = this.zUserRepository}   
-
-      const user = await repository.findOne({ where: { nickname: userNickname } });
+      let repository = this.AccountRepository
+      const user = await repository.findOne({ where: { account: userNickname } });
 
       if (!user) {
         throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
       }
 
-      const passwordMatch = await bcrypt.compare(nowpw, user.pw);
+      const passwordMatch = await bcrypt.compare(nowpw, user.password);
 
       if (!passwordMatch) {
         throw new HttpException('현재 암호가 일치하지 않습니다.', HttpStatus.UNAUTHORIZED);
       }
 
-      user.pw = await bcrypt.hash(newpw, 10);
-      if (userTable === 'b_user') {
-        await this.bUserRepository.save(user as BUser);
-      } else if (userTable === 'm_user') {
-        await this.mUserRepository.save(user as MUser);
-      }
-      else {
-        await this.zUserRepository.save(user as ZUser);
-      }
+      user.password = await bcrypt.hash(newpw, 10);
+        await this.AccountRepository.save(user);
       return { success: true };
     } catch (error) {
       return { success: false };

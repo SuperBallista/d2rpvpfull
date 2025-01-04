@@ -1,6 +1,14 @@
 import { writable, get } from "svelte/store";
 
-export const mode = writable("babapk");
+export const mode = writable("");
+
+export const myUnionAccount = writable("");
+export const myorigin = writable("");
+export const mybabapk = writable("");
+export const mympk = writable("");
+export const myzpke = writable("");
+export const email = writable("");
+export const modeinput = writable("");
 
 
 export const jwtToken = writable('');
@@ -23,6 +31,7 @@ function getCookie(name: string) {
   
     if (token) {headers["d2rpvpjwttoken"] = token};
     if (csrfToken) {headers["X-CSRF-Token"] = csrfToken};
+    if (get(mode)) {headers["mode"] = get(mode)}
   
     const options: RequestInit = {
       method: method,
