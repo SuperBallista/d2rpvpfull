@@ -224,10 +224,10 @@ let isWebView = false;
 <h1>이 페이지는 현재 브라우저에서 동작하지 않습니다. 적절한 브라우저에서 열어주세요</h1>
 <div>
     {#if isAndroid}
-    <button on:click={openInChrome}>Chrome으로 열기</button>
+    <button class="emphasis-button" on:click={openInChrome}>Chrome으로 열기</button>
 {/if}
 {#if isiOS}
-    <button on:click={openInSafari}>Safari/Chrome으로 열기</button>
+    <button class="emphasis-button" on:click={openInSafari}>Safari/Chrome으로 열기</button>
 {/if}
 </div>
 
