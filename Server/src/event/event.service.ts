@@ -360,11 +360,11 @@ else
   async modifyMemo(eventData: any): Promise<void> {
   
   let EventRecordRepository
-  if (eventData.memo === "babapk")
+  if (eventData.mode === "babapk")
   {EventRecordRepository = this.bEventRecordRepository}
-  else if (eventData.memo === "mpk")
+  else if (eventData.mode === "mpk")
   {EventRecordRepository = this.mEventRecordRepository}
-  else
+  else if (eventData.mode === "zpke")
   {EventRecordRepository = this.zEventRecordRepository}
   try{
    await EventRecordRepository.update(
