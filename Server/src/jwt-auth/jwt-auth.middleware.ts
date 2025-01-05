@@ -27,6 +27,9 @@ export class JwtAuthMiddleware implements NestMiddleware {
     if (req.method === 'GET') {
       return next(); // GET 요청은 미들웨어 통과
     }
+    
+
+    
 
     const findNickname = async (account: string, mode: string): Promise<string> => {
       const userDB = await this.AccountRepository.findOne({ where: { account } });

@@ -14,6 +14,9 @@
 
     onMount(async () => {
 
+    // WebView 감지 실행
+    detectWebView();
+
         try{
         const token = sessionStorage.getItem('token');
 
@@ -123,10 +126,40 @@ async function Unconnect(mode:string) {
         }
 
     }
-
-
     
 }
+
+let isWebView = false;
+    let isAndroid = false;
+    let isiOS = false;
+
+    // WebView 감지 함수
+    function detectWebView() {
+        const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+
+        // Android WebView 감지
+        if (/wv/.test(userAgent) || /Android.*Version\/[0-9.]+.*Chrome\/[0-9.]+ Mobile/.test(userAgent)) {
+            isWebView = true;
+            isAndroid = true;
+        }
+
+        // iOS WebView 감지
+        if (/iPhone|iPad|iPod/.test(userAgent) && !/Safari/.test(userAgent)) {
+            isWebView = true;
+            isiOS = true;
+        }
+    }
+
+    // 이동 함수
+    function openInChrome() {
+        const intentUrl = "intent://d2rpvp.org#Intent;scheme=https;package=com.android.chrome;end;";
+        window.location.href = intentUrl;
+    }
+
+    function openInSafari() {
+        const safariUrl = "googlechrome://d2rpvp.org";
+        window.location.href = safariUrl;
+    }
 
 
 </script>
@@ -185,7 +218,24 @@ async function Unconnect(mode:string) {
         transform: scale(0.95);
     }
 </style>
+
+{#if isWebView}
+
+<h1>이 페이지는 현재 브라우저에서 동작하지 않습니다. 적절한 브라우저에서 열어주세요</h1>
+<div>
+    {#if isAndroid}
+    <button on:click={openInChrome}>Chrome으로 열기</button>
+{/if}
+{#if isiOS}
+    <button on:click={openInSafari}>Safari/Chrome으로 열기</button>
+{/if}
+</div>
+
+
+{:else}
+
 {#if $myUnionAccount === ""}
+
 
 <div class="social-login">
     <button class="button google" on:click={onGoogleLogin}>
@@ -278,4 +328,5 @@ async function Unconnect(mode:string) {
 </table>
 
 
+{/if}
 {/if}
