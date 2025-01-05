@@ -78,52 +78,38 @@ export class ConnectService {
     const { nickname, mode } = body;
 
     const lowerCaseNickname = nickname.toLowerCase();
-    const userData = await this.AccountRepository.findOne({where: {account}})
-    let isUser   
-    let user
-    let UserRepository
-    if (mode === "babapk")
-    {
-    UserRepository = this.bUserRepository;
-   isUser = UserRepository.findOne({where:{nickname}})
-  if (!isUser) {
-    userData.babapk = nickname
-    user = new BUser();
-    user.nickname = lowerCaseNickname;
-    user.bScore = START_SCORE;
-    user.lScore = 0;
-  }}
-  if (mode === "mpk")
-    {
-    UserRepository = this.mUserRepository;
-     isUser = UserRepository.findOne({where:{nickname}})
-    if (!isUser) {  
-    userData.mpk = nickname
-    user = new MUser();
-    user.nickname = lowerCaseNickname;
-    user.bScore = START_SCORE_M;
-    user.lScore = 0;
-  }}
-  if (mode === "zpke")
-    {
-    UserRepository = this.zUserRepository;
-     isUser = UserRepository.findOne({where:{nickname}})
-    if (!isUser) { 
-    userData.zpke = nickname
-    user = new ZUser();
-    user.nickname = lowerCaseNickname;
-    user.bScore = START_SCORE_Z;
-    user.lScore = 0;
-  }}
+    const userData = await this.AccountRepository.findOne({ where: { account } });
 
-  if (isUser)
-  {throw new HttpException('계정이 이미 있습니다', HttpStatus.CONFLICT)}
-  
+    const modeConfig = {
+        babapk: { repo: this.bUserRepository, class: BUser, startScore: START_SCORE },
+        mpk: { repo: this.mUserRepository, class: MUser, startScore: START_SCORE_M },
+        zpke: { repo: this.zUserRepository, class: ZUser, startScore: START_SCORE_Z },
+    };
+
+    const config = modeConfig[mode];
+    if (!config) {
+        throw new HttpException('잘못된 모드입니다.', HttpStatus.BAD_REQUEST);
+    }
+
+    const UserRepository = config.repo;
+    const isUser = await UserRepository.findOne({ where: { nickname } });
+
+    if (isUser) {
+        throw new HttpException('계정이 이미 있습니다.', HttpStatus.CONFLICT);
+    }
+
+    userData[mode] = nickname;
+    const user = new config.class();
+    user.nickname = lowerCaseNickname;
+    user.bScore = config.startScore;
+    user.lScore = 0;
+
     await UserRepository.save(user);
     await this.AccountRepository.save(userData);
 
     return res.json({ success: true, message: '캐릭터 추가가 완료되었습니다.' });
-  }
+}
+
 
   async deleteCharactor(
     userNickname: string,
