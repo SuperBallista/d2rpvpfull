@@ -8,8 +8,7 @@
     // 페이지 로드 시 닉네임 목록을 가져오고 현재 사용자 제외
     onMount(() => {
       fetchNicknames($mode);
-     nicknameexceptme = $mode==="babapk" ?
-     $nicknames.filter(item => item !== $myaccount) : $nicknames.filter(item => item !== $myaccount.replace("_m","").replace("_z",""));
+     nicknameexceptme = $nicknames.filter(item => item !== $myaccount);
   
     });
   
@@ -32,13 +31,7 @@ function handle_winner_change(event: Event): void {
     // 기록 전송 함수
     async function submitrecord() {
      
-      let data
-      if ($mode==="babapk")
-    {data =    { winner:winner, mode:$mode } }
-     else if ($mode === "mpk")
-     {data = {winner: winner+"_m", mode: $mode}}
-     else
-     {data = {winner: winner+"_z", mode: $mode}};
+      let data = { winner:winner, mode:$mode }
       try {
         const response = await SecurityFetch("/record/submit", "POST", data)
         if (response.ok) {
