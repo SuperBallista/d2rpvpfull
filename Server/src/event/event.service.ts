@@ -120,7 +120,7 @@ else
       repository = this.mEventRecordRepository
       scores = TEAMS_SCORES_M
     }
-    else
+    else if (mode === "zpke")
     {userRepository = this.zUserRepository
       repository = this.zEventRecordRepository
       scores = TEAMS_SCORES_Z
@@ -159,7 +159,7 @@ else
   
           for (const participant of participants) {
             const user = await userRepository.findOne({
-              where: { nickname: mode === "babapk"? participant : participant + "_"+ mode.slice(0,1) },
+              where: { nickname: participant },
             });
   
             if (user) {
@@ -210,7 +210,7 @@ else
         // 이벤트 호스트 점수
         if (mode != "zpke") {
         const user = await userRepository.findOne({
-          where: { nickname: mode === "babapk" ? Eventhost : Eventhost + "_m" },
+          where: { nickname: Eventhost },
         });
 
         if (user) {
@@ -282,7 +282,7 @@ else
   
           for (const participant of participants) {
             const user = await userRepository.findOne({
-              where: { nickname: mode === "babapk" ? participant: participant + "_" + mode.slice(0,1) },
+              where: { nickname: participant },
             });
   
             if (user) {
@@ -323,7 +323,7 @@ else
         {repository = this.bEventRecordRepository}
         else if (mode === "mpk")
         {repository = this.mEventRecordRepository}
-        else
+        else if (mode === "zpke")
         {repository = this.zEventRecordRepository}
   
         const eventRecord = await repository.findOne({
@@ -337,7 +337,7 @@ else
         // 이벤트 호스트 점수
         if (mode != "zpke") {
           const user = await userRepository.findOne({
-            where: { nickname: mode === "babapk" ? Eventhost : Eventhost + "_m" },
+            where: { nickname:  Eventhost },
           });
   
           if (user) {
