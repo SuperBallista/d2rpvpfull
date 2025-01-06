@@ -34,16 +34,15 @@ export class ConnectService {
 
     const UnionUser = await this.AccountRepository.findOne({where: {account: username}})
 
+    lowerCaseNickname = nickname.toLowerCase()
+
     if (mode === "mpk") {
-     lowerCaseNickname = nickname.toLowerCase()+"_m"  
      UserRepository = this.mUserRepository
     }
     else if (mode === "zpke") {
-     lowerCaseNickname = nickname.toLowerCase()+"_z"
      UserRepository = this.zUserRepository
     }
     else if (mode === "babapk") {
-      lowerCaseNickname = nickname.toLowerCase()
       UserRepository = this.bUserRepository
     }
   
