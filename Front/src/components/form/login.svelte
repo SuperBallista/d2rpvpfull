@@ -1,5 +1,5 @@
 <script lang="ts">
-import { form, modeinput, SecurityFetch, mybabapk, mympk, myzpke } from "../../store";
+import { form, mode, modeinput, SecurityFetch, mybabapk, mympk, myzpke } from "../../store";
 
 
 let loginnickname = "";
@@ -8,7 +8,7 @@ let loginnickname = "";
 
 // 계정 연동을 위한 구 계정 로그인
 async function formprocess() {
-  let logindata = { nickname: loginnickname, password: loginpw, mode: $modeinput };
+  let logindata = { nickname: loginnickname, password: loginpw, mode: $modeinput || $mode };
   try {
     const endpoint = "/connect/login";
     const response = await SecurityFetch(endpoint,"POST",logindata);
