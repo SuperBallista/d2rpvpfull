@@ -407,8 +407,8 @@
       </tr>
       {#if simulCheck.length > 0}
       <tr>
-        <td>프레임 단위 시뮬레이션 결과 검증</td>
-        <td><input class="input-text short" type="number" bind:value={checkframe} max={simulframeResult} min="0"></td>
+        <td>{checkframe} 프레임 보기</td>
+        <td><input class="input-text short" type="range" bind:value={checkframe} max={simulframeResult} min="0"></td>
       </tr>
       <tr>
         <td>

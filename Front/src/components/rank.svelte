@@ -166,7 +166,7 @@
                   순위: {user.rank}<br />
                   Elo: {(Math.round(user.Elo * 100) / 100).toFixed(2)}<br />
                   {user.wins} 승 / {user.losses} 패<br />
-                  {#if Number(myRank) > Number(user.rank)}
+                  {#if (Number(myRank) > Number(user.rank)) && ($mode != "babapk")}
                     <button class="simple-button" on:click={() => challengeRank(user.nickname)}>
                       도전하기
                     </button>
