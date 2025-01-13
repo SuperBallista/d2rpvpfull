@@ -1,5 +1,5 @@
 <script lang="ts">
-import { form, mode, modeinput, SecurityFetch, mybabapk, mympk, myzpke } from "../../store";
+import { form, mode, modeinput, SecurityFetch, mybabapk, mympk, myzpke, lang } from "../../store";
 
 
 let loginnickname = "";
@@ -23,9 +23,9 @@ async function formprocess() {
     else if ($modeinput === "zpke")
     {myzpke.set(data.nickname)}
       form.set("none");
-    alert(data.nickname + " 계정을 연동하였습니다");
+    alert(data.nickname + ($lang ?  " 계정을 연동하였습니다" : "Connected"));
     } else {
-      alert("로그인 실패 혹은 수정이 불가합니다"); // 에러 메시지 출력
+      alert($lang ? "로그인 실패 혹은 수정이 불가합니다" : "Connecting Failed"); // 에러 메시지 출력
     }
   } catch (error) {
     alert(error);
@@ -36,12 +36,12 @@ async function formprocess() {
 
 
 </script>
-<h3 class="message-title">{$modeinput} 로그인하여 캐릭터 연동</h3>
+<h3 class="message-title">{$modeinput} {$lang ? "로그인하여 캐릭터 연동" : "Connect Legacy Character"}</h3>
 
 <div class="message-body">
 
-<input class="input-text" bind:value={loginnickname} type="text" placeholder="닉네임">
-<input class="input-text" bind:value={loginpw} type="password" placeholder="비밀번호">
-<button class="emphasis-button block" on:click={() => formprocess()}>로그인</button>
+<input class="input-text" bind:value={loginnickname} type="text" placeholder={$lang ? "닉네임" : "Nickname"}>
+<input class="input-text" bind:value={loginpw} type="password" placeholder={$lang ? "비밀번호" : "Password"}>
+<button class="emphasis-button block" on:click={() => formprocess()}>{$lang ? "로그인" : "Connect"}</button>
     
 </div>

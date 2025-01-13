@@ -33,14 +33,14 @@ export class BoardService {
         ])
         .orderBy('post.postId', 'DESC')
         .skip((page - 1) * 20)
-        .take(20);
+        .take(21);
   
       if (category !== 'all') {
         queryBuilder.where('post.category = :category', { category });
       }
   
-      const posts = await queryBuilder.getMany();
-  
+      let posts = await queryBuilder.getMany();
+
       // 데이터 매핑
       return posts.map(post => ({
         post_id: post.postId,
@@ -78,31 +78,36 @@ export class BoardService {
     }
   }
 
-  async createPost({ title, category, content, nickname }: { title: string; category: string; content: string; nickname: string }) {
+  async createPost({ title, category, content, nickname, account }: { title: string; category: string; content: string; nickname: string, account: string }) {
     try {
       const sanitizedContent = this.sanitizeContent(content);
-      const post = this.postRepository.create({ title, category, content: sanitizedContent, nickname });
+      const post = this.postRepository.create({ title, category, content: sanitizedContent, nickname, account});
       await this.postRepository.save(post);
     } catch (error) {
       throw new HttpException('Error creating post', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async modifyPost({ title, category, content, postId, nickname }: { title: string; category: string; content: string; postId: number; nickname: string }) {
+  async modifyPost({ title, category, content, postId, nickname, account }: { title: string; category: string; content: string; postId: number; nickname: string; account:string }) {
     try {
-      const post = await this.postRepository.findOne({ where: { postId: Number(postId), nickname } });
+      const post = await this.postRepository.findOne({ where: { postId: Number(postId)} });
+      if (post.account !== account) {
+        throw new HttpException("수정할 수 없습니다" , HttpStatus.FORBIDDEN)
+      }
       if (!post) {
-        throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+        throw new HttpException('포스트가 없습니다', HttpStatus.NOT_FOUND);
       }
 
       post.title = title;
       post.category = category;
       post.content = this.sanitizeContent(content);
       post.updatedAt = new Date();
+      post.nickname = nickname
+      post.account = account
 
       await this.postRepository.save(post);
     } catch (error) {
-      throw new HttpException('Error modifying post', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException('포스트 수정에 실패하였습니다', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
   async getPost(postId: number): Promise<Post> {
@@ -131,7 +136,7 @@ export class BoardService {
   }
   
 
-  async deletePost(postId: number, nickname: string): Promise<void> {
+  async deletePost(postId: number, account: string, admin: string[]): Promise<void> {
     try {
       
        const post = await this.postRepository.findOne({ where: { postId: Number(postId) } });
@@ -139,7 +144,7 @@ export class BoardService {
         throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
       }
 
-      if (nickname !== "admin" && nickname !== "admin_m" && nickname !=="admin_z" && nickname !== post.nickname )
+      if (admin.length === 0 && account !== post.account )
       {throw new HttpException('삭제 권한이 없습니다', HttpStatus.FORBIDDEN);}
 
       await this.postRepository.delete({ postId });
@@ -148,21 +153,21 @@ export class BoardService {
     }
   }
 
-  async addComment({ postId, nickname, content }: { postId: number; nickname: string; content: string }): Promise<void> {
+  async addComment({ postId, nickname, content, account }: { postId: number; nickname: string; content: string; account: string; }): Promise<void> {
     try {
       const post = await this.postRepository.findOne({ where: { postId: Number(postId) } });
       if (!post) {
         throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
       }
 
-      const comment = this.commentRepository.create({ postId: Number(postId), nickname, content });
+      const comment = this.commentRepository.create({ postId: Number(postId), account, content, nickname });
       await this.commentRepository.save(comment);
     } catch (error) {
       throw new HttpException('Error adding comment', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async deleteComment(commentId: number, nickname: string): Promise<void> {
+  async deleteComment(commentId: number, account: string, admin: string[]): Promise<void> {
     try {
       const comment = await this.commentRepository.findOne({ where: { commentId: Number(commentId)} });
       
@@ -170,7 +175,7 @@ export class BoardService {
         throw new HttpException('Comment not found', HttpStatus.NOT_FOUND);
       }
 
-      if (nickname !== "admin" && nickname !== "admin_m" && nickname !=="admin_z" && nickname !== comment.nickname )
+      if (admin.length === 0 && account !== comment.account )
         {throw new HttpException('삭제 권한이 없습니다', HttpStatus.FORBIDDEN);}
 
       await this.commentRepository.delete({ commentId });

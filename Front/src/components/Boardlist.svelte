@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { Link } from "svelte-routing";
-    import { formatDate, page, category, myaccount, mode, SecurityFetch } from "../store";
+    import { formatDate, page, category, myaccount, mode, SecurityFetch, lang } from "../store";
   
     interface Post {
       post_id: string;
@@ -15,6 +15,7 @@
     let loading: boolean = true;
     let errormsg: string | null = null;
     let List_data: Post[] = [];
+    let next:boolean
   
     onMount(() => {
       fetchList($category);
@@ -43,7 +44,7 @@
             {
               post_id: "-",
               date: "-",
-              title: "검색 결과가 없습니다",
+              title: $lang ? "검색 결과가 없습니다" : "No Data",
               writter: "-",
               views: 0,
             },
@@ -72,10 +73,20 @@
         }
   
         const responsedata: Post[] = await response.json();
+
         List_data = responsedata.map((item) => ({
           ...item,
           date: formatDate(item.date),
         }));
+
+        if (List_data.length===21)
+        {List_data.pop
+          next = true
+        }
+        else {
+          next = false
+        }
+
         loading = false;
         word = "";
       } catch (error) {
@@ -87,7 +98,7 @@
   
   {#if $myaccount}
   <div class="fixed-button-div">
-  <Link to={`${modepage}/write`} class="simple-button">작성하기</Link>
+  <Link to={`${modepage}/write`} class="simple-button">{$lang ? "작성하기" : "Write"}</Link>
 </div>
 {/if}
 
@@ -96,30 +107,30 @@
       bind:value={$category}
       on:change={() => fetchList($category)}
     >
-      <option value="all">모든 글 보기</option>
-      <option value="free">자유 글 보기</option>
-      <option value="trade">거래 글 보기</option>
-      <option value="setting">공략 글 보기</option>
+      <option value="all">{$lang ? "모든 글 보기" : "Show All Posts"}</option>
+      <option value="free">{$lang ? "자유 글 보기" : "Show Free Posts"}</option>
+      <option value="trade">{$lang ? "거래 글 보기" : "Show Trade Posts"}</option>
+      <option value="setting">{$lang ? "공략 글 보기" : "Show Guide Posts"}</option>
     </select>
   
     <input class="input-text" type="text" bind:value={word} />
-    <button class="simple-button small" on:click={() => fetchSearch($category)}>검색</button>
+    <button class="simple-button small" on:click={() => fetchSearch($category)}>{$lang ? "검색" : "Search"}</button>
   
   
   <!-- 테이블 구조 -->
   <table>
     <thead>
       <tr>
-        <th class="table-head_board_date">날짜</th>
-        <th class="table-head_board_title">제목</th>
-        <th class="table-head_board_writter">작성자</th>
-        <th class="table-head_board_views">조회수</th>
+        <th class="table-head_board_date">{$lang ? "날짜":"Date"}</th>
+        <th class="table-head_board_title">{$lang ? "제목":"Title"}</th>
+        <th class="table-head_board_writter">{$lang ? "작성자":"Writter"}</th>
+        <th class="table-head_board_views">{$lang ? "조회수":"Views"}</th>
       </tr>
     </thead>
     <tbody>
       {#if loading}
         <tr>
-          <td colspan="4">로딩 중...</td>
+          <td colspan="4">{$lang ? "로딩 중" : "Loading"}...</td>
         </tr>
       {:else if errormsg}
         <tr>
@@ -142,10 +153,10 @@
   
   <div class="pagination">
     {#if $page != 1}
-      <button class="simple-button" on:click={() => changepage(-1)}>이전</button>
+      <button class="simple-button" on:click={() => changepage(-1)}>{$lang ? "이전":"before"}</button>
     {/if}
-    {#if List_data.length === 20}
-      <button class="simple-button" on:click={() => changepage(1)}>다음</button>
+    {#if next === true}
+      <button class="simple-button" on:click={() => changepage(1)}>{$lang ? "다음" : "Next"}</button>
     {/if}
   </div>
   

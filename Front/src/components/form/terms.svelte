@@ -1,3 +1,4 @@
+
 <strong>웹사이트 이용 약관</strong>
 <p>
   D2R PvP는 Diablo 2: Resurrected에서 PvP(플레이어 대 플레이어) 매치에

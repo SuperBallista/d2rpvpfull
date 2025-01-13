@@ -1,5 +1,6 @@
 
 <script lang="ts">
+  import {lang} from "../store"
     interface Winner {
       season: string;
       first: string;
@@ -10,6 +11,8 @@
 
     import { mode }  from "../store"
    
+    let hide = $lang ? "이전 시즌 결과 숨기기" : "Hide Past Season"
+    let show = $lang ? "이전 시즌 결과 보이기" : "Show Past Season"
     let babapkwinner = [
         {
       season: "2024.10-11 랭킹전",
@@ -357,10 +360,10 @@
     <table>
       <thead>
         <tr>
-          <th>시즌 이름</th>
-          <th>1위</th>
-          <th>2위</th>
-          <th>3위</th>
+          <th>{$lang ? "시즌 이름" : "Season Name"}</th>
+          <th>{$lang ? "1위" : "1st"}</th>
+          <th>{$lang ? "2위" : "2nd"}</th>
+          <th>{$lang ? "3위" : "3rd"}</th>
         </tr>
       </thead>
       <tbody>
@@ -382,7 +385,7 @@
   
     <div class="toggle-wrapper">
       <button class="simple-button" on:click={togglePastwinners}>
-        {showPastWinner ? "이전 시즌 결과 숨기기" : "이전 시즌 결과 보기"}
+        {showPastWinner ? hide : show}
       </button>
     </div>
   
@@ -390,10 +393,10 @@
       <table>
         <thead>
           <tr>
-            <th>시즌 이름</th>
-            <th>1위</th>
-            <th>2위</th>
-            <th>3위</th>
+            <th>{$lang ? "시즌 이름" : "Season Name"}</th>
+            <th>{$lang ? "1위" : "1st"}</th>
+            <th>{$lang ? "2위" : "2nd"}</th>
+            <th>{$lang ? "3위" : "3rd"}</th>
           </tr>
         </thead>
         <tbody>

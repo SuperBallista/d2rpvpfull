@@ -2,7 +2,7 @@
 
 import {
     email,
-    form, SecurityFetch
+    form, SecurityFetch, lang
   } from "../../store";
 
   let pw = "";
@@ -21,7 +21,7 @@ import {
       const data = await response.json();
       
       if (typeof data.message === "string") {
-        alert("이메일 변경 완료");
+        alert($lang ? "이메일 변경 완료" : "E-mail Changed");
         email.set(newemail)
         form.set("none")
     } else {
@@ -38,14 +38,14 @@ import {
 
 
 
-<h3 class="message-title">이메일 변경</h3>
+<h3 class="message-title">{$lang ? "이메일 변경" : "Change Your Email"}</h3>
 
 <div class="message-body">
 
-<input class="input-text" bind:value={newemail} type="text" placeholder="새 이메일">
-<input class="input-text" bind:value={pw} type="password" placeholder="비밀번호">
+<input class="input-text" bind:value={newemail} type="text" placeholder={$lang ? "새 이메일" : "New E-mail"}>
+<input class="input-text" bind:value={pw} type="password" placeholder={$lang ? "비밀번호" : "Password"}>
 <br/>
-<button class="emphasis-button" on:click={() => changeemail()}>변경하기</button>
+<button class="emphasis-button" on:click={() => changeemail()}>{$lang ? "변경하기" : "Change"}</button>
     
 </div>
-<button class="message-button" on:click={() => form.set("myinfo")}>돌아가기</button>
+<button class="message-button" on:click={() => form.set("myinfo")}>{$lang ? "돌아가기" : "Back"}</button>

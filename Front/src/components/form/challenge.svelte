@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { SecurityFetch, mode } from "../../store";
+    import { SecurityFetch, mode, lang } from "../../store";
   
     interface Record {
       challengeDate: string; // 날짜 정보
@@ -20,30 +20,31 @@
         recordData = await response.json();
       } catch (error) {
         console.error("데이터 불러오기 오류:", (error as Error).message);
-        alert("정보를 불러오는 중 오류가 발생하였습니다");
+        alert(error);
       }finally {
     // 로딩 상태를 항상 업데이트
     loading = false;
   }
     }
   
+
     // 레코드 승인/삭제 요청 함수
     async function handleRecord(action: "win" | "lose", challenger: string): Promise<void> {
       const endpoint: string = action === "win" ? "/record/challenge/win" : "/record/challenge/lose";
       const data = { challenger, mode: $mode };
-  
+  const win = $lang ? "도전을 승인하였습니다, 결과는 대전 기록에서 입력해주세요." : "You accepted challenge. You should input result on 'Records'"
+  const giveUp = $lang ? "경기를 포기하여 자동 패배처리합니다" : "You give up games, your records add 1 lost game"
       try {
         const response = await SecurityFetch(endpoint, "POST", data);
   
         if (response.ok) {
           alert(
             action === "win"
-              ? "도전을 승인하였습니다, 결과는 대전 기록에서 입력해주세요."
-              : "경기를 포기하여 자동 패배처리합니다"
+              ? win : giveUp
           );
           fetchGameData();
         } else {
-          throw new Error(`오류 발생: ${response.status}`);
+          throw new Error(`Error Code: ${response.status}`);
         }
       } catch (error) {
         console.error(`${action === "win" ? "승인" : "삭제"} 오류:`, (error as Error).message);
@@ -56,24 +57,24 @@
       fetchGameData();
     });
   </script>
-  <h3 class="message-title">도전 승인하기</h3>
+  <h3 class="message-title">{$lang ? "도전 승인하기" : "Challenge Accept"}</h3>
 
   <div class="message-body">
 
   <table>
     <thead>
     <tr>
-      <th class="record-table-date">날짜</th>
-      <th class="record-table-loser">도전자</th>
-      <th class="record-table-score">결과</th>
+      <th class="record-table-date">{$lang ? "날짜" : "Date"}</th>
+      <th class="record-table-loser">{$lang ? "도전자" : "Challenger"}</th>
+      <th class="record-table-score">{$lang ? "결과" : "Result"}</th>
     </tr>
 </thead>
     {#if loading}
     <tbody>
-      <tr><td colspan="3" class="text-center">로딩 중...</td></tr></tbody>
+      <tr><td colspan="3" class="text-center">{$lang ? "로딩 중" : "Loading"}...</td></tr></tbody>
     {:else if recordData.length === 0}
     <tbody>
-      <tr><td colspan="3" class="text-center">기록이 없습니다</td></tr></tbody>
+      <tr><td colspan="3" class="text-center">{$lang ? "기록이 없습니다" : "No Data"}</td></tr></tbody>
     {:else}
     <tbody>
       {#each recordData as row}
@@ -81,8 +82,8 @@
           <td>{new Date(row.challengeDate).toLocaleDateString()}</td>
           <td>{$mode ? row.nickname.replace("_m", "") : row.nickname}</td>
           <td>
-            <button class="small simple-button" on:click={() => handleRecord("win", row.nickname)}>경기</button>
-            <button class="small simple-button" on:click={() => handleRecord("lose", row.nickname)}>기권</button>
+            <button class="small simple-button" on:click={() => handleRecord("win", row.nickname)}>{$lang ? "경기" : "Play"}</button>
+            <button class="small simple-button" on:click={() => handleRecord("lose", row.nickname)}>{$lang ? "포기" : "Give Up"}</button>
           </td>
         </tr>
       {/each}

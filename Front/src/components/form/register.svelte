@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { SecurityFetch, form } from "../../store";
+    import { SecurityFetch, form, lang } from "../../store";
     import Terms from "./terms.svelte";
     import Privacy from "./privacy.svelte";
 
@@ -24,19 +24,19 @@
   function validateNickname(nickname:string) {
   // 닉네임 공백 체크
   if (!nickname || nickname.trim() === "") {
-    return { isValid: false, message: "닉네임을 입력해주세요." };
+    return { isValid: false, message: $lang ? "닉네임을 입력해주세요." : "Input Your Nickname" };
   }
 
   // 정규식: 알파벳, 숫자, 밑줄(_)만 허용, 길이는 3~20자
-  const nicknameRegex = /^[a-zA-Z가-힣]{3,20}$/;
+  const nicknameRegex = /^[\u4E00-\u9FFF\u3400-\u4DBF\u20000-\u2EBFF\u2E80-\u2EFF\u2F00-\u2FDF\u3007\uAC00-\uD7A3a-zA-Z]{3,20}$/;
   if (!nicknameRegex.test(nickname)) {
     return {
       isValid: false,
-      message: "닉네임은 3~20자의 알파벳, 한글만 허용됩니다.",
+      message: $lang ? "닉네임은 3~20자의 알파벳, 한글, 중국어만 허용됩니다." : "Nicknames must be 3 to 20 characters long and can only include alphabets, Korean, and Chinese characters.",
     };
   }
 
-  return { isValid: true, message: "닉네임이 유효합니다." };
+  return { isValid: true, message: $lang ? "닉네임이 유효합니다." : "You can use this nickname" };
 }
 
 
@@ -51,7 +51,7 @@
   }
 
   if (checked_nickname) {
-    alert("계정을 이미 확인하였습니다");
+    alert($lang ? "계정을 이미 확인하였습니다" : "Your Account name checked");
   } else {
     const checkEndpoint = `/auth/check-nickname`;
     const data = { nickname: reginickname };
@@ -59,11 +59,11 @@
     try {
       const response = await SecurityFetch(checkEndpoint, "POST", data);
       if (response.status === 200) {
-        alert("해당 계정은 사용 가능합니다");
+        alert($lang ? "해당 계정은 사용 가능합니다" : "You can use this name");
         checked_nickname = true;
       } else if (response.status === 403)
       {
-        alert("해당 계정은 사용이 불가능합니다");
+        alert($lang ? "해당 계정은 사용이 불가능합니다" : "You can't use this name");
       }
       
     } catch (error) {
@@ -86,12 +86,12 @@
       const endpoint = `/auth/register`;
       const response = await SecurityFetch(endpoint, "POST",payload);
       if (!response.ok) {
-        throw new Error("회원가입에 실패했습니다.");
+        throw new Error($lang ? "회원가입에 실패했습니다." : "Register Failed");
       }
 
      if (response.status===201) {
 
-      alert("회원가입이 성공적으로 완료되었습니다.");
+      alert($lang ? "회원가입이 성공적으로 완료되었습니다." : "Register Success");
       form.set("none")
     }
     } catch (error) {

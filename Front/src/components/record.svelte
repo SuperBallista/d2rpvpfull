@@ -6,6 +6,8 @@
       myaccount,
       key,
       mode,
+      admin,
+      lang,
       SecurityFetch, form
     } from "../store.js";
   
@@ -30,7 +32,7 @@
         filteredData = applyFilter(recordData);
         updatePaginatedData();
       } catch (error: unknown) {
-        alert("서버 오류가 발생하여 자료를 불러올 수 없습니다");
+        alert($lang ? "서버 오류가 발생하여 자료를 불러올 수 없습니다" : "Server Error");
       } finally {
         loading = false;
       }
@@ -110,13 +112,13 @@
       try {
         const response = await SecurityFetch("/record/delete", "DELETE", data);
         if (response.status === 200) {
-          alert("삭제 완료하였습니다");
+          alert($lang ? "삭제 완료하였습니다" : "Remove Complete");
           fetchData();
         } else {
           alert(`오류 발생: ${response.status}`);
         }
       } catch (error: unknown) {
-        alert(`오류 발생: ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
+        alert(`Error : ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
       }
     }
 
@@ -139,7 +141,7 @@ if (checkData.length===0)
   {newdata = true}
    
   } catch (error) {
-    console.error("데이터 불러오기 오류:", error);
+    console.error("Error :", error);
   }
 }
 }
@@ -163,19 +165,19 @@ if (checkData.length===0)
   
   <div class="table-outline">
     {#if loading}
-      <p>로딩 중...</p>
+      <p>{$lang ? "로딩 중" : "Loading"}...</p>
     {:else if error}
       <p>Error: {error}</p>
     {:else}
       <table class="data-table">
         <thead>
           <tr>
-            <th>번호</th>
-            <th>승자</th>
-            <th>패자</th>
-            <th>날짜</th>
-            {#if $myaccount === "admin_m" || $myaccount === "admin" || $myaccount === "admin_z"}
-              <th>관리</th>
+            <th>{$lang ? "번호" : "No."}</th>
+            <th>{$lang ? "승자" : "Win"}</th>
+            <th>{$lang ? "패자" : "Lose"}</th>
+            <th>{$lang ? "날짜" : "Date"}</th>
+            {#if $admin.includes($mode)}
+              <th>{$lang ? "삭제" : "Set"}</th>
             {/if}
           </tr>
         </thead>
@@ -186,9 +188,9 @@ if (checkData.length===0)
               <td>{winner.replace("_m", "").replace("_z","")}</td>
               <td>{loser.replace("_m", "").replace("_z","")}</td>
               <td>{date}</td>
-              {#if $myaccount === "admin_m" || $myaccount === "admin" || $myaccount === "admin_z"}
+              {#if $admin.includes($mode)}
                 <td>
-                  <button class="simple-button small" on:click={() => delete_row(orderNum)}>삭제</button>
+                  <button class="simple-button small" on:click={() => delete_row(orderNum)}>{$lang ? "삭제" : "Remove"}</button>
                 </td>
               {/if}
             </tr>
@@ -197,8 +199,8 @@ if (checkData.length===0)
       </table>
       <div class="pagination">
         {#if currentPage > 1}
-          <button class="simple-button" on:click={() => changePage(1)}>처음</button>
-          <button class="simple-button" on:click={() => changePage(currentPage - 1)}>이전</button>
+          <button class="simple-button" on:click={() => changePage(1)}>{$lang ? "처음" : "First"}</button>
+          <button class="simple-button" on:click={() => changePage(currentPage - 1)}>{$lang ? "이전" : "Before"}</button>
         {/if}
         {#each visiblePages as page}
           <button class={page===currentPage? "emphasis-button" : "simple-button" } on:click={() => changePage(page)}>
@@ -206,17 +208,17 @@ if (checkData.length===0)
           </button>
         {/each}
         {#if currentPage < totalPages}
-          <button class="simple-button" on:click={() => changePage(currentPage + 1)}>다음</button>
-          <button class="simple-button" on:click={() => changePage(totalPages)}>마지막</button>
+          <button class="simple-button" on:click={() => changePage(currentPage + 1)}>{$lang ? "다음" : "Next"}</button>
+          <button class="simple-button" on:click={() => changePage(totalPages)}>{$lang ? "마지막" : "Last"}</button>
         {/if}
       </div>
     {/if}
 
 
-    {#if $myaccount && $myaccount != "admin_m" && $myaccount != "admin" && $myaccount != "admin_z"}
+    {#if $myaccount}
       <div class="fixed-button-div">
-        <button class="simple-button" on:click={() => form.set("recordcreate")}>기록하기</button>
-        <button class="simple-button" on:click={() => form.set("recordok")}>승인하기
+        <button class="simple-button" on:click={() => form.set("recordcreate")}>{$lang ? "기록하기" : "Record"}</button>
+        <button class="simple-button" on:click={() => form.set("recordok")}>{$lang ? "승인하기" : "Accept"}
          {#if newdata}       
           <span class="badge">NEW</span>
         {/if}        

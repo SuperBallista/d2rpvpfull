@@ -9,7 +9,9 @@
       myUnionAccount,
       mybabapk,
       mympk,
-      myzpke
+      myzpke,
+      admin, lang
+
     } from "../../store";
   import { navigate } from "svelte-routing";
   
@@ -50,7 +52,7 @@
         }
       } catch (error) {
         console.error("정보를 불러오는 중 오류가 발생하였습니다:", error);
-        alert("정보를 불러오는 중 오류가 발생하였습니다");
+        alert(error);
       }
     }
   
@@ -60,7 +62,7 @@
       try {
         const response = await SecurityFetch("/userdata/challenge/cancel", "DELETE", data);
         if (response.status === 200) {
-          alert("도전 중인 게임 정보를 삭제하였습니다");
+          alert($lang ? "도전 중인 게임 정보를 삭제하였습니다" : "You cancel challenge");
         }
       } catch (error) {
         console.error("요청에 실패하였습니다", error);
@@ -77,17 +79,19 @@
     // JSON 응답 처리
     const responseData = await response.json();
 
+    const msg = $lang ? "도전 중이 아니거나 응답 기간이 끝나지 않았습니다" : "You didn't challenge game or it is still within the period."
+    
     if (response.status === 201) {
-      alert("도전 기간에 상대가 응답하지 않아 자동 승리로 입력되었습니다");
+      alert($lang ? "도전 기간에 상대가 응답하지 않아 자동 승리로 입력되었습니다" : "You win because your Opposite give up the match");
     } else if (response.status === 400) {
-      alert(responseData.message || "도전 중이 아니거나 응답 기간이 끝나지 않았습니다");
+      alert(responseData.message || msg);
     } else {
-      alert("알 수 없는 상태 코드: " + response.status);
+      alert("Error Code :" + response.status);
     }
   } catch (error) {
     // 예상치 못한 네트워크 오류 처리
     console.error("요청에 실패하였습니다:", error);
-    alert("요청 처리 중 오류가 발생했습니다. 네트워크 상태를 확인해주세요.");
+    alert(error);
   }
 }
 
@@ -99,8 +103,8 @@
     async function logout() {
     try{
  await SecurityFetch("/auth/logout", "POST")
-  alert("로그아웃하였습니다")  
-  navigate($mode === "babapk"? "/" : "/"+$mode)
+ alert($lang ? "로그아웃하였습니다" : "Logout success")  
+ navigate($mode === "babapk"? "/" : "/"+$mode)
   form.set("none")
   myaccount.set("")
   myUnionAccount.set("")
@@ -109,6 +113,7 @@
   myzpke.set("")
   jwtToken.set("")
   email.set("")
+  admin.set([])
   }
     catch (error)
     {
@@ -121,16 +126,16 @@
 
   </script>
   
-  <h3 class="message-title">내 정보 확인</h3>
+  <h3 class="message-title">{$lang ? "내 정보 확인" : "My Pages"}</h3>
 
   <div class="message-body">
 
   <table class="info-table">
     <tbody>
       <tr>
-        <td>캐릭터</td>
+        <td>{$lang ? "캐릭터" : "Character"}</td>
         <td>{$myaccount.replace("_m","").replace("_z","")}</td>
-        <td><button class="simple-button" on:click={() => logout()}>로그아웃</button></td>
+        <td><button class="simple-button" on:click={() => logout()}>{$lang ? "로그아웃" : "Leave"}</button></td>
       </tr>
       <!-- <tr>
         <td>암호</td>
@@ -160,33 +165,33 @@
           <td></td>
         </tr> -->
         <tr> 
-          <td>도전 신청</td>
+          <td>{$lang ? "도전 신청" : "Challenge"}</td>
           <td>{challenge ? challenge.replace("_m","") : ""}</td>
           <td>
-            <button  class="simple-button {challenge===""? "hidden" : null}" on:click={() => cancelChallenge()}>도전 취소</button>
+            <button  class="simple-button {challenge===""? "hidden" : null}" on:click={() => cancelChallenge()}>{$lang ? "도전 취소" : "Cancel"}</button>
           </td>
         </tr>
         <tr>
-          <td>도전 날짜</td>
+          <td>{$lang ? "도전 날짜" : "Challenge Date"}</td>
           <td>{challengeDate || ""}</td>
           <td>
-            <button class="simple-button {challenge==="" ? "hidden" : null}" on:click={() => CheckTimeOver()}>자동 승리</button>
+            <button class="simple-button {challenge==="" ? "hidden" : null}" on:click={() => CheckTimeOver()}>{$lang ? "자동 승리" : "Check Date"}</button>
           </td>
         </tr>
         {/if}
       <!-- {:else} -->
         <tr>
-          <td>대전점수</td>
+          <td>{$lang ? "대전 점수" : "Battle Score"}</td>
           <td>{bscore}</td>
           <td></td>
         </tr>
         <tr>
-          <td>대회점수</td>
+          <td>{$lang ? "대회 점수" : "Event Score"}</td>
           <td>{lscore}</td>
           <td></td>
         </tr>
         <tr>
-          <td>승/패</td>
+          <td>{$lang ? "승/패" : "Win/Lose"}</td>
           <td>{wins}/{loses}</td>
           <td></td>
         </tr>

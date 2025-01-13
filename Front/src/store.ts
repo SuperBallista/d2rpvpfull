@@ -9,6 +9,7 @@ export const mympk = writable("");
 export const myzpke = writable("");
 export const email = writable("");
 export const modeinput = writable("");
+export const admin = writable<string[]>([])
 
 
 export const jwtToken = writable('');
@@ -32,7 +33,7 @@ function getCookie(name: string) {
     if (token) {headers["d2rpvpjwttoken"] = token};
     if (csrfToken) {headers["X-CSRF-Token"] = csrfToken};
     if (get(mode)) {headers["mode"] = get(mode)}
-  
+
     const options: RequestInit = {
       method: method,
       headers,
@@ -71,20 +72,12 @@ export const myaccount = writable("");
   // 닉네임을 서버에서 가져오는 함수
   export async function fetchNicknames(mode: string) {
     try {
-      const endpoint = "/nicknames/" + mode;
+      const endpoint = "/nicknames?mode=" + mode;
       const response = await SecurityFetch(endpoint,"GET");
       if (response.ok) {
-        const data = await response.json();
-  
+        const data = await response.json(); 
         // 닉네임 리스트 초기화 및 업데이트
-        if (mode==="babapk") {
           nicknames.set(data);
-        } else if (mode==="mpk") {
-          nicknames.set(data.map((name: string) => name.replace("_m", "")));
-        } else if (mode==="zpke")
-        {
-          nicknames.set(data.map((name: string) => name.replace("_z", "")));
-        }
       } else {
         console.error('닉네임을 가져오는데 실패했습니다.');
       }
@@ -124,8 +117,8 @@ export const modify_postid = writable("none");
 
 
 
-
-
+// 언어설정(true = 한국어 / false = 영어)
+export const lang = writable(true);
 
 // 폼 전환
 export const form = writable("none");

@@ -42,6 +42,10 @@ export class RecordService {
 
   // 기록 삭제
   async deleteRecord(orderNum: number, mode: string, admin: string): Promise<void> {
+
+    if (!admin.includes(mode))
+    {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -366,7 +370,7 @@ else
     userNickname: string,
     challenge: string,
     tablePrefix: string,
-  ): Promise<string> {
+  ): Promise<void> {
     const repository =
       tablePrefix === 'm' ? this.mUserRepository : this.zUserRepository;
       
@@ -397,9 +401,7 @@ else
           HttpStatus.BAD_REQUEST,
         );
       }
-
-      return "ok"
-  
+ 
     } catch (error) {
       if (error instanceof HttpException) {
         console.log('HTTP Exception 상태 코드:', error.getStatus());

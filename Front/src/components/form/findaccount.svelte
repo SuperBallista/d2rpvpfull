@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { form, mode, SecurityFetch } from "../../store";
+    import { form, lang, SecurityFetch } from "../../store";
     let isValidEmail = true; // 이메일 검증 상태
 
     let findnickname = "";
@@ -22,10 +22,10 @@
       const response = await SecurityFetch(endpoint,"POST",findpwdata);
 
       if (response.ok) {
-        alert("이메일을 확인하세요");
+        alert($lang ? "이메일을 확인하세요" : "Check Your E-mail");
         form.set("none")
       } else {
-        alert("에러 발생");
+        alert("error");
       }
     } catch (error) {
       alert(error);
@@ -36,16 +36,16 @@
 }
 </script>
 
-<h3 class="message-title">{$mode} 계정찾기</h3>
+<h3 class="message-title">{$lang ? "계정찾기" : "Find Account"}</h3>
 <div class="message-body">
-    <input class="input-text" type="text" bind:value={findnickname} placeholder="계정 입력">
+    <input class="input-text" type="text" bind:value={findnickname} placeholder={$lang ? "계정입력" : "Account"}>
     <input
     type="text" 
     bind:value={findemail}
     class="input-text {isValidEmail ? '' : 'invalid'}"
-    placeholder="이메일 입력"
+    placeholder={$lang ? "이메일 입력" : "E-mail"}
     on:input={validateEmail}
   />
-      <button class="emphasis-button block" on:click={handleSubmit}>계정찾기</button>
+      <button class="emphasis-button block" on:click={handleSubmit}>{$lang ? "계정찾기" : "Find Account"}</button>
 </div>
     

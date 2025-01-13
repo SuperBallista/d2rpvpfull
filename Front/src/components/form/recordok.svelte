@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import {SecurityFetch, mode} from "../../store";
+    import {SecurityFetch, lang, mode} from "../../store";
     let recordData:any[];
     let loading = true;
   
@@ -17,12 +17,14 @@
         recordData = await response.json();
       } catch (error) {
         console.error("데이터 불러오기 오류:", error);
-        alert("정보를 불러오는 중 오류가 발생하였습니다");
+        alert(error);
       } finally{
         loading = false;
       }
     }
-  
+    const ok = $lang ? "승인" : "Accept"
+  const remove = $lang ? "삭제" : "Remove"
+
     // 레코드 승인/삭제 요청 함수
     async function handleRecord(action:string, orderNum:number) {
       const endpoint = action === "approve" ? "/record/approve" : "/record/cancel";
@@ -30,15 +32,14 @@
   
       try {
         const response = await SecurityFetch(endpoint,action==="approve"? "POST":"DELETE",data);
-  
         if (response.ok) {
-          alert(`${action === "approve" ? "승인" : "삭제"} 완료`);
+          alert(`${action === "approve" ? ok : remove} 완료`);
           fetchGameData();
         } else {
           throw new Error(`오류 발생: ${response.status}`);
         }
       } catch (error) {
-        console.error(`${action === "approve" ? "승인" : "삭제"} 오류:`, error);
+        console.error(`${action === "approve" ? ok : remove} 오류:`, error);
         alert(`오류 발생: ${error}`);
       }
     }
@@ -50,32 +51,30 @@ onMount(async () => {
   </script>
 
 
-<h3 class="message-title">{$mode ? "밀리PK" : "정통바바"} 기록 승인하기</h3>
+<h3 class="message-title">{$mode} {$lang ? "기록 승인하기" : "Record Accept"}</h3>
 <div class="message-body">
 
 <table class="temp-table">
     <thead>
     <tr>
-      <th class="record-table-date">날짜</th>
-      <th class="record-table-loser">패자</th>
-      <th class="record-table-score">점수</th>
-      <th class="record-table-ok">승인</th>
+      <th class="record-table-date">{$lang ? "날짜" : "Date"}</th>
+      <th class="record-table-loser">{$lang ? "패자" : "Loser"}</th>
+      <th class="record-table-ok">{$lang ? "승인" : "OK"}</th>
     </tr>
 </thead>
-<tbody>
+<tbody>     
     {#if loading}
-      <tr><td colspan="4" class="text-center">로딩 중...</td></tr>
+      <tr><td colspan="3" class="text-center">{$lang ? "로딩 중" : "Loading"}...</td></tr>
     {:else if recordData.length === 0}
-      <tr><td colspan="4" class="text-center">기록이 없습니다</td></tr>
+      <tr><td colspan="3" class="text-center">{$lang ? "기록이 없습니다" : "No Data"}</td></tr>
     {:else}
       {#each recordData as row}
         <tr>
           <td>{new Date(row.date).toLocaleDateString()}</td>
           <td>{$mode? row.loser.replace("_m","") : row.loser}</td>
-          <td>{row.lScore}</td>
           <td>
-            <button class="simple-button" on:click={() => handleRecord("approve", row.orderNum)}>승인</button>
-            <button class="simple-button" on:click={() => handleRecord("delete", row.orderNum)}>삭제</button>
+            <button class="simple-button" on:click={() => handleRecord("approve", row.orderNum)}>{ok}</button>
+            <button class="simple-button" on:click={() => handleRecord("delete", row.orderNum)}>{remove}</button>
           </td>
         </tr>
       {/each}

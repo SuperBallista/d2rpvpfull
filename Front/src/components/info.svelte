@@ -1,5 +1,5 @@
 <script lang="ts">
-import { mode } from "../store";
+import { mode, lang } from "../store";
 
 type InfoList = { title: string; href: string;}    
 
@@ -55,7 +55,7 @@ list = [
 <table>
     <thead>
         <tr>
-            <th>공지사항 들어가기(구글 문서 링크)</th>
+            <th>{$lang ? "공지사항 들어가기(구글 문서)" : "Notice(Google Doc, Korean)"}</th>
         </tr>
     </thead>
     <tbody>

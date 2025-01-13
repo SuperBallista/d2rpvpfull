@@ -1,11 +1,11 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import {
-      myaccount,
       nicknames,
       fetchNicknames,
       mode,
-      SecurityFetch
+      SecurityFetch,
+      admin
     } from "../store.js";
     let player:string;
     let playerscore:number;
@@ -28,10 +28,10 @@
   
   
     async function submit_bonus_score() {
-      const data = { player: player, playerScore: playerscore };
+      const data = { player: player, playerScore: playerscore, mode: $mode };
   
       try {
-        const response = await SecurityFetch("/admin-score/zpke/submit", "POST", data);
+        const response = await SecurityFetch("/admin-score/submit", "POST", data);
   
         if (response && response.status === 201) {
           alert("점수 부여 완료");
@@ -50,7 +50,7 @@
   
       if (userResponse) {
         try {
-          const response = await SecurityFetch("/admin-score/zpke/reset", "DELETE");
+          const response = await SecurityFetch("/admin-score/reset", "DELETE", {mode: $mode});
   
           if (response && response.status === 200) {
             alert("점수를 초기화하였습니다");
@@ -65,7 +65,7 @@
   </script>
   
   <div class="main_data">
-    {#if $myaccount === "admin_z"}
+    {#if $admin.includes($mode)}
       <div class="left">
         직접 점수를 부여할 선수
         <input

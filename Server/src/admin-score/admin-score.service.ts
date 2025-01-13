@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { BUser } from '../entities/b-user.entity';
 import { MUser } from '../entities/m-user.entity';
 import { ZUser } from 'src/entities/z-user.entity';
+import { START_SCORE, START_SCORE_M, START_SCORE_Z } from 'src/config/constants';
 
 @Injectable()
 export class AdminScoreService {
@@ -18,7 +19,13 @@ export class AdminScoreService {
   ) {}
 
   // 사용자 점수 업데이트
-  async updateUserScore(mode: string, player: string, adminScore: number): Promise<void> {
+  async updateUserScore(mode: string, player: string, adminScore: number, admin: string): Promise<void> {
+
+    if (!admin.includes(mode)) {
+      throw new HttpException('권한이 없습니다.', HttpStatus.FORBIDDEN);
+    }
+
+
     let repository;
 
     // 테이블에 따라 Repository 선택
@@ -30,7 +37,7 @@ export class AdminScoreService {
     {repository = this.zUserRepository;}
     else
      {
-      throw new Error('올바르지 않은 테이블 이름입니다.');
+      throw new HttpException('잘못된 상태값입니다. ' + mode, HttpStatus.BAD_REQUEST);
     }
 
     // 점수 업데이트
@@ -51,12 +58,23 @@ export class AdminScoreService {
     oldRecordTable: string,
     oldHistoryTable: string,
     oldTournamentTable: string,
-    score: number,
+    mode: string,
+    admin: string
   ): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
+    let score
+
+    if (mode==="babapk") {score = START_SCORE}
+    else if (mode === "mpk") {score = START_SCORE_M}
+    else if (mode === "zpke") {score = START_SCORE_Z}
+    else {throw new HttpException('잘못된 상태값입니다. ' + mode, HttpStatus.BAD_REQUEST);}
+
+    if (!admin.includes(mode))
+    {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN);}
+    
     try {
       // 사용자 데이터 백업
       await queryRunner.manager.query(`
@@ -106,8 +124,7 @@ export class AdminScoreService {
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.error('랭킹 리셋 실패:', error);
-      throw error;
+      throw new HttpException('알 수 없는 오류입니다' + error, HttpStatus.INTERNAL_SERVER_ERROR);
     } finally {
       await queryRunner.release();
     }

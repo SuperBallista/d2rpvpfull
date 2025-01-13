@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { BClan } from '../entities/b-clan.entity';
@@ -41,39 +41,43 @@ GROUP BY
   async getMyClanService(nickname:string)
 {
 const user = await this.userRepository.findOne({where: {nickname : nickname}})
-return user.clan
+return JSON.stringify(user.clan)
 }
 
-  async clanJoinService(nickname: string, clan: string): Promise<string> {
+  async clanJoinService(nickname: string, clan: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { nickname } });
 
     if (user?.clan === 'none') {
       user.clan = clan
       await this.userRepository.save(user);
-      return 'ok';
     }
-    return 'error';
+    else {
+      throw new HttpException('클랜은 중복 가입이 불가합니다', HttpStatus.CONFLICT)
+    }
   }
 
-  async clanResetService(nickname: string): Promise<string> {
+  async clanResetService(nickname: string, admin: string[]): Promise<void> {
+    if (!admin.includes("babapk"))
+    {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
     const user = await this.userRepository.findOne({ where: { nickname } });
-    if (!user) return 'error';
-
+    if (!user) {
+      throw new HttpException('유저를 찾을 수 없습니다', HttpStatus.NOT_FOUND)
+    };
     user.clan = "none";
     await this.userRepository.save(user);
-    return 'ok';
   }
 
-  async adminClanScoreService(clan: string, clanScore: number): Promise<string> {
+  async adminClanScoreService(clan: string, clanScore: number, admin: string[]): Promise<void> {
+    if (!admin.includes('babapk'))
+    {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
     const clanEntity = await this.clanRepository.findOne({ where: { name: clan } });
 
     if (!clanEntity) {
-      return 'error';
+throw new HttpException('해당 클랜이 없습니다', HttpStatus.NOT_FOUND)
     }
 
     clanEntity.Lscore += clanScore;
     await this.clanRepository.save(clanEntity);
-    return 'ok';
   }
 
 //   async createClanObject(clans: MClan[], playerdb: MUser[]): Promise<any[]> {
@@ -175,26 +179,34 @@ return user.clan
 //     return 'ok';
 //   }
 
-  async clanRemoveService(clan: string): Promise<string> {
+  async clanRemoveService(clan: string, admin: string[]): Promise<void> {
     const clanEntity = await this.clanRepository.findOne({ where: { name: clan } });
 
+    if (!admin.includes('babapk'))
+    {
+      throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)
+    }
+
     if (!clanEntity) {
-      return 'Clan not found';
+      throw new HttpException('해당 클랜을 찾을 수 없습니다', HttpStatus.NOT_FOUND)
     }
 
     await this.clanRepository.remove(clanEntity);
-    return 'ok';
   }
 
-  async clanCreateService(clan: string): Promise<string> {
+  async clanCreateService(clan: string, admin: string[]): Promise<void> {
     const existingClan = await this.clanRepository.findOne({ where: { name: clan } });
 
+    if (!admin.includes('babapk'))
+      {
+        throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)
+      }
+  
     if (existingClan) {
-      return 'Clan already exists';
+      throw new HttpException('클랜 이름이 중복됩니다!', HttpStatus.CONFLICT)
     }
 
     const newClan = this.clanRepository.create({ name: clan, Bscore: START_CLAN_SCORE_B });
     await this.clanRepository.save(newClan);
-    return 'ok';
   }
 }

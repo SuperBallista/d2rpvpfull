@@ -73,7 +73,7 @@ export class ConnectService {
   }
 
   
-  async processNew(body: any, res: any, account: string) {
+  async processNew(body: any, account: string): Promise<void> {
     const { nickname, mode } = body;
 
     const lowerCaseNickname = nickname.toLowerCase();
@@ -105,8 +105,6 @@ export class ConnectService {
 
     await UserRepository.save(user);
     await this.AccountRepository.save(userData);
-
-    return res.json({ success: true, message: '캐릭터 추가가 완료되었습니다.' });
 }
 
 
@@ -114,7 +112,7 @@ export class ConnectService {
     userNickname: string,
     nickname: string,
     mode: string
-  ): Promise<{ success: boolean; error?: string; status?: number }> {
+  ): Promise<void> {
   
     let repository
   
@@ -128,11 +126,7 @@ export class ConnectService {
   
     const user = await repository.findOne({ where: { nickname: nickname } });
     if (!user) {
-      return {
-        success: false,
-        error: '사용자를 찾을 수 없습니다.',
-        status: HttpStatus.NOT_FOUND,
-      };
+      throw new HttpException("사용자를 찾을 수 없습니다", HttpStatus.NOT_FOUND)
     }
    const userData =  await this.AccountRepository.findOne({where: {account: userNickname} });
   
@@ -144,21 +138,8 @@ export class ConnectService {
     {userData.zpke = ""} 
    
    await this.AccountRepository.save(userData);  
-   const deleteResult = await repository.delete({ nickname: nickname });
-    
-    if (deleteResult.affected === 1) {
-      return { success: true };
-    } else {
-      return {
-        success: false,
-        error: '계정 삭제에 실패했습니다.',
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-      };
-    }
+   await repository.delete({ nickname: nickname });
   }
-  
-
-
 }
 
 

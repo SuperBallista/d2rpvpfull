@@ -1,15 +1,17 @@
 <script lang="ts">
       import { Link, useLocation } from "svelte-routing";
-      import { mode, form, myaccount, SecurityFetch, jwtToken, mybabapk, mympk, myzpke, myUnionAccount, email, myorigin } from "../store";
+      import { mode, form, myaccount, SecurityFetch, jwtToken, mybabapk, mympk, myzpke, myUnionAccount, email, myorigin, admin, lang } from "../store";
   import { onMount } from "svelte";
       
-
-  export let isOpen = false;
   
+  export let isOpen = false;
+
+    
+
   const location = useLocation();
   let pathname = "";
   let modeName
-  let modeChange = "밀리PK"
+  let modeChange = $lang ? "밀리PK" : "Melee PK"
   let modeChangeLink = "/mpk"
   let modeSrc = "/"
   let menuItems:{label:string, href:string}[]
@@ -20,29 +22,30 @@
   };
 
 
+
 $: if (pathname.includes("mpk"))
 {mode.set("mpk")
- modeName = "밀리PK"
+ modeName = $lang ? "밀리PK" : "Melee PK"
  modeChangeLink = "/zpke"
- modeChange = "질딘PK"
+ modeChange = $lang ? "질딘PK" : "Zeal PK"
  modeSrc = "/" + $mode
  menuSet()
  myaccount.set($mympk || "")
 }
 else if (pathname.includes("zpke"))
 {mode.set("zpke")
-modeName = "질딘PK"
+modeName = $lang ? "질딘PK" : "Zeal PK"
 modeChangeLink = "/babapk"
-modeChange = "정통바바"
+modeChange = $lang ? "정통바바" : "Barb PK"
 modeSrc = "/" + $mode
 menuSet()
 myaccount.set($myzpke || "")
 }
 else if (pathname.includes("babapk"))
 {mode.set("babapk")
-modeName = "정통바바"
+modeName = $lang ? "정통바바" : "Barb PK"
 modeChangeLink = "/mpk"
-modeChange = "밀리PK"
+modeChange = $lang ? "밀리PK" : "Melee PK"
 modeSrc = "/" + $mode
 menuSet()
 myaccount.set($mybabapk || "")
@@ -56,20 +59,20 @@ menuSet()
 
 function menuSet() {
   menuItems = $mode === "" ? [
-    { label: "정통바바", href: "/babapk" },
-    { label: "통합밀리", href: "/mpk" },
-    { label: "질딘PK", href: "/zpke" },
+    { label: $lang ? "정통바바" : "Barb PK", href: "/babapk" },
+    { label: $lang ? "통합밀리" : "Melee PK", href: "/mpk" },
+    { label: $lang ? "질딘PK" : "Zeal PK", href: "/zpke" },
   ] : [
-    { label: "공지사항", href: "/info" },
-    { label: "랭킹조회", href: "/rank" },
-    { label: "대전기록", href: "/record" },
-    { label: "대회기록", href: "/tournament" },
-    ...($mode === "babapk" ? [{ label: "클랜목록", href: "/clan" }] : []),
-    { label: "커뮤니티", href: "/boardlist" },
-    ...($mode === "zpke" ? [] : [{ label: "역대우승", href: "/winners" }]),
-    { label: "계산하기", href: "/calculator" },
-    ...($myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z"
-      ? [{ label: "관리설정", href: "/admin" }]
+    { label: $lang ? "공지사항" : "Notice", href: "/info" },
+    { label: $lang ? "랭킹조회" : "Ladder", href: "/rank" },
+    { label: $lang ? "대전기록" : "Records", href: "/record" },
+    { label: $lang ? "대회기록" : "Event", href: "/tournament" },
+    ...($mode === "babapk" ? [{ label: $lang ? "클랜목록" : "Clans", href: "/clan" }] : []),
+    { label: $lang ? "커뮤니티" : "Community", href: "/boardlist" },
+    ...($mode === "zpke" ? [] : [{ label: $lang ? "역대우승" : "Winners", href: "/winners" }]),
+    { label: $lang ? "계산하기" : "Calculator", href: "/calculator" },
+    ...($admin.includes($mode)
+      ? [{ label: $lang ? "관리설정" : "Settings", href: "/admin" }]
       : []),
   ];
 
@@ -101,6 +104,7 @@ if (data.authenticated)
  jwtToken.set(data.token);
  email.set(data.email);
  myorigin.set(data.origin);
+ admin.set(data.admin);
  menuSet()
 }
 else
@@ -112,7 +116,8 @@ jwtToken.set("");
   }
   catch (error)
   {
-    alert("서버 연결에 실패하였습니다")
+    const msg = $lang ? "서버 연결에 실패했습니다" : "Server Error"
+    alert(msg + error)
   }
 }
 
@@ -242,6 +247,47 @@ onMount(async () => {
     }
   }
 
+  /* 토글 스위치 컨테이너 */
+  .toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 25px;
+    background-color: #f5f5f5;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.4s;
+  }
+
+  /* 슬라이더 핸들 */
+  .slider {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 19px;
+    height: 19px;
+    background-color: #3b3b3b;
+    border-radius: 50%;
+    transition: transform 0.4s;
+  }
+
+  /* 활성화 상태 (ON) */
+  .toggle-switch.on {
+    background-color: #1e1e2f;
+  }
+
+  .toggle-switch.on .slider {
+    transform: translateX(25px);
+  }
+  .slider-label{
+    color:#f5f5f5;
+    font-size: 1.25rem;
+    width: 70px;
+    text-align: center;
+  }
+  .switch-container{
+    display: flex;
+    flex-direction: row;
+  }
 
   </style>
   
@@ -256,12 +302,21 @@ onMount(async () => {
       {/each}
     </div>
   
+<!-- 토글 스위치 -->
+<div class="switch-container">
+<div class="toggle-switch {$lang ? 'on' : ''}" on:click={() => lang.set(!$lang)}>
+  <div class="slider"></div>
+</div>
+<div class="slider-label">{$lang ? "English" : "한국어"}</div>
+</div>
     <!-- Mobile Hamburger -->
     <button class="hamburger" on:click={toggleMenu}>
       <span style:transform={isOpen ? 'rotate(45deg)' : ''}></span>
       <span style:opacity={isOpen ? '0' : '1'}></span>
       <span style:transform={isOpen ? 'rotate(-45deg)' : ''}></span>
     </button>
+
+    
   </div>
  
 
@@ -277,13 +332,13 @@ onMount(async () => {
     {#if $mode !== ""}
     {#if $myUnionAccount === ""}
     <Link class="emphasis-button inline-block" to="/">
-      로그인
+      {$lang ? "로그인" : "SignUp"}
     </Link>
     {/if}
     {#if $myaccount !==""}
-    <button class="simple-button" on:click={() => form.set("myinfo")}>나의정보</button>
+    <button class="simple-button" on:click={() => form.set("myinfo")}>{$lang ? "나의정보" : "MyPages"}</button>
     {:else if $myUnionAccount !== ""}
-    <button class="simple-button" on:click={() => form.set("connect")}>등록하기</button>
+    <button class="simple-button" on:click={() => form.set("connect")}>{$lang ? "등록하기" : "Register"}</button>
     {/if}
     <Link class="simple-button" to={modeChangeLink}>
       {modeChange}

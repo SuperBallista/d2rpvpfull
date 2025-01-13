@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { form, myaccount, SecurityFetch, jwtToken, mybabapk, mympk, myUnionAccount, myzpke, email} from "../../store";
+  import { form, myaccount, SecurityFetch, jwtToken, mybabapk, mympk, myUnionAccount, myzpke, email, lang} from "../../store";
 
 let pw = "";
 
@@ -14,7 +14,7 @@ async function delete_account() {
     const response = await SecurityFetch(endpoint,"DELETE",pwdata);
 
     if (response.status===200) {
-      alert("계정 삭제 완료");
+      alert($lang ? "계정 삭제 완료" : "Your Account Removed");
       form.set("none");
       myaccount.set("");
       mybabapk.set("");
@@ -24,11 +24,11 @@ async function delete_account() {
       email.set("");
       jwtToken.set("");
     } else {
-      alert(`오류 발생: ${response.status}`);
+      alert(`Error Code: ${response.status}`);
     }
   } catch (error) {
-    console.error("오류 발생:", error);
-    alert("오류 발생: " + error);
+    console.error("Error:", error);
+    alert("Error: " + error);
   }
 }
 
@@ -37,11 +37,11 @@ async function delete_account() {
 </script>
 
 
-<h3 class="message-title">계정 삭제</h3>
+<h3 class="message-title">{$lang ? "계정 삭제" : "Account Remove"}</h3>
 
 <div class="message-body">
 
-<input class="input-text" bind:value={pw} type="password" placeholder="비밀번호">
-<button class="emphasis-button block" on:click={() => delete_account()}>계정삭제</button>
+<input class="input-text" bind:value={pw} type="password" placeholder={$lang ? "비밀번호" : "Password"}>
+<button class="emphasis-button block" on:click={() => delete_account()}>{$lang ? "계정삭제" : "Remove"}</button>
     
 </div>

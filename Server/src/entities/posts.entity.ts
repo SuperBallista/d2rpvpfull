@@ -28,4 +28,7 @@ export class Post {
 
   @Column({ length: 255, default: 'free', nullable: false })
   category: string; // 기본값 'free', NOT NULL
+
+  @Column({length: 255})
+  account: string
 }

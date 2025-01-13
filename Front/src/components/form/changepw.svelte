@@ -1,6 +1,6 @@
 <script lang="ts">
     import {
-      mode,
+      lang,
       form, SecurityFetch
     } from "../../store";
   
@@ -11,7 +11,7 @@
   
     async function changepw() {
       if (newpw !== checkpw) {
-        alert("암호 확인이 일치하지 않습니다. 다시 확인해주세요.");
+        alert($lang ? "암호 확인이 일치하지 않습니다. 다시 확인해주세요.": "Check Password please");
         return;
       }
   
@@ -26,14 +26,14 @@
         const data = await response.json()
   
         if (typeof data.message === 'string') {
-          alert("암호 변경 완료");
+          alert($lang ? "암호 변경 완료" : "Your Password Changed");
           form.set("none");
         } else {
-          alert(`오류 발생: ${response.status}`);
+          alert(`Error: ${response.status}`);
         }
       } catch (error) {
-        console.error("오류 발생:", error);
-        alert("오류 발생: " + error);
+        console.error("Error:", error);
+        alert("Error: " + error);
       }
     }
   </script>
@@ -43,9 +43,9 @@
 <h3 class="message-title">암호 변경</h3>
 
 <div class="message-body">
-  <input class="input-text" bind:value={oldpw} type="password" placeholder="현재암호">
-<input class="input-text" bind:value={newpw} type="password" placeholder="새 암호">
-<input class="input-text" bind:value={checkpw} type="password" placeholder="암호확인"><br/>
-<button class="emphasis-button" on:click={() => changepw()}>변경하기</button>
-    
+  <input class="input-text" bind:value={oldpw} type="password" placeholder={$lang ? "현재암호" : "Old Password"}>
+<input class="input-text" bind:value={newpw} type="password" placeholder={$lang ? "새 암호" : "New Password"}>
+<input class="input-text" bind:value={checkpw} type="password" placeholder={$lang ? "암호확인" : "Input New Password Again"}><br/>
+<button class="emphasis-button" on:click={() => changepw()}>{$lang ? "변경하기" : "Change"}</button>
 </div>
+<button class="message-button" on:click={() => form.set("myinfo")}>{$lang ? "돌아가기" : "Back"}</button>

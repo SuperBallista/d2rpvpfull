@@ -3,7 +3,9 @@
     import {
       myaccount,
       modify_postid, SecurityFetch,
-      mode
+      mode, lang,
+      myUnionAccount
+
     } from "../store";
     import { navigate } from "svelte-routing";
     import Quill from "quill";
@@ -24,7 +26,7 @@
   
       input.onchange = async () => {
         const file = input.files ? input.files[0] : null;
-        if (!file) return alert("파일이 선택되지 않았습니다.");
+        if (!file) return alert( $lang ? "파일이 선택되지 않았습니다." : "No File Selected.");
   
         const reader = new FileReader();
         reader.onloadend = async () => {
@@ -36,7 +38,7 @@
               quill.insertEmbed(range?.index || 0, "image", imageUrl);
             }
           } catch (error) {
-            console.error("이미지 업로드 오류:", error);
+            console.error("Upload Error:", error);
           }
         };
         reader.readAsDataURL(file);
@@ -47,7 +49,7 @@
     async function uploadImage(base64Image: string): Promise<string> {
       const response = await SecurityFetch("/cloudinary/upload", "POST", { image: base64Image });
   
-      if (!response.ok) throw new Error("이미지 업로드 실패");
+      if (!response.ok) throw new Error("Upload Error");
   
       const data = await response.json();
       return data.url;
@@ -61,18 +63,19 @@
         content,
         nickname: $myaccount,
         postId: $modify_postid,
+        account: $myUnionAccount
       };
   
       try {
         const response = await SecurityFetch("/board/write", "POST", data);
         if (response.ok) {
-          alert("글을 성공적으로 작성하였습니다");
+          alert($lang ? "글을 성공적으로 작성하였습니다" : "Post Successed");
           resetForm();
           navigate(`${modepage}/boardlist`);
         }
       } catch (error) {
         console.error("네트워크 오류:", error);
-        alert(`네트워크 오류: ${(error as Error).message}`);
+        alert(`Network Error: ${(error as Error).message}`);
       }
     }
   
@@ -86,7 +89,7 @@
           content = postData.content;
           category = postData.category;
         } catch (error) {
-          alert("게시물 로드 중 오류 발생");
+          alert($lang ? "게시물을 불러오는데 실패하였습니다" : "Loading post failed");
         }
       }
     }
@@ -137,9 +140,9 @@
     </div>
     <div class="table-contents-gray">
       <select class="namewidth" bind:value={category}>
-        <option value="free">자유</option>
-        <option value="trade">거래</option>
-        <option value="setting">공략</option>
+        <option value="free">{$lang ? "자유" : "Free"}</option>
+        <option value="trade">{$lang ? "거래" : "Trade"}</option>
+        <option value="setting">{$lang ? "공략" : "Tips"}</option>
       </select>
     </div>
     <div class="table-contents-white">
@@ -147,8 +150,8 @@
     </div>
   
     <div class="form-group">
-      <button class="emphasis-button" on:click={handleSubmit}>작성하기</button>
-      <button class="simple-button" on:click={cancel}>취소하기</button>
+      <button class="emphasis-button" on:click={handleSubmit}>{$lang ? "작성하기" : "Post"}</button>
+      <button class="simple-button" on:click={cancel}>{$lang ? "취소하기" : "Cancel"}</button>
     </div>
   </div>
   

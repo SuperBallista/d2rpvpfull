@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { BUser } from '../entities/b-user.entity';
 import { MUser } from '../entities/m-user.entity';
 import { ZUser } from 'src/entities/z-user.entity';
@@ -16,46 +16,24 @@ export class NicknameService {
     private readonly zUserRepository: Repository<ZUser>,
   ) {}
 
-  // Get nicknames from `b_user` table excluding admin
-  async getBUserNicknames(): Promise<string[]> {
+  // Get nicknames from user table
+  async getUserNicknames(mode:string): Promise<string[]> {
+    let userRepository
+    if (mode === "babapk")
+    {userRepository = this.bUserRepository}
+    else if (mode === "mpk")
+    {userRepository = this.mUserRepository}
+    else if (mode === "zpke")
+    {userRepository = this.zUserRepository}
+    else
+    {throw new HttpException("모드값이 잘못되었습니다", HttpStatus.BAD_REQUEST)}
     try {
-      const users = await this.bUserRepository.find({
-        where: { nickname: Not('admin') },
+      const users = await userRepository.find({
         select: ['nickname'],
       });
       return users.map(user => user.nickname);
     } catch (error) {
-      console.error('Error fetching BUser nicknames:', error);
-      throw new Error('Database error occurred while fetching BUser nicknames.');
+      throw new HttpException("서버 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
-
-  // Get nicknames from `m_user` table excluding admin_m
-  async getMUserNicknames(): Promise<string[]> {
-    try {
-      const users = await this.mUserRepository.find({
-        where: { nickname: Not('admin_m') },
-        select: ['nickname'],
-      });
-      return users.map(user => user.nickname);
-    } catch (error) {
-      console.error('Error fetching MUser nicknames:', error);
-      throw new Error('Database error occurred while fetching MUser nicknames.');
-    }
-  }
-
-  async getZUserNicknames(): Promise<string[]> {
-    try {
-      const users = await this.zUserRepository.find({
-        where: { nickname: Not('admin_z') },
-        select: ['nickname'],
-      });
-      return users.map(user => user.nickname);
-    } catch (error) {
-      console.error('Error fetching ZUser nicknames:', error);
-      throw new Error('Database error occurred while fetching ZUser nicknames.');
-    }
-  }
-
-
 }

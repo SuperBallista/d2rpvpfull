@@ -3,7 +3,15 @@ import * as cloudinary from 'cloudinary';
 
 @Injectable()
 export class CloudinaryService {
-  async uploadImage(base64Image: string): Promise<{ url: string; publicId: string }> {
+  async uploadImage(base64Image: string, account): Promise<{ url: string; publicId: string }> {
+
+    if (!base64Image) {
+      throw new HttpException('이미지가 없습니다', HttpStatus.BAD_REQUEST);
+    }
+    if (!account) {
+      throw new HttpException('로그인해야합니다', HttpStatus.UNAUTHORIZED);
+    }
+  
     try {
       const result = await cloudinary.v2.uploader.upload(base64Image, {
         folder: 'uploads',
@@ -15,8 +23,7 @@ export class CloudinaryService {
         publicId: result.public_id,
       };
     } catch (error) {
-      console.error('Error uploading image:', error);
-      throw new HttpException('Failed to upload image', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException('이미지 업로드에 실패하였습니다', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

@@ -1,15 +1,15 @@
 <script lang="ts">
 
-import {mode} from "../store"
+import {mode, lang} from "../store"
 
 type LinkType = { icon: string;href: string;alt: string;}    
 let socialLinks: LinkType[] = [];
 
 
-  const footerLinks = [
-    { label: "문의하기", href: "https://open.kakao.com/me/balli" },
-    { label: "개인정보 보호정책", href: "/privacy.html" },
-    { label: "이용 약관", href: "/terms.html" }
+ $: footerLinks = [
+    { label: $lang ? "문의하기" : "Contact", href: "https://open.kakao.com/me/balli" },
+    { label: $lang ? "개인정보 보호정책" : "Privacy Policy", href: "/privacy.html" },
+    { label: $lang ? "이용 약관" : "Terms of Service", href: "/terms.html" }
   ];
 
   $: if ($mode === "mpk") {

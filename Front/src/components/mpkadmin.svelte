@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import {
-      myaccount,
+      admin,
       nicknames,
       mode,
       fetchNicknames,
@@ -47,9 +47,9 @@
   
     // 점수 부여
     async function submit_bonus_score() {
-      const data = { player: player, playerScore: playerscore };
+      const data = { player: player, playerScore: playerscore, mode: $mode };
       try {
-        const response = await SecurityFetch("/admin-score/mpk/submit", "POST", data);
+        const response = await SecurityFetch("/admin-score/submit", "POST", data);
 
       if  (response.status===201) {
         alert("점수 부여 완료")
@@ -70,7 +70,7 @@
   
       if (userResponse) {
         try {
-         const response = await SecurityFetch("/admin-score/mpk/reset", "DELETE");
+          const response = await SecurityFetch("/admin-score/reset", "DELETE", {mode: $mode});
           if (response && response.status === 200) {
           alert("점수를 초기화하였습니다");
         } else {
@@ -125,7 +125,7 @@
   </script>
   
   <div class="main_data">
-    {#if $myaccount === "admin_m"}
+    {#if $admin.includes($mode)}
       <div class="left">
         직접 점수를 부여할 선수
         <input

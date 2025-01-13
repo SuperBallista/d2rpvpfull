@@ -1,6 +1,6 @@
 <script lang="ts">
     import { useLocation } from "svelte-routing";
-    import { mode } from "../store";
+    import { mode, lang } from "../store";
     
     const location = useLocation();
     let pathname = "";
@@ -11,41 +11,41 @@
     let titlestring : string = "";
     
     $: if (pathname.includes("rank")) {
-        titlestring = "랭킹조회";
+        titlestring = $lang ? "랭킹조회" : "Ladder";
     }
     else if (pathname.includes("info")) {
-        titlestring = "공지사항";
+        titlestring = $lang ? "공지사항" : "Notice";
     }
     else if (pathname.includes("record")) {
-        titlestring = "대전기록";
+        titlestring = $lang ? "대전기록" : "Records";
     }
     else if (pathname.includes("tournament")) {
-        titlestring = "대회기록";
+        titlestring = $lang ? "대회기록" : "Event";
     }
     else if (pathname.includes("boardlist")) {
-        titlestring = "커뮤니티";
+        titlestring = $lang ? "커뮤니티" : "Community";
     }
     else if (pathname.includes("winners")) {
-        titlestring = "역대우승";
+        titlestring = $lang ? "역대우승" : "Winners";
     }   
     else if (pathname.includes("calculator")) {
-        titlestring = "계산하기";
+        titlestring = $lang ? "계산하기" : "Calculate";
     }
     else if (pathname.includes("admin")){
-        titlestring = "관리설정";
+        titlestring = $lang ? "관리설정" : "Setting";
     }
     else {
         titlestring = "";
     }
 
     $: if ($mode === "mpk") {
-        modestring = "밀리PK";
+        modestring = $lang ? "밀리PK" : "Melee PK";
     }   
     else if ($mode === "babapk") {
-        modestring = "정통바바";
+        modestring = $lang ? "정통바바" : "Barb PK";
     }   
     else if ($mode === "zpke"){
-        modestring = "질딘PK";
+        modestring = $lang ? "질딘PK" : "Zeal PK";
     }
     else if ($mode === ""){
         modestring = ""

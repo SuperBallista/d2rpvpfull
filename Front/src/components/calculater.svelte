@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { mode } from "../store";
+    import { mode, lang } from "../store";
     import {Link} from "svelte-routing";
     
     
@@ -7,44 +7,44 @@
 
     const mpklist = [
  {
-    href: "/mpk/elo", title: "Elo 점수 예상계산기"
+    href: "/mpk/elo", title: $lang ? "Elo 점수 예상계산기" : "Elo Calculate"
     },
     {
-    href: "/mpk/simul", title: "시뮬레이터"
+    href: "/mpk/simul", title: $lang ? "시뮬레이터" : "Simulate"
     },
     {
-    href: "/mpk/ring", title: "링 스탯 측정기"
+    href: "/mpk/ring", title: $lang ?  "링 스탯 측정기" : "Check Ring Stats"
     }
     ]
     const babapklist = [
     {
-    href: "/babapk/pscore", title: "파워점수 계산기"
+    href: "/babapk/pscore", title: $lang ?  "파워점수 계산기" : "Power Score Calculate"
     },
     {
-    href: "/babapk/visio", title: "렙당뚜껑 계산기"
+    href: "/babapk/visio", title: $lang ?  "렙당뚜껑 계산기" : "Visio Calculate"
     },
     {
-    href: "/babapk/elo", title: "Elo 점수 예상계산기"
+    href: "/babapk/elo", title: $lang ? "Elo 점수 예상계산기" : "Elo Calculate"
     },
     {
-    href: "/babapk/simul", title: "시뮬레이터"
+    href: "/babapk/simul", title: $lang ? "시뮬레이터" : "Simulate"
     },
     {
-    href: "/babapk/ring", title: "링 스탯 측정기"
+    href: "/babapk/ring", title: $lang ? "링 스탯 측정기" : "Check Ring Stats"
     }
     ] 
     const zpkelist = [
     {
-    href: "/zpke/pscore", title: "질딘 파워점수 계산기"
+    href: "/zpke/pscore", title:  $lang ?  "파워점수 계산기" : "Power Score Calculate"
     },
     {
-    href: "/zpke/elo", title: "Elo 점수 예상계산기"
+    href: "/zpke/elo", title: $lang ? "Elo 점수 예상계산기" : "Elo Calculate"
     },
     {
     href: "/zpke/simul", title: "시뮬레이터"
     },
 {
-href: "/zpke/ring", title: "링 스탯 측정기"
+href: "/zpke/ring", title: $lang ? "시뮬레이터" : "Simulate"
 }
     ]
 
@@ -63,7 +63,7 @@ else
     <table>
         <thead>
             <tr>
-                <th>{$mode} 계산기 들어가기</th>
+                <th>{$mode} {$lang ? "계산기 들어가기" : "Calculater Links(Korean)"}</th>
             </tr>
         </thead>
         <tbody>

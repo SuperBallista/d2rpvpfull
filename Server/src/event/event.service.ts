@@ -29,14 +29,17 @@ export class EventService {
     private readonly entityManager: EntityManager,
   ) {}
 
-  async submitEvent(eventData: Record<string, any>, mode:string): Promise<void> {
+  async submitEvent(eventData: Record<string, any>): Promise<void> {
+let mode = eventData.mode
 let repository
 if (mode === "babapk")
 {repository = this.bEventRecordRepository}
 else if (mode === "mpk")
 {repository = this.mEventRecordRepository}
-else
+else if (mode === "zpke")
 {repository = this.zEventRecordRepository}
+else
+{throw new HttpException("상태 입력이 잘못되었습니다", HttpStatus.BAD_REQUEST)}
   
     try {
       // 데이터 변환 및 기본값 설정
@@ -63,14 +66,16 @@ else
     }
   }
   
-  async getEventHistory(mode: string): Promise<any[]> {
+  async getEventHistory(mode: string): Promise<object[]> {
     let repository
     if (mode === "babapk")
     {repository = this.bEventRecordRepository}
     else if (mode === "mpk")
     {repository = this.mEventRecordRepository}
-    else
+    else if (mode === "zpke")
     {repository = this.zEventRecordRepository}
+    else
+    {throw new HttpException("모드 설정이 잘못되었습니다", HttpStatus.BAD_REQUEST)}
     try {
       return await repository.find({ order: { orderNum: 'DESC' } });
     } catch (error) {
@@ -82,7 +87,11 @@ else
     }
   }
 
-  async deleteEvent(eventname: string, mode: string): Promise<void> {
+  async deleteEvent(eventname: string, mode: string, admin: string[]): Promise<void> {
+    
+    if (!admin.includes(mode))
+    {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
+    
     let repository
     if (mode === "babapk")
     {repository = this.bEventRecordRepository}
@@ -105,7 +114,12 @@ else
     }
   }
 
-  async acceptEvent(eventData: any, mode: string): Promise<void> {
+  async acceptEvent(eventData: any, mode: string, admin: string[]): Promise<void> {
+
+    if (!admin.includes(mode))
+      {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
+  
+
     let userRepository
     let scores
     let repository
@@ -126,25 +140,27 @@ else
       scores = TEAMS_SCORES_Z
     }
   
+    console.log(eventData)
+    const {
+      eventname,
+      Championship1,
+      Championship2,
+      Championship3,
+      Championship4,
+      Runner_up1,
+      Runner_up2,
+      Runner_up3,
+      Runner_up4,
+      Place3rd1,
+      Place3rd2,
+      Place3rd3,
+      Place3rd4,
+      numberteams,
+      Eventhost,
+    } = eventData;
+
     try {
       await this.entityManager.transaction(async (manager) => {
-        const {
-          eventname,
-          Championship1,
-          Championship2,
-          Championship3,
-          Championship4,
-          Runner_up1,
-          Runner_up2,
-          Runner_up3,
-          Runner_up4,
-          Place3rd1,
-          Place3rd2,
-          Place3rd3,
-          Place3rd4,
-          numberteams,
-          Eventhost,
-        } = eventData;
   
         // 참가자의 점수를 업데이트하는 함수
         const updateScore = async (
@@ -222,6 +238,13 @@ else
 
 
       });
+
+      console.log('Event data:', eventData);
+      console.log('Mode:', mode);
+      console.log('Admin list:', admin);
+      console.log('Selected repository:', repository);
+      
+
     } catch (error) {
       console.error('이벤트 승인 오류:', error);
       throw new HttpException(
@@ -234,7 +257,11 @@ else
 
 
   
-  async cancelAccepted(eventData: any, mode: string): Promise<void> {
+  async cancelAccepted(eventData: any, mode: string, admin: string[]): Promise<void> {
+
+    if (!admin.includes(mode))
+      {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
+  
     let userRepository
     let scores
 
@@ -357,7 +384,10 @@ else
     }
   }
 
-  async modifyMemo(eventData: any): Promise<void> {
+  async modifyMemo(eventData: any, admin: string[]): Promise<void> {
+  
+    if (!admin.includes(eventData.mode))
+      {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
   
   let EventRecordRepository
   if (eventData.mode === "babapk")

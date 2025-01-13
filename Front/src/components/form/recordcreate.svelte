@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { nicknames, fetchNicknames, myaccount, mode, SecurityFetch } from "../../store";
+    import { nicknames, fetchNicknames, myaccount, mode, SecurityFetch, lang } from "../../store";
   
     let nicknameexceptme:any[] = [];
     let winner:string | null
@@ -35,18 +35,18 @@ function handle_winner_change(event: Event): void {
       try {
         const response = await SecurityFetch("/record/submit", "POST", data)
         if (response.ok) {
-          alert("기록 전송 완료");
+          alert($lang ? "기록 전송 완료" : "Your record sended");
         } else {
-          alert(`오류 발생: ${response.status}`);
+          alert(response.status);
         }
       } catch (error) {
-        console.error("오류 발생:", error);
-        alert("오류 발생: " + error);
+        console.error(error);
+        alert(error);
       }
     }
   </script>
 
-  <h3 class="message-title">{$mode} 기록 보내기</h3>
+  <h3 class="message-title">{$mode} {$lang ? "기록 보내기" : "Send Record"}</h3>
 
   <div class="message-body">
   
@@ -55,7 +55,7 @@ function handle_winner_change(event: Event): void {
     bind:value={winner}
     on:blur={handle_winner_change}
     class="input-text"
-    placeholder="승자를 선택하세요"
+    placeholder={$lang ? "승자를 선택하세요" : "Select Winner"}
   />
   <datalist id="nicknames_list">
     {#each nicknameexceptme as option}
@@ -63,6 +63,6 @@ function handle_winner_change(event: Event): void {
     {/each}
   </datalist>
 
-  <button class="emphasis-button block" on:click={submitrecord}>보내기</button>
+  <button class="emphasis-button block" on:click={submitrecord}>{$lang ? "보내기" : "Send"}</button>
 
   </div>

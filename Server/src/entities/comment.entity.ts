@@ -16,4 +16,7 @@ export class Comment {
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date; // NOT NULL, 현재 타임스탬프
+
+  @Column({length: 255})
+  account: string
 }

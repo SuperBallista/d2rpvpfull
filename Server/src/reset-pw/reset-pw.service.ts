@@ -1,11 +1,8 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BUser } from '../entities/b-user.entity';
-import { MUser } from '../entities/m-user.entity';
 import * as bcrypt from 'bcrypt';
 import * as nodemailer from 'nodemailer';
-import { ZUser } from 'src/entities/z-user.entity';
 import { Account } from 'src/entities/account.entity';
 
 interface ResetPasswordResult {

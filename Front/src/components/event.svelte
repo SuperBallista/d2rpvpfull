@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { myaccount, key, form, SecurityFetch, mode } from "../store";
+    import { myaccount, key, form, SecurityFetch, mode, admin, lang } from "../store";
     import { onMount } from "svelte";
   
     let eventData:any[] = [];
@@ -7,9 +7,13 @@
     let error:any = null;
     let showDetails:boolean[] = [];
     let memotext:string
-  
+    let noMemo = $lang ? "기록하기" : "Input memo"
+
+    let wait = $lang ? "대기" : "Waiting"
+    let Accept = $lang ? "승인" : "Accepted"
+    
      function modify_memo(index:number) {
-      if ($myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z")
+      if ($admin.includes($mode))
   {
       for (let i = 0; i < eventData.length; i++)
       {eventData[i].modify = false}
@@ -20,18 +24,18 @@
 
     async function SaveMemo(index:number) {
      const data = {eventname: eventData[index].eventname, memotext: memotext, mode: $mode}
-     if ($myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z")
+     if ($admin.includes($mode))
      {
      try{
       const response = await SecurityFetch("/event/memo","PATCH",data);
       if (response.ok){
-        alert("메모 수정 완료하였습니다")
+        alert($lang ? "메모 수정 완료하였습니다" : "Modified Completed")
         fetchData();
       }
     }
       catch (error)
       {
-        alert("오류가 발생하였습니다" + error)
+        alert($lang ? "오류가 발생하였습니다" + error : "Error :" + error)
       }
           finally{
             eventData[index].modify = false
@@ -40,30 +44,32 @@
   }
 
     async function deleteandresetEvent(index:number) {
+      const data = {event: eventData[index], mode: $mode}
       try {
-        const endpoint = `/event/${$mode}/cancel`;
-        const response = await SecurityFetch(endpoint, "DELETE", eventData[index]);
+        const endpoint = `/event/cancel`;
+        const response = await SecurityFetch(endpoint, "DELETE", data);
   
         if (response && response.ok) {
-          alert("토너먼트 히스토리를 삭제하고 점수를 초기화하였습니다");
+          alert($lang ? "토너먼트 히스토리를 삭제하고 점수를 초기화하였습니다" : "Results removed and returned score.");
         }
       } catch (error) {
-        alert("에러가 발생하였습니다: " + error);
+        alert($lang ? "에러가 발생하였습니다: " + error : "Error :" + error);
       } finally {
         fetchData();
       }
     }
   
     async function approveEvent(index:number) {
+      const data = {event: eventData[index], mode: $mode }
       try {
-        const endpoint = `/event/${$mode}/accept`;
-        const response = await SecurityFetch(endpoint, "POST", eventData[index]);
+        const endpoint = `/event/accept`;
+        const response = await SecurityFetch(endpoint, "POST", data);
   
         if (response && response.status === 201) {
-          alert("토너먼트 히스토리를 승인하였습니다");
+          alert($lang ? "토너먼트 히스토리를 승인하였습니다" : "Event results registered");
         }
       } catch (error) {
-        alert("에러가 발생하였습니다: " + error);
+        alert($lang ? "에러가 발생하였습니다: " + error : "Error :" + error);
       } finally {
         fetchData();
       }
@@ -71,15 +77,15 @@
   
     async function deleteEvent(index:number) {
       try {
-        const endpoint = `/event/${$mode}/delete`;
-        const data = { eventname: eventData[index].eventname };
+        const endpoint = `/event/delete`;
+        const data = { event: eventData[index].eventname, mode: $mode };
         const response = await SecurityFetch(endpoint, "DELETE", data);
 
         if (response && response.status === 200) {
-          alert("토너먼트 히스토리를 삭제하였습니다");
+          alert($lang ? "토너먼트 히스토리를 삭제하였습니다" : "Results deleted");
         }
       } catch (error) {
-        alert("에러가 발생하였습니다: " + error);
+        alert($lang ? "에러가 발생하였습니다: " + error : "Error :" + error);
       } finally {
         fetchData();
       }
@@ -87,7 +93,7 @@
   
     async function fetchData() {
       try {
-        const response = await SecurityFetch(`/event/${$mode}/history`,"GET");
+        const response = await SecurityFetch(`/event/history?mode=${$mode}`,"GET");
         if (!response.ok) {
           throw new Error("연결 에러입니다");
         }
@@ -95,7 +101,7 @@
   
         eventData = eventData.map((event) => ({
           ...event,
-          ok: event.accept === 1 ? "대기" : event.accept === 2 ? "승인" : event.ok,
+          ok: event.accept === 1 ? wait : event.accept === 2 ? Accept : event.ok,
           modify: false
         }));
   
@@ -126,17 +132,17 @@
   <!-- 테이블 UI -->
   <div class="table-container">
     {#if loading}
-      <p>로딩 중...</p>
+      <p>{$lang ? "로딩 중" : "Loading"}...</p>
     {:else if error}
       <p>Error: {error}</p>
     {:else}
       <table>
         <thead>
           <tr>
-            <th>대회명</th>
-            <th>규모</th>
-            <th>우승자</th>
-            <th>승인</th>
+            <th>{$lang ? "대회명" : "Title"}</th>
+            <th>{$lang ? "규모" : "Size"}</th>
+            <th>{$lang ? "우승자" : "Winner"}</th>
+            <th>{$lang ? "승인" : "Accept"}</th>
           </tr>
         </thead>
         <tbody>
@@ -145,19 +151,19 @@
               <td>{event.eventname}</td>
               <td>
                 {#if event.numberteams === 24}
-                  정식전
+                  {$lang ? "정규전" : "Official"}
                 {:else}
                   {event.numberteams}x{event.teamSize}
                 {/if}
               </td>
               <td>{event.Championship1.replace("_m", "").replace("_z","")}</td>
               <td>
-                {#if $myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z"}
-                  {#if event.ok === "대기"}
-                    <button class="simple-button small" on:click={() => approveEvent(index)}>승인</button>
-                    <button class="simple-button small" on:click={() => deleteEvent(index)}>삭제</button>
+                {#if $admin.includes($mode)}
+                  {#if event.ok === wait}
+                    <button class="simple-button small" on:click={() => approveEvent(index)}>{$lang ? "승인" : "Accept"}</button>
+                    <button class="simple-button small" on:click={() => deleteEvent(index)}>{$lang ? "삭제" : "Remove"}</button>
                   {:else}
-                    <button class="simple-button small" on:click={() => deleteandresetEvent(index)}>삭제</button>
+                    <button class="simple-button small" on:click={() => deleteandresetEvent(index)}>{$lang ? "취소" : "Cancel"}</button>
                   {/if}
                 {:else}
                   {event.ok}
@@ -169,23 +175,23 @@
                 <td colspan="4">
                   <div class="details">
                     <strong>토너먼트 정보</strong><br />
-                    주최자: {event.Eventhost.replace("_m", "").replace("_z", "")}<br />
-                    우승: {event.Championship1 ? event.Championship1.replace("_m", "").replace("_z", "") : ""}
+                    {$lang ? "주최자" : "Host"}: {event.Eventhost.replace("_m", "").replace("_z", "")}<br />
+                    {$lang ? "우승" : "1st"}: {event.Championship1 ? event.Championship1.replace("_m", "").replace("_z", "") : ""}
                     {event.Championship2 ? event.Championship2.replace("_m", "").replace("_z", "") : ""}
                     {event.Championship3 ? event.Championship3.replace("_m", "").replace("_z", "") : ""}
                     {event.Championship4 ? event.Championship4.replace("_m", "").replace("_z", "") : ""}<br />
-                    준우승: {event.Runner_up1 ? event.Runner_up1.replace("_m", "").replace("_z", "") : ""}
+                    {$lang ? "준우승" : "2nd"}: {event.Runner_up1 ? event.Runner_up1.replace("_m", "").replace("_z", "") : ""}
                     {event.Runner_up2 ? event.Runner_up2.replace("_m", "").replace("_z", "") : ""}
                     {event.Runner_up3 ? event.Runner_up3.replace("_m", "").replace("_z", "") : ""}
                     {event.Runner_up4 ? event.Runner_up4.replace("_m", "").replace("_z", "") : ""}<br />
-                    3위: {event.Place3rd1 ? event.Place3rd1.replace("_m", "").replace("_z", "") : ""}
+                    {$lang ? "3위" : "3rd"}: {event.Place3rd1 ? event.Place3rd1.replace("_m", "").replace("_z", "") : ""}
                     {event.Place3rd2 ? event.Place3rd2.replace("_m", "").replace("_z", "") : ""}
                     {event.Place3rd3 ? event.Place3rd3.replace("_m", "").replace("_z", "") : ""}
                     {event.Place3rd4 ? event.Place3rd4.replace("_m", "").replace("_z", "") : ""}<br/>
-                    메모: {#if event.modify}<input type="text" bind:value={memotext} class="memo-input" on:keydown={(e) => {
+                    {$lang ? "메모" : "Memo"}: {#if event.modify}<input type="text" bind:value={memotext} class="memo-input" on:keydown={(e) => {
                       if (e.key === "Enter") SaveMemo(index);
-                    }}/><button class="simple-button" on:click={() => SaveMemo(index)}>작성</button>
-                    {:else}<span on:click={()=> modify_memo(index)} class={$myaccount === "admin" || $myaccount ==="admin_m" ? "modify" : "" }>{typeof event.memo === "string" ? event.memo : "기록하기" }</span>{/if}
+                    }}/><button class="simple-button" on:click={() => SaveMemo(index)}>{$lang ? "작성":"Ok"}</button>
+                    {:else}<span on:click={()=> modify_memo(index)} class={$admin.includes($mode) ? "modify" : "" }>{typeof event.memo === "string" ? event.memo : noMemo }</span>{/if}
                   </div>
                 </td>
               </tr>
@@ -198,7 +204,7 @@
   
   {#if $myaccount}
   <div class="fixed-button-div">
-    <button class="simple-button" on:click={() => form.set("newevent")}>등록하기</button>
+    <button class="simple-button" on:click={() => form.set("newevent")}>{$lang ? "기록하기" : "Record"}</button>
     </div>
   {/if}
   

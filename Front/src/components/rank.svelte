@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { key, myaccount, SecurityFetch, mode, form } from "../store.js";
+    import { key, myaccount, SecurityFetch, mode, form, admin, lang } from "../store.js";
   
     let rankData: any[] = [];
     let loading = true;
@@ -8,6 +8,8 @@
     let myRank: number | null = null;
     let showDetails: boolean[] = [];
     let newdata:boolean = false
+    let memo:string = ""
+    let noMemo = $lang ? "기록하기" : "Input Memo"
   
     async function fetchData() {
       let bValidCount;
@@ -21,6 +23,12 @@
           throw new Error("연결 에러입니다");
         }
         rankData = await response.json();
+
+        rankData = rankData.map((rank) => ({
+          ...rank,
+          memoModify: false
+        }));
+
   
         rankData.sort((a, b) => b.TScore - a.TScore);
         bValidCount = rankData.length || 1;
@@ -54,16 +62,16 @@
         const response = await SecurityFetch(`/rank/challenge`, "POST", data);
   
         if (response.status === 201) {
-          alert(`${challengeNickname.replace("_m", "")}님에게 도전을 신청하였습니다`);
+          alert($lang ? `${challengeNickname.replace("_m", "")}님에게 도전을 신청하였습니다` : `You challenged to ${challengeNickname}`);
         } else if (response.status === 400) {
-          alert(`당신은 이미 도전 신청을 한 상태입니다`);
+          alert($lang ? `당신은 이미 도전 신청을 한 상태입니다` : `You should cancel or finished your challenge first`);
         } else if (response.status === 403) {
-          alert(`${challengeNickname.replace("_m", "")}님은 휴가중으로 도전을 받을 수 없는 상태입니다`);
+          alert($lang ? `${challengeNickname.replace("_m", "")}님은 휴가중으로 도전을 받을 수 없는 상태입니다` : `You can't challenge to ${challengeNickname} now`);
         } else if (response.status === 404) {
-          alert(`서버 에러입니다`);
+          alert($lang ? `서버 오류입니다` : `Server Error`);
         }
       } catch (err) {
-        alert("서버 오류입니다");
+        alert($lang ? "서버 오류입니다" : `Server Error`);
       }
     }
   
@@ -89,7 +97,7 @@
   if ($myaccount) {
       try {
         const response = await SecurityFetch(endpoint, "POST");
-        if (!response.ok) throw new Error(`오류 발생: ${response.status}`);
+        if (!response.ok) throw new Error($lang ? `오류 발생: ${response.status}` : "Error: " + response.status);
        const data:any[] = await response.json();
        if (data.length===0)
        {newdata = false}
@@ -102,21 +110,55 @@
     }
   }
 
+
+  function modify_memo(index:number) {
+      if ($admin.includes($mode))
+  {
+      for (let i = 0; i < rankData.length; i++)
+      {rankData[i].memoModify = false}
+      memo = rankData[index].memo
+      rankData[index].memoModify = true
+}
+    }
+
+    async function SaveMemo(index:number) {
+     const data = {nickname: rankData[index].nickname, memo: memo, mode: $mode}
+     if ($admin.includes($mode))
+     {
+     try{
+      const response = await SecurityFetch("/rank/memo","PATCH",data);
+      if (response.ok){
+        alert($lang ? "메모 수정 완료하였습니다" : "Memo modified complete")
+        fetchData();
+      }
+    }
+    catch (error)
+      {
+        alert($lang ? "오류가 발생하였습니다" + error : "Error: " + error)
+      }
+          finally{
+            rankData[index].memoModify = false
+     }      
+  }
+}
+
+
+
   </script>
     
   <div class="table-outline">
     {#if loading}
-      <p>로딩 중...</p>
+      <p>{$lang ? "로딩 중" : "Loading"}...</p>
     {:else if error}
       <p>Error: {error.message}</p>
     {:else}
       <table class="rank-table">
         <thead>
           <tr>
-            <th>등급</th>
-            <th>닉네임</th>
-            <th>승률</th>
-            <th>점수</th>
+            <th>{$lang ? '등급' : 'Tier'}</th>
+            <th>{$lang ? '닉네임' : 'Nickname'}</th>
+            <th>{$lang ? '승률' : 'WinRate'}</th>
+            <th>{$lang ? '점수' : 'Score'}</th>
           </tr>
         </thead>
         <tbody>
@@ -161,14 +203,23 @@
             {#if showDetails[index]}
               <tr>
                 <td colspan="5" class="detail-row">
-                  대전점수: {(Math.round(user.BScore * 100) / 100).toFixed(2)}<br />
-                  대회점수: {user.LScore}<br />
-                  순위: {user.rank}<br />
+                  {$lang ? '대전점수' : 'Battle Score'}: {(Math.round(user.BScore * 100) / 100).toFixed(2)}<br />
+                  {$lang ? '대회점수' : 'Event Score'}: {user.LScore}<br />
+                  {$lang ? '순위' : "Rank"}: {user.rank}<br />
                   Elo: {(Math.round(user.Elo * 100) / 100).toFixed(2)}<br />
-                  {user.wins} 승 / {user.losses} 패<br />
+                  {user.wins} / {user.losses}<br />
+                  {$lang ? "메모" : "Memo"} : 
+                  {#if user.memoModify}
+                  <input type="text" class="memo-input" bind:value={memo} on:keydown={(e) => {
+                    if (e.key === "Enter") SaveMemo(index);}}>
+                    <button class="simple-button" on:click={() => SaveMemo(index)}>작성</button>
+                  {:else}
+                  <span on:click={()=> modify_memo(index)} class={$admin.includes($mode) ? "modify" : "" }>{typeof user.memo === "string" ? user.memo : noMemo }</span>
+                  {/if}
+                  <br/>
                   {#if (Number(myRank) > Number(user.rank)) && ($mode != "babapk")}
                     <button class="simple-button" on:click={() => challengeRank(user.nickname)}>
-                      도전하기
+                      {$lang ? "도전하기" : "Challenge"}
                     </button>
                   {/if}
                 </td>
@@ -182,9 +233,9 @@
   </div>
 
   
-  {#if $myaccount && (($mode==="mpk" &&  $myaccount != "admin_m") || ($mode==="zpke" &&  $myaccount != "admin_z"))}
+  {#if $myaccount && ($mode==="zpke" || $mode==="mpk") }
   <div class="fixed-button-div">
-    <button class="simple-button" on:click={() => form.set("challenge")}>도전승인
+    <button class="simple-button" on:click={() => form.set("challenge")}>{$lang ? "도전승인" : "My challengers"}
       {#if newdata}       
       <span class="badge">NEW</span>
     {/if}     
@@ -221,5 +272,15 @@ table tr td:nth-child(3), table tr th:nth-child(3) {
 table tr td:nth-child(4), table tr th:nth-child(4) {
   width: 20%; /* 네 번째 열 */
 }
+
+.memo-input{
+    border: none; /* 테두리 제거 */
+  background: transparent; /* 배경 투명 */
+  color: inherit; /* 부모 요소의 텍스트 색상 상속 */
+  font-size: inherit; /* 기본 폰트 크기 */
+  width: 60%; /* 셀 너비에 맞추기 */
+  outline: none; /* 포커스 시 파란 테두리 제거 */
+  padding: 0; /* 여백 제거 */
+  }
 
   </style>

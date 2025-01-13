@@ -4,6 +4,7 @@ import { jwtService } from 'src/jwt/jwt.service';
 import { Account } from 'src/entities/account.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { BABAPK_ADMIN, MPK_ADMIN, ZPKE_ADMIN } from 'src/config/constants';
 
 interface Request extends ExpressRequest {
   user?: any;
@@ -42,6 +43,7 @@ export class JwtAuthMiddleware implements NestMiddleware {
 
     const accessToken = req.headers['d2rpvpjwttoken'] as string; // 요청 헤더의 액세스 토큰
     const refreshToken = req.cookies['d2rpvprefreshToken']; // 쿠키의 리프레시 토큰
+    let admin: string[] = []
 
     if (accessToken) {
       try {
@@ -51,7 +53,13 @@ export class JwtAuthMiddleware implements NestMiddleware {
        if (!username) {
         console.warn('계정을 생성하지 않은 사용자입니다')
        }
-        req.user = { username: username, account: decoded.username }; // 사용자 정보 설정
+       if (BABAPK_ADMIN.includes(decoded.username))
+        {admin.push("babapk")}          
+       if (MPK_ADMIN.includes(decoded.username))
+        {admin.push("mpk")}          
+       if (ZPKE_ADMIN.includes(decoded.username))
+        {admin.push("zpke")} 
+        req.user = { username: username, account: decoded.username, admin: admin }; // 사용자 정보 설정
         
         return next(); // 요청 흐름 계속
       } catch (error) {
@@ -72,7 +80,13 @@ export class JwtAuthMiddleware implements NestMiddleware {
         if (!username) {
          console.warn('계정을 생성하지 않은 사용자입니다')
         }
-         req.user = { username: username, account: decoded.username }; // 사용자 정보 설정
+         if (BABAPK_ADMIN.includes(decoded.username))
+          {admin.push("babapk")}          
+         if (MPK_ADMIN.includes(decoded.username))
+          {admin.push("mpk")}          
+         if (ZPKE_ADMIN.includes(decoded.username))
+          {admin.push("zpke")} 
+         req.user = { username: username, account: decoded.username, admin: admin }; // 사용자 정보 설정
         console.log('New access token generated and set in header');
       } catch (error) {
         console.error('Invalid refresh token:', error.message);

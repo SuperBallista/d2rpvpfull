@@ -18,11 +18,7 @@ export class CalendarController {
     const yearmonth = String(body.year) + String(body.month).padStart(2, '0');
     const yearmonthdate = yearmonth + String(body.day).padStart(2, '0');
     const mode = body.mode;
-
-    await this.calendarService.saveEventText(
-      { yearmonth, yearmonthdate, date: Number(body.day), text: body.event },
-      mode,
-    );
-    return { message: 'Event successfully saved' };
-  }
+    return  await this.calendarService.saveEventText({ yearmonth, yearmonthdate, date: Number(body.day), text: body.event },
+      mode);
+}
 }

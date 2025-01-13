@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { key, myaccount, SecurityFetch, mode, form } from "../store.js";
+    import { key, myaccount, SecurityFetch, mode, lang } from "../store.js";
   
     let rankData: any[] = [];
     let loading = true;
@@ -40,11 +40,12 @@
         {const resClan = await SecurityFetch(fetchmyclanendpoint, "POST");
         myclan = await resClan.json();}
 
-
       } catch (err) {
         error = err;
       } finally {
         loading = false;
+        console.log($myaccount, $mode, $lang)
+        console.log(rankData, myclan)
       }
     }
   
@@ -55,7 +56,7 @@
     }
   
     onMount(() => {
-      const unsubscribe = key.subscribe((value) => {
+      const unsubscribe = key.subscribe(() => {
         fetchData();
       });
   
@@ -67,20 +68,20 @@
    async function clanJoin(clanname:string){
     const data = {clanname: clanname}
     const endpoint = `/clan/${$mode}/join`
-    const userResponse = confirm(`${clanname} 클랜에 가입합니다. 계속하시겠습니까?`);
+    const userResponse = confirm($lang ? `${clanname} 클랜에 가입합니다. 계속하시겠습니까?` : "Are you sure you want to join the clan? Do you want to continue? :" + clanname);
     if (userResponse) {
     try{
         const response = await SecurityFetch(endpoint, "PATCH", data)
         if (response.status===200)
-    {alert("클랜에 가입하였습니다")
+    {alert($lang ? "클랜에 가입하였습니다" : "You joined clan")
      fetchData();   
     }
     else
-    {alert("오류 발생")}
+    {alert($lang ? "오류 발생" : "Error")}
     }
     catch (error)
     {
-alert("오류 발생 :" + error)
+alert(error)
     }
   }
    }
@@ -89,17 +90,17 @@ alert("오류 발생 :" + error)
     
   <div class="table-outline">
     {#if loading}
-      <p>로딩 중...</p>
+      <p>{$lang ? "로딩 중" : "Loading"}...</p>
     {:else if error}
       <p>Error: {error.message}</p>
     {:else}
       <table class="rank-table">
         <thead>
           <tr>
-            <th>순위</th>
-            <th>클랜</th>
-            <th>점수</th>
-            <th>인원</th>
+            <th>{$lang ? "순위" : "Rank"}</th>
+            <th>{$lang ? "클랜" : "Clan"}</th>
+            <th>{$lang ? "점수" : "Score"}</th>
+            <th>{$lang ? "인원" : "Member"}</th>
           </tr>
         </thead>
         <tbody>
@@ -120,11 +121,11 @@ alert("오류 발생 :" + error)
             {#if showDetails[index]}
               <tr>
                 <td colspan="5" class="detail-row">
-                  대전점수: {clan.BScore.toFixed(2)}<br />
-                  대회점수: {clan.LScore}<br />
-                  클랜원: {clan.members}
+                  {$lang ? '대전점수' : 'Battle Score'}: {clan.BScore.toFixed(2)}<br />
+                  {$lang ? '대회점수' : 'Event Score'}: {clan.LScore}<br />
+                  {$lang ? '클랜원' : 'Members'}: {clan.members}
                   {#if myclan === "none"}
-                  <button class="simple-button" on:click={() => clanJoin(clan.name)}>가입하기</button>
+                  <button class="simple-button" on:click={() => clanJoin(clan.name)}>{$lang ? '가입하기' : 'Join'}</button>
                   {/if}
                 </td>
               </tr>

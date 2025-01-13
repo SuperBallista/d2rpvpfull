@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not } from 'typeorm';
+import { Repository } from 'typeorm';
 import { BUser } from '../entities/b-user.entity';
 import { MUser } from '../entities/m-user.entity';
 import { BRecord } from '../entities/b-record.entity';
@@ -26,8 +26,35 @@ export class RankService {
     private readonly zRecordRepository: Repository<ZRecord>,
   ) {}
 
+  async memoModify(admin:string[], nickname:string, mode:string, memo:string) {   
+    let userRepository:any
+
+    if (!admin.includes(mode))
+    {throw new HttpException("권한이 없습니다", HttpStatus.FORBIDDEN)}
+
+    if (mode==="babapk")
+    {userRepository = this.bUserRepository}
+    else if (mode==="mpk")
+    {userRepository = this.mUserRepository}
+    else if (mode==="zpke")
+    {userRepository = this.zUserRepository}
+    else
+    {throw new HttpException("잘못된 요청입니다", HttpStatus.BAD_REQUEST)}
+    console.log(nickname, mode, memo)
+    const user = await userRepository.findOne({where: {nickname}})
+    
+    if (!user)
+    {throw new HttpException("사용자가 없습니다", HttpStatus.NOT_FOUND)}
+
+    user.memo = memo
+    await userRepository.save(user);
+
+    return user
+  }
+  
+
   // 승리 기록 쿼리
-  private async getWinCount(repository: Repository<any>, recordRepository: Repository<any>, mode: boolean) {
+  private async getWinCount(repository: Repository<any>, recordRepository: Repository<any>, mode: string) {
     const query = repository
       .createQueryBuilder('user')
       .leftJoin(recordRepository.metadata.tableName, 'record', `
@@ -45,7 +72,7 @@ export class RankService {
   }
 
   // 패배 기록 쿼리
-  private async getLoseCount(repository: Repository<any>, recordRepository: Repository<any>, mode: boolean) {
+  private async getLoseCount(repository: Repository<any>, recordRepository: Repository<any>, mode: string) {
     const query = repository
       .createQueryBuilder('user')
       .leftJoin(recordRepository.metadata.tableName, 'record', `
@@ -63,7 +90,7 @@ export class RankService {
   }
 
   // 랭킹 데이터 생성
-  private createResultArray(rankdb, recordWin, recordLose, mode: boolean) {
+  private createResultArray(rankdb, recordWin, recordLose, mode: string) {
     return rankdb.map(user => {
       const wins = recordWin.find(record => record.nickname === user.nickname)?.TotalWins || 0;
       const losses = recordLose.find(record => record.nickname === user.nickname)?.TotalLoses || 0;
@@ -81,6 +108,7 @@ export class RankService {
         clan: mode ? user.clan : null,
         Elo: user.bScore,
         TScore: totalBScore + (user.lScore * 0.4),
+        memo: user.memo
       };
     });
   }
@@ -94,11 +122,11 @@ export class RankService {
     .getMany();
 
     const [recordWin, recordLose] = await Promise.all([
-      this.getWinCount(this.bUserRepository, this.bRecordRepository, false),
-      this.getLoseCount(this.bUserRepository, this.bRecordRepository, false),
+      this.getWinCount(this.bUserRepository, this.bRecordRepository, "babapk"),
+      this.getLoseCount(this.bUserRepository, this.bRecordRepository, "babapk"),
     ]);
 
-    return this.createResultArray(rankdb, recordWin, recordLose, false);
+    return this.createResultArray(rankdb, recordWin, recordLose, "babapk");
   }
 
   // m_user 랭킹 데이터 가져오기
@@ -109,11 +137,11 @@ export class RankService {
     .andWhere('(user.records + user.lScore) > 0')
     .getMany();
     const [recordWin, recordLose] = await Promise.all([
-      this.getWinCount(this.mUserRepository, this.mRecordRepository, true),
-      this.getLoseCount(this.mUserRepository, this.mRecordRepository, true),
+      this.getWinCount(this.mUserRepository, this.mRecordRepository, "mpk"),
+      this.getLoseCount(this.mUserRepository, this.mRecordRepository, "mpk"),
     ]);
 
-    return this.createResultArray(rankdb, recordWin, recordLose, true);
+    return this.createResultArray(rankdb, recordWin, recordLose, "mpk");
   }
 
     // z_user 랭킹 데이터 가져오기
@@ -125,11 +153,11 @@ export class RankService {
     .getMany();
     
       const [recordWin, recordLose] = await Promise.all([
-        this.getWinCount(this.zUserRepository, this.zRecordRepository, false),
-        this.getLoseCount(this.zUserRepository, this.zRecordRepository, false),
+        this.getWinCount(this.zUserRepository, this.zRecordRepository, "zpke"),
+        this.getLoseCount(this.zUserRepository, this.zRecordRepository, "zpke"),
       ]);
   
-      return this.createResultArray(rankdb, recordWin, recordLose, false);
+      return this.createResultArray(rankdb, recordWin, recordLose, "zpke");
     }
   
 

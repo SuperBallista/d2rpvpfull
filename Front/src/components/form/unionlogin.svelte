@@ -1,5 +1,5 @@
 <script lang="ts">
-import {form, jwtToken, SecurityFetch, myUnionAccount, mybabapk, mympk, myzpke, myorigin, email } from "../../store";
+import {form, jwtToken, SecurityFetch, myUnionAccount, mybabapk, mympk, myzpke, myorigin, email, admin, lang } from "../../store";
 
 
 let loginnickname = "";
@@ -28,6 +28,7 @@ async function formprocess() {
       myorigin.set(data.how || "");
       email.set(data.email || "");
       form.set("none");
+      admin.set(data.admin)
     } else {
       alert("로그인 실패"); // 에러 메시지 출력
     }
@@ -40,14 +41,14 @@ async function formprocess() {
 
 
 </script>
-<h3 class="message-title">계정 로그인</h3>
+<h3 class="message-title">{$lang ? "계정 로그인" : "Sign Up"}</h3>
 
 <div class="message-body">
 
-<input class="input-text" bind:value={loginnickname} type="text" placeholder="계정">
-<input class="input-text" bind:value={loginpw} type="password" placeholder="비밀번호">
-<button class="emphasis-button block" on:click={() => formprocess()}>로그인</button>
+<input class="input-text" bind:value={loginnickname} type="text" placeholder={$lang ? "계정" : "Account"}>
+<input class="input-text" bind:value={loginpw} type="password" placeholder={$lang ? "암호" : "Password"}>
+<button class="emphasis-button block" on:click={() => formprocess()}>Sign Up</button>
     
 </div>
-<button class="message-button" on:click={() => form.set("findaccount")}>계정찾기</button>
-<button class="message-button" on:click={() => form.set("register")}>회원가입</button>
+<button class="message-button" on:click={() => form.set("findaccount")}>{$lang ? "계정찾기" : "Find Account"}</button>
+<button class="message-button" on:click={() => form.set("register")}>{$lang ? "가입하기" : "Register"}</button>

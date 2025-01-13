@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import Calendar from "./calendar.svelte";
-    import { mode, SecurityFetch } from "../store";
+    import { mode, SecurityFetch, lang } from "../store";
     import { useLocation } from "svelte-routing"
 
     const location = useLocation()
@@ -64,7 +64,7 @@
         });
         eventname = eventsByDate;
       } catch (error) {
-        alert("달력 DB 에러");
+        alert($lang ? "달력 DB 오류" : "Calendar DB error");
         console.error("Error:", error);
       }
     }
@@ -80,9 +80,9 @@
     });
   </script>
 <div class="calendar-header">
-<button class="simple-button" on:click={clickbefore}>지난달</button>
-  <div class="calendar-header-text">{year}년 {month + 1}월</div>
-    <button class="simple-button" on:click={clicknext}>다음달</button>
+<button class="simple-button" on:click={clickbefore}>{$lang ? "지난 달" : "Before"}</button>
+  <div class="calendar-header-text">{year}.{month + 1}</div>
+    <button class="simple-button" on:click={clicknext}>{$lang ? "다음 달" : "Next"}</button>
 </div>
     <Calendar {year} {month} {date} {events} {eventname} {getCalendartext} />
   

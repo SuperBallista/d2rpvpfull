@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
 import axios from 'axios';
 import { AuthService } from '../auth.service';

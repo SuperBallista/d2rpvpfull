@@ -11,7 +11,6 @@ import { CalendarModule } from './calendar/calendar.module';
 import { ClanModule } from './clan/clan.module';
 import { EventModule } from './event/event.module';
 import { GetNicknameModule } from './get-nickname/get-nickname.module';
-import { OldRecordModule } from './old-record/old-record.module';
 import { UserdataModule } from './userdata/userdata.module';
 import { ResetPwModule } from './reset-pw/reset-pw.module';
 import { RankModule } from './rank/rank.module';
@@ -56,7 +55,6 @@ import { Account } from './entities/account.entity';
     ClanModule,
     EventModule,
     GetNicknameModule,
-    OldRecordModule,
     UserdataModule,
     ResetPwModule,
     RankModule,

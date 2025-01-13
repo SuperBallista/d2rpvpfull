@@ -1,3 +1,4 @@
+
 export const START_SCORE = 800;  // 기본 점수 설정
 export const START_SCORE_M = 800
 export const START_SCORE_Z = 800
@@ -38,3 +39,8 @@ export const TEAMS_SCORES_Z = {
 
 
 export const EVENT_HOST_SCORE = 3;
+
+
+export const BABAPK_ADMIN = ["kor8240@gmail.com", "mhj2030@hanmail.net"]
+export const MPK_ADMIN = ["kor8240@gmail.com", "mhj2030@hanmail.net", "3864769874", "3864854217"]
+export const ZPKE_ADMIN = ["kor8240@gmail.com", "mhj2030@hanmail.net"]

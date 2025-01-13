@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { formatDate, myaccount, modify_postid, mode, SecurityFetch } from "../store";
+    import { formatDate, myaccount, modify_postid, mode, SecurityFetch, admin, myUnionAccount, lang } from "../store";
     import { Link, navigate } from "svelte-routing";
 
     // 변수 타입 정의
@@ -8,7 +8,7 @@
     let List_data: { [key: string]: any } = {}; // 게시글 데이터 (key-value 객체로 처리)
     $: loading = true;
     let errormsg: string = "";
-    let comment: { nickname: string; content: string; createdAt: string; commentId: string }[] = [];
+    let comment: { nickname: string; content: string; createdAt: string; commentId: string, account: string }[] = [];
     let comment_content: string = "";
 
     const modepage: string = "/" + $mode;
@@ -54,23 +54,22 @@
 
     onMount(() => {
     const extractedId = getIdFromPathname(window.location.pathname);
-    console.log("Extracted ID:", extractedId); // 디버깅 로그
     id = extractedId ?? "";
     if (id) {
         fetchPost(id);
         fetchcomment(id);
     } else {
         loading = false;
-        errormsg = "잘못된 주소입니다";
+        errormsg = $lang ? "잘못된 주소입니다" : "Not Found";
     }
 });
     // 댓글 작성
     async function add_comment(id: string): Promise<void> {
-        const data = { post_id: id, content: comment_content, writter: $myaccount };
+        const data = { post_id: id, content: comment_content, writter: $myaccount, account: $myUnionAccount };
         try {
             const response = await SecurityFetch("/board/comment/add", "POST", data);
             if (response.ok) {
-                alert("댓글을 등록하였습니다");
+                alert($lang ? "댓글을 등록하였습니다" : "Comment added");
                 comment_content = ""; // 댓글 내용 초기화
                 fetchcomment(id);
             }
@@ -81,16 +80,22 @@
 
     // 댓글 삭제
     async function delete_comment(post_id: string, comment_id: string): Promise<void> {
-        const data = { comment_id };
+
+        const userResponse =  confirm($lang ? "댓글을 삭제하시겠습니까? 삭제시 복원이 불가합니다" : "Do you really want to delete this comment?")
+
+        if (userResponse) {
+
+        const data = { comment_id: comment_id };
         try {
             const response = await SecurityFetch("/board/comment/delete", "DELETE", data)
             if (response.ok) {
-                alert("댓글을 삭제하였습니다");
+                alert($lang ? "댓글을 삭제하였습니다" : "Comment removed");
                 fetchcomment(post_id);
             }
         } catch (error) {
             console.error("댓글 삭제 오류:", error);
         }
+    }
     }
 
     // 게시물 수정
@@ -101,16 +106,23 @@
 
     // 게시물 삭제
     async function delete_post(id: string): Promise<void> {
-        const data = { post_id: id };
+
+      const userResponse =  confirm($lang ? "글을 삭제하시겠습니까? 삭제시 복원이 불가합니다" : "Do you really want to delete this post?")
+
+        if (userResponse) {
+
+        const data = { post_id: id};
+
         try {
             const response = await SecurityFetch("/board/delete", "DELETE",data)
                         if (response.ok) {
-                alert("글을 삭제하였습니다");
+                alert($lang ? "글을 삭제하였습니다" : "Post removed");
                 navigate(`${modepage}/boardlist`);
             }
         } catch (error) {
             console.error("글 삭제 오류:", error);
         }
+    }
     }
 
     // HTML 태그 제거
@@ -125,9 +137,9 @@
 
 
 {#if loading}
-    <div class="text-center">Loading...</div>
+    <div class="text-center">{$lang ? "로딩 중" : "Loading"}...</div>
 {:else if errormsg}
-    <div class="text-center">Error: {errormsg}</div>
+    <div class="text-center">{errormsg}</div>
 {:else}
 <!--데이터 렌더링-->
     <div class="table-outline main_data">
@@ -135,9 +147,9 @@
         <div class="table-contents-wrapper">
             <div class="table-info-no-line flex">
                 <div class="table-info-writter table-contents_cell">{List_data.nickname || ""}</div>
-                <div class="table-info-date table-contents_cell">작성일 : {formatDate(List_data.createdAt) || ""}</div>
-                <div class="table-info-date table-contents_cell">수정일 : {formatDate(List_data.updatedAt) || ""}</div>
-                <div class="table-info-views table-contents_cell">조회수 : {List_data.views || ""}</div>
+                <div class="table-info-date table-contents_cell">{$lang ? "작성일" : "WrittenAt"} : {formatDate(List_data.createdAt) || ""}</div>
+                <div class="table-info-date table-contents_cell">{$lang ? "수정일" : "ModifiedAt"} : {formatDate(List_data.updatedAt) || ""}</div>
+                <div class="table-info-views table-contents_cell">{$lang ? "조회수" : "Views"} : {List_data.views || ""}</div>
             </div>
         </div>
         <div class="table-contents-wrapper">
@@ -149,12 +161,12 @@
             <div class="table-contents-no-line">
                 <div class="table-info-button">
                     {#if List_data.nickname === $myaccount}
-                        <button class="simple-button" on:click={modify_post}>수정하기</button>
+                        <button class="simple-button" on:click={modify_post}>{$lang ? "수정하기" : "Modify"}</button>
                     {/if}
-                    {#if $myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z" || List_data.nickname === $myaccount}
-                        <button class="simple-button" on:click={() => delete_post(id)}>삭제하기</button>
+                    {#if $admin.includes($mode) || List_data.nickname === $myaccount}
+                        <button class="simple-button" on:click={() => delete_post(id)}>{$lang ? "삭제하기" : "Delete"}</button>
                     {/if}
-                    <Link class="simple-button" to={`${modepage}/boardlist`}>목록보기</Link>
+                    <Link class="simple-button" to={`${modepage}/boardlist`}>{$lang ? "목록보기" : "List"}</Link>
                 </div>
             </div>
         </div>
@@ -163,21 +175,21 @@
     <table class="comment-table">
         <thead>
             <tr>
-                <th>작성자</th>
-                <th>내용</th>
-                <th>작성일</th>
-                <th>관리</th>
+                <th>{$lang ? "작성자" : "Writter"}</th>
+                <th>{$lang ? "내용" : "Content"}</th>
+                <th>{$lang ? "작성일" : "WrittedAt"}</th>
+                <th>{$lang ? "관리" : "Delete"}</th>
             </tr>
         </thead>
         <tbody>
-            {#each comment as { nickname, content, createdAt, commentId }}
+            {#each comment as { nickname, content, createdAt, commentId}}
                 <tr>
                     <td>{nickname}</td>
                     <td class="commentContent">{content}</td>
                     <td>{formatDate(createdAt)}</td>
                     <td>
-                        {#if nickname === $myaccount || $myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z"}
-                            <button class="simple-button small" on:click={() => delete_comment(id, commentId)}>삭제</button>
+                        {#if nickname === $myaccount || $admin.includes($mode) }
+                            <button class="simple-button small" on:click={() => delete_comment(id, commentId)}>{$lang ? "삭제" : "Delete"}</button>
                         {/if}
                     </td>
                 </tr>
@@ -190,7 +202,7 @@
             <div class="table-contents-no-line">
                 <div class="table-info-comment table-contents_cell">
                     <input class="input-text" type="text" bind:value={comment_content} />
-                    <button class="simple-button small" on:click={() => add_comment(id)}>댓글 작성</button>
+                    <button class="simple-button small" on:click={() => add_comment(id)}>{$lang ? "댓글 작성" : "Add Comment"}</button>
                 </div>
             </div>
         </div>

@@ -1,8 +1,8 @@
 <script lang="ts">
     import {
-      myaccount,
       mode,
       SecurityFetch,
+      admin, lang
     } from "../store";
   
     export let year: number;
@@ -53,7 +53,7 @@
     }
   
     const handleEdit = (day: Date, text: string): void => {
-    if ($myaccount === "admin" || $myaccount === "admin_m" || $myaccount === "admin_z") {
+    if ($admin.includes($mode)) {
       editing = day.toDateString();
       eventText = text || ""; // Initialize with existing event text or empty
     }
@@ -73,8 +73,8 @@
         const endpoint = "/calendar/event";
         const response = await SecurityFetch(endpoint, "POST", eventPayload);
   
-        if (response.ok) {
-          alert("이벤트 기록을 저장하였습니다");
+        if (response.status === 201) {
+          alert($lang ? "이벤트 기록을 저장하였습니다" : "Memo Saved");
           events = { ...events, [eventDate]: eventText };
           editing = null;
           eventText = "";
@@ -156,13 +156,13 @@ function toggleTooltip(dayKey: number): void {
     <table class="calendar-table">
       <thead>
         <tr>
-          <th class="day-header">일</th>
-          <th class="day-header">월</th>
-          <th class="day-header">화</th>
-          <th class="day-header">수</th>
-          <th class="day-header">목</th>
-          <th class="day-header">금</th>
-          <th class="day-header">토</th>
+          <th class="day-header">{$lang ? '일' : 'Sun'}</th>
+          <th class="day-header">{$lang ? '월' : 'Mon'}</th>
+          <th class="day-header">{$lang ? '화' : 'Tue'}</th>
+          <th class="day-header">{$lang ? '수' : 'Wed'}</th>
+          <th class="day-header">{$lang ? '목' : 'Thu'}</th>
+          <th class="day-header">{$lang ? '금' : 'Fri'}</th>
+          <th class="day-header">{$lang ? '토' : 'Sat'}</th>
         </tr>
       </thead>
       <tbody>
@@ -175,7 +175,7 @@ function toggleTooltip(dayKey: number): void {
               <td class="day-cell" role="button" tabindex="0">
                 <div
                   on:click={() => handleEdit(dayEntry.day, eventname[dayEntry.dayKey])}
-                  class="day-number {$myaccount==="admin" || $myaccount === "admin_m" || $myaccount === "admin_z" ? "pointer" : ""}"
+                  class="day-number {$admin.includes($mode) ? "pointer" : ""}"
                 >
                   {dayEntry.day.getDate()}
                 </div>
@@ -192,7 +192,7 @@ function toggleTooltip(dayKey: number): void {
                     class="emphasis-button small"
                     on:click={() => handleSave(dayEntry.day)}
                   >
-                    저장
+                    {$lang ? "저장" : "Save"}
                   </button>
                 {:else}
                   <div
@@ -205,7 +205,7 @@ function toggleTooltip(dayKey: number): void {
                     class="tooltiptext"
                     class:visible={activeTooltip === `${dayEntry.dayKey}`}
                   >
-                    {eventname[dayEntry.dayKey] || "이벤트 없음"}
+                    {eventname[dayEntry.dayKey] || ""}
                   </div>
                 {/if}
               </td>

@@ -5,7 +5,6 @@ import {
     Body,
     Req,
     Res,
-    HttpException,
     HttpStatus,
     HttpCode,
     UseGuards, Get,
@@ -21,11 +20,6 @@ import { jwtService } from 'src/jwt/jwt.service';
     user?: any;
   }
   
-  interface DeleteAccountResult {
-    success: boolean;
-    error?: string;
-    status?: number;
-  }
   
   @Controller('/auth')
   export class AuthController {
@@ -47,136 +41,21 @@ import { jwtService } from 'src/jwt/jwt.service';
     }
   
     @Delete('/delete')
-    async deleteAccount(@Req() req: Request, @Res() res: Response) {
-      try {
-        const userNickname = req.user['username']; // 인증 미들웨어로부터 사용자 정보 추출
-        const { nowpw } = req.body;
-
-        if (userNickname === "badmin" || userNickname === "madmin" || userNickname === "zadmin")
-        {throw new HttpException("관리자 계정은 삭제가 불가능합니다", HttpStatus.FORBIDDEN)}
-  
-        const result: DeleteAccountResult = await this.authService.deleteAccount(
+    async deleteAccount(@User() user: any, @Body() body: any, @Res() res: Response) {
+        const userNickname = user.account; // 인증 미들웨어로부터 사용자 정보 추출
+        const { nowpw } = body;
+        await this.authService.deleteAccount(
           userNickname,
           nowpw,
         );
-        if (result.success) {
-          // 계정 삭제 성공 시 쿠키 삭제
           res.clearCookie('d2rpvprefreshToken', {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
           });
-          console.log(userNickname, '계정 삭제 성공');
-          return res.json({ success: true });
-        } else {
-          throw new HttpException(result.error, result.status);
-        }
-      } catch (error) {
-        console.error('계정 삭제 오류:', error);
-        throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
-      }
+          console.log(userNickname, '계정 삭제');
     }
  
-
-
-
-
-    // @Delete('/babapk/delete')
-    // async deleteAccountB(@Req() req: Request, @Res() res: Response) {
-    //   try {
-    //     const userNickname = req.user['username']; // 인증 미들웨어로부터 사용자 정보 추출
-    //     const { nowpw } = req.body;
-
-    //     if (userNickname === "admin")
-    //     {throw new HttpException("관리자 계정은 삭제가 불가능합니다", HttpStatus.FORBIDDEN)}
-  
-    //     const result: DeleteAccountResult = await this.authService.deleteAccount(
-    //       userNickname,
-    //       nowpw,
-    //       'b_user',
-    //     );
-    //     if (result.success) {
-    //       // 계정 삭제 성공 시 쿠키 삭제
-    //       res.clearCookie('d2rpvprefreshToken', {
-    //         httpOnly: true,
-    //         secure: true,
-    //         sameSite: 'strict',
-    //       });
-    //       console.log(userNickname, '계정 삭제 성공');
-    //       return res.json({ success: true });
-    //     } else {
-    //       throw new HttpException(result.error, result.status);
-    //     }
-    //   } catch (error) {
-    //     console.error('계정 삭제 오류:', error);
-    //     throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
-    //   }
-    // }
-
-    
-    // @Delete('/mpk/delete')
-    // async deleteAccountM(@Req() req: Request, @Res() res: Response) {
-    //   try {
-    //     const userNickname = req.user['username']; // 인증 미들웨어로부터 사용자 정보 추출
-    //     const { nowpw } = req.body;
-
-    //     if (userNickname === "admin_m")
-    //       {throw new HttpException("관리자 계정은 삭제가 불가능합니다", HttpStatus.FORBIDDEN)}
-  
-    //     const result: DeleteAccountResult = await this.authService.deleteAccount(
-    //       userNickname,
-    //       nowpw,
-    //       'm_user',
-    //     );
-    //     if (result.success) {
-    //       // 계정 삭제 성공 시 쿠키 삭제
-    //       res.clearCookie('d2rpvprefreshToken', {
-    //         httpOnly: true,
-    //         secure: true,
-    //         sameSite: 'strict',
-    //       });
-    //       console.log(userNickname, '계정 삭제 성공');
-    //       return res.json({ success: true });
-    //     } else {
-    //       throw new HttpException(result.error, result.status);
-    //     }
-    //   } catch (error) {
-    //     console.error('계정 삭제 오류:', error);
-    //     throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
-    //   }
-    // }
-
-    // @Delete('/zpke/delete')
-    // async deleteAccountZ(@Req() req: Request, @Res() res: Response) {
-    //   try {
-    //     const userNickname = req.user['username']; // 인증 미들웨어로부터 사용자 정보 추출
-    //     const { nowpw } = req.body;
-
-    //       if (userNickname === "admin_z")
-    //     {throw new HttpException("관리자 계정은 삭제가 불가능합니다", HttpStatus.FORBIDDEN)}
-
-    //     const result: DeleteAccountResult = await this.authService.deleteAccount(
-    //       userNickname,
-    //       nowpw,
-    //       'z_user',
-    //     );
-    //     if (result.success) {
-    //       // 계정 삭제 성공 시 쿠키 삭제
-    //       res.clearCookie('d2rpvprefreshToken', {
-    //         httpOnly: true,
-    //         secure: true,
-    //         sameSite: 'strict',
-    //       });
-    //       console.log(userNickname, '계정 삭제 성공');
-    //       return res.json({ success: true });
-    //     } else {
-    //       throw new HttpException(result.error, result.status);
-    //     }
-    //   } catch (error) {
-    //     console.error('계정 삭제 오류:', error);
-    //     throw new HttpException('서버 오류', HttpStatus.INTERNAL_SERVER_ERROR);
-    //   }
-    // }
 
   
     @Post('/login')
@@ -203,44 +82,10 @@ import { jwtService } from 'src/jwt/jwt.service';
       return { username };
     }
 
-    
-
-    
-    // @Post('/babapk/register')
-    // async processRegi(@Body() body: any, @Res() res: Response) {
-    //   return this.authService.processRegi(body, res);
-    // }
-  
-    // @Post('/mpk/register')
-    // async processRegiM(@Body() body: any, @Res() res: Response) {
-    //   return this.authService.processRegiM(body, res);
-    // }
-  
-    // @Post('/zpke/register')
-    // async processRegiZ(@Body() body: any, @Res() res: Response) {
-    //   return this.authService.processRegiZ(body, res);
-    // }
-
 @Post('/register')
-    async processRegiU(@Body() body: any, @Res() res: Response) {
-      return this.authService.processRegiU(body, res);
+    async processRegiU(@Body() body: any) {
+      return this.authService.processRegiU(body);
     }
-
-
-
-    // @Post('/babapk/check-nickname')
-    // async processNicknameCheck(@Body() body: any, @Res() res: Response) {
-    //   return this.authService.processNicknameCheck(body, res);
-    // }
-    //   @Post('/mpk/check-nickname')
-    // async processNicknameCheckM(@Body() body: any, @Res() res: Response) {
-    //   return this.authService.processNicknameCheckM(body, res);
-    // }
-    // @Post('/zpke/check-nickname')
-    // async processNicknameCheckZ(@Body() body: any, @Res() res: Response) {
-    //   return this.authService.processNicknameCheckZ(body, res);
-    // }
-
     
     @Post('/check-nickname')
     async processNicknameCheckU(@Body() body: any, @Res() res: Response) {
