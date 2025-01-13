@@ -5,7 +5,7 @@
     async function createChar() {
         
         const data = {nickname: makenickname, mode: $modeinput || $mode}
-        const nicknameRegex = /^[\u4E00-\u9FFF\u3400-\u4DBF\u20000-\u2EBFF\u2E80-\u2EFF\u2F00-\u2FDF\u3007\uAC00-\uD7A3a-zA-Z]{3,20}$/;
+        const nicknameRegex = /^[\u4E00-\u9FFF\u3400-\u4DBF\u20000-\u2EBFF\u2E80-\u2EFF\u2F00-\u2FDF\u3007\uAC00-\uD7A3a-zA-Z]{2,20}$/;
         if (!nicknameRegex.test(makenickname)) {
             alert($lang ? "캐릭터 닉네임을 바르게 지어주세요! 닉네임은 한글, 영어, 한자만 가능합니다" : "Please create a proper character nickname! Nicknames can only contain Korean, English, or Chinese characters.")
                     }

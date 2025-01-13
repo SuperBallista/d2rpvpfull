@@ -23,13 +23,10 @@
       try {
         const endpoint = `/userdata/change-pw`;
         const response = await SecurityFetch(endpoint,"POST",pwdata);
-        const data = await response.json()
   
-        if (typeof data.message === 'string') {
+        if (response.status === 201) {
           alert($lang ? "암호 변경 완료" : "Your Password Changed");
           form.set("none");
-        } else {
-          alert(`Error: ${response.status}`);
         }
       } catch (error) {
         console.error("Error:", error);

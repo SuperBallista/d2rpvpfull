@@ -7,7 +7,7 @@ import {
   import { UserDataService } from './userdata.service';
   import { User } from '../user/user.decorator';
   
-  @Controller('userdata')
+  @Controller('/userdata')
   export class UserDataController {
     constructor(private readonly userDataService: UserDataService) {}
   
@@ -28,7 +28,15 @@ import {
         await this.userDataService.changeEmail(user.username, nowpw, newemail);
     }
   
-  
+      // 암호 변경 (b_user)
+      @Post('/change-pw')
+      async changePassword(
+        @User() user: any,
+        @Body() body: { newpw: string; nowpw: string },
+      ) {
+          const { nowpw, newpw } = body;
+          await this.userDataService.changePassword(user.username, nowpw, newpw);
+      }
     // 도전 취소
     @Delete('/challenge/cancel')
     async cancelChallenge(@User() user: any, @Body() body: { mode: string }) {

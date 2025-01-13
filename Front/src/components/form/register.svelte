@@ -27,8 +27,8 @@
     return { isValid: false, message: $lang ? "닉네임을 입력해주세요." : "Input Your Nickname" };
   }
 
-  // 정규식: 알파벳, 숫자, 밑줄(_)만 허용, 길이는 3~20자
-  const nicknameRegex = /^[\u4E00-\u9FFF\u3400-\u4DBF\u20000-\u2EBFF\u2E80-\u2EFF\u2F00-\u2FDF\u3007\uAC00-\uD7A3a-zA-Z]{3,20}$/;
+  // 정규식: 알파벳, 숫자, 밑줄(_)만 허용, 길이는 2~20자
+  const nicknameRegex = /^[\u4E00-\u9FFF\u3400-\u4DBF\u20000-\u2EBFF\u2E80-\u2EFF\u2F00-\u2FDF\u3007\uAC00-\uD7A3a-zA-Z]{2,20}$/;
   if (!nicknameRegex.test(nickname)) {
     return {
       isValid: false,

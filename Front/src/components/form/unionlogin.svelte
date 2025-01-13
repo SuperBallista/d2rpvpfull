@@ -47,7 +47,7 @@ async function formprocess() {
 
 <input class="input-text" bind:value={loginnickname} type="text" placeholder={$lang ? "계정" : "Account"}>
 <input class="input-text" bind:value={loginpw} type="password" placeholder={$lang ? "암호" : "Password"}>
-<button class="emphasis-button block" on:click={() => formprocess()}>Sign Up</button>
+<button class="emphasis-button block" on:click={() => formprocess()}>{$lang ? "로그인" : "Sign Up"}</button>
     
 </div>
 <button class="message-button" on:click={() => form.set("findaccount")}>{$lang ? "계정찾기" : "Find Account"}</button>

@@ -305,11 +305,13 @@ let isWebView = false;
         {/if}
     
 </tr>
+{#if $myorigin === "d2rpvp"}
 <tr>
     <td>{$lang ? "암호" : "Password"}</td>
     <td>*********</td>
     <td><button class="simple-button" on:click={() => form.set("changepw")}>{$lang ? "변경" : "Modify"}</button></td>
     </tr>
+    {/if}
     <tr>
         <td>{$lang ?  "이메일" : "E-mail"}</td>
         <td>{$email}</td><td> <button class="simple-button" on:click={() => form.set("changeemail")}>{$lang ? "변경" : "Modify"}</button></td>
