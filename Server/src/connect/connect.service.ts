@@ -91,13 +91,13 @@ export class ConnectService {
     }
 
     const UserRepository = config.repo;
-    const isUser = await UserRepository.findOne({ where: { nickname } });
+    const isUser = await UserRepository.findOne({ where: { nickname:lowerCaseNickname } });
 
     if (isUser) {
         throw new HttpException('계정이 이미 있습니다.', HttpStatus.CONFLICT);
     }
 
-    userData[mode] = nickname;
+    userData[mode] = lowerCaseNickname;
     const user = new config.class();
     user.nickname = lowerCaseNickname;
     user.bScore = config.startScore;
