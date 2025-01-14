@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 function activeEffect(odd:number):boolean {
+if (odd > 100 || odd < 0)
+{throw new HttpException("확률 계산 오류", HttpStatus.BAD_REQUEST)}
   if (odd/100 > Math.random())
 {return true}
   else
@@ -16,20 +18,9 @@ const realmin = min / 6 * reducePercent
 return Math.floor(Math.random() * (realmax - realmin + 1)) + realmin
 }
 
-function CSActiveCalculate(cs: number, ds: number): number{
- return cs + (ds * (100 - cs))
-}
-
 
 @Injectable()
 export class CalculateService {
-  roundFloatToInt(value: number): number {
-    return Math.round(value);
-  }
-
-  roundFloatToTwoDecimals(value: number): number {
-    return Math.round(value * 100) / 100;
-  }
 
 
   calculateRound(startStat: any): any[] {
@@ -61,6 +52,17 @@ export class CalculateService {
 
     let wincount = 0;
     let losecount = 0;
+
+const myattackdodgepercent = (100 - startStat.yourdodge)
+const myattackPercent = Math.max(Math.min(Math.floor((startStat.myar / (startStat.myar + (startStat.yourdf * (1 - startStat.mydfoff / 2))) * (2 * mylv) / (mylv + yourlv))*100),95),5)
+
+console.log(myattackPercent, myattackdodgepercent)
+
+const yourattackdodgepercent = (100 - startStat.mydodge)
+const yourattackPercent = Math.max(Math.min(Math.floor((startStat.yourar / (startStat.yourar + (startStat.mydf * (1 - startStat.yourdfoff / 2))) * (2 * yourlv) / (yourlv + mylv))*100),95),5)
+
+console.log(yourattackPercent, yourattackdodgepercent)
+
     
 // 게임을 횟수만큼 돌립니다
     for (let games = 1; games < startStat.iterations + 1; games++)
@@ -78,8 +80,6 @@ let yourAttackFrameIndex = 0;
 
 let myOpenedWoundStatus = 0
 let yourOpenedWoundStatus = 0
-
-
 
 // 경기시작, 프레임이 진행됩니다
 while (myCharHp > 0 && yourCharHp > 0 && FrameCount < 7500){
@@ -127,8 +127,7 @@ myAttackTried = true
 
 
 // 타격 성공 여부 계산
-if (activeEffect(
-  0.25 * this.roundFloatToTwoDecimals(((100 - startStat.yourdodge) / 100) * (startStat.myar / (startStat.myar + startStat.yourdf * ((100 - startStat.mydfoff / 2) / 100))) * (2 * mylv) / mylv + yourlv)))
+if (activeEffect(25) && activeEffect(myattackPercent) && activeEffect(myattackdodgepercent) )
 {
 myAttackSuccess = caculateFinalDamage(startStat.mymindmg, startStat.mymaxdmg, startStat.yourreduce)
 
@@ -147,7 +146,7 @@ if (activeEffect(startStat.myopenwound))
 }
 
 // 치명적 공격 성공여부
-if (activeEffect(CSActiveCalculate(startStat.mycs, startStat.myds)))
+if (activeEffect(startStat.mycs) || activeEffect(startStat.myds))
 {
   myDeadlySuccess = true
   // 치타 성공으로 물리데미지 한번 더 빼서 계산
@@ -173,8 +172,7 @@ if (yourFrameCheck - yourAttackFrame >= 0){
   
   
   // 타격 성공 여부 계산
-  if (activeEffect(
-    0.25 * this.roundFloatToTwoDecimals(((100 - startStat.mydodge) / 100) * (startStat.yourar / (startStat.yourar + startStat.mydf * ((100 - startStat.yourdfoff / 2) / 100))) * (2 * yourlv) / yourlv + mylv)))
+  if (activeEffect(25) && activeEffect(myattackPercent) && activeEffect(myattackdodgepercent))
   {
   yourAttackSuccess = caculateFinalDamage(startStat.yourmindmg, startStat.yourmaxdmg, startStat.myreduce)
   
@@ -193,7 +191,7 @@ if (yourFrameCheck - yourAttackFrame >= 0){
   }
   
   // 치명적 공격 성공여부
-  if (activeEffect(CSActiveCalculate(startStat.yourcs, startStat.yourds)))
+  if (activeEffect(startStat.yourcs) || activeEffect(startStat.yourds))
   {
     yourDeadlySuccess = true
     // 치타 성공으로 물리데미지 한번 더 빼서 계산
@@ -214,11 +212,9 @@ if (yourFrameCheck - yourAttackFrame >= 0){
   if (myCharHp <= 0 || yourCharHp <= 0) {
 if (myCharHp > 0) {
   wincount = wincount + 1
-  // console.log("win", wincount)
 }
 else if (yourCharHp > 0) {
   losecount = losecount + 1
-  // console.log("lose", losecount)
 }
 
 

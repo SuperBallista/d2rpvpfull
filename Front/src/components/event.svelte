@@ -174,7 +174,7 @@
               <tr>
                 <td colspan="4">
                   <div class="details">
-                    <strong>토너먼트 정보</strong><br />
+                    <strong>{$lang ? "토너먼트 정보" : "Event Info"}</strong><br />
                     {$lang ? "주최자" : "Host"}: {event.Eventhost.replace("_m", "").replace("_z", "")}<br />
                     {$lang ? "우승" : "1st"}: {event.Championship1 ? event.Championship1.replace("_m", "").replace("_z", "") : ""}
                     {event.Championship2 ? event.Championship2.replace("_m", "").replace("_z", "") : ""}
