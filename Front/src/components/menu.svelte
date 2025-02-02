@@ -118,7 +118,7 @@ jwtToken.set("");
   catch (error)
   {
     const msg = $lang ? "서버 연결에 실패했습니다" : "Server Error"
-    alert(msg + error)
+    console.log(msg + error)
   }
 }
 
