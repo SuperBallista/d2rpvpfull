@@ -1,258 +1,170 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import {
-      nicknames,
-      fetchNicknames,
-      myaccount,
-      key,
-      mode,
-      admin,
-      lang,
-      SecurityFetch, form
-    } from "../store.js";
-  
-    let recordData: any[] = [];
-    let loading = true;
-    let error = null;
-    let currentPage = 1;
-    const itemsPerPage = 10;
-    let filter = "All";
-    let filteredData: any[] = [];
-    let paginatedData: any[] = [];
-    let newdata:boolean = false
-  
-    async function fetchData() {
-      const endpoint = "/record/data?mode="+ $mode;
-      try {
-        await fetchNicknames($mode);
-        const response = await SecurityFetch(endpoint, "GET");
-        if (!response.ok) throw new Error("연결 에러입니다");
-  
-        recordData = await response.json();
-        filteredData = applyFilter(recordData);
-        updatePaginatedData();
-      } catch (error: unknown) {
-        alert($lang ? "서버 오류가 발생하여 자료를 불러올 수 없습니다" : "Server Error");
-      } finally {
-        loading = false;
-      }
-    }
-  
-    onMount(() => {
-      const unsubscribe = key.subscribe(() => {
-        fetchData();
-        checkRecord();
-      });
-  
-      return () => {
-        unsubscribe();
-      };
-    });
-  
-    function changePage(page: number) {
-      currentPage = page;
-      updatePaginatedData();
-    }
-  
-    // 필터링 시 `_m` 제거 후 비교
-    function applyFilter(data: any[]) {
-  if (filter === "All") return data;
+  import { onMount } from "svelte";
+  import { mode, myaccount, SecurityFetch, lang } from "../store";
 
-  return data.filter((item: any) => 
-    item.winner && item.loser && // 속성이 정의된 경우에만 필터링
-    (
-      item.winner.replace("_m", "").replace("_z","") === filter || 
-      item.loser.replace("_m", "").replace("_z","") === filter
-    )
-  );
-}
-    function updatePaginatedData() {
-      const start = (currentPage - 1) * itemsPerPage;
-      const end = start + itemsPerPage;
-      paginatedData = filteredData.slice(start, end);
-    }
-  
-    $: totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  
-    function handleFilterChange(event: Event) {
-      const target = event.target as HTMLInputElement;
-      filter = validateInput(target.value, $nicknames) || "All";
-      currentPage = 1;
-      filteredData = applyFilter(recordData);
-      updatePaginatedData();
-    }
-  
-    $: visiblePages = getVisiblePages(currentPage, totalPages);
-  
-    function getVisiblePages(currentPage: number, totalPages: number) {
-      const maxVisible = 5;
-      const pages = [];
-  
-      let start = Math.max(currentPage - Math.floor(maxVisible / 2), 1);
-      let end = start + maxVisible - 1;
-  
-      if (end > totalPages) {
-        end = totalPages;
-        start = Math.max(end - maxVisible + 1, 1);
-      }
-  
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-  
-      return pages;
-    }
-  
-    function validateInput(value: string, options: string[]): string | null {
-      return options.includes(value) ? value : "All";
-    }
-  
-    async function delete_row(OrderNum: number) {
-      const data = { OrderNum: OrderNum, mode: $mode };
-      try {
-        const response = await SecurityFetch("/record/delete", "DELETE", data);
-        if (response.status === 200) {
-          alert($lang ? "삭제 완료하였습니다" : "Remove Complete");
-          fetchData();
-        } else {
-          alert(`오류 발생: ${response.status}`);
-        }
-      } catch (error: unknown) {
-        alert(`Error : ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
-      }
-    }
-
-
-    // 게임 데이터를 불러오는 함수
-    async function checkRecord() {
-  
-  const endpoint = "/record/pending";
-  const data = {mode: $mode} 
-if ($myaccount) {
-  try {
-    const response = await SecurityFetch(endpoint, "POST", data);
-    if (!response.ok) 
-    {throw new Error(`오류 발생: ${response.status}`);}
-   const checkData:any[] = await response.json();
-   
-if (checkData.length===0)
-  {newdata = false}
-  else
-  {newdata = true}
-   
-  } catch (error) {
-    console.error("Error :", error);
+  interface Room {
+      id: number;
+      mode: string;
+      created_at: Date;
+      room_name: string;
+      views: number;
   }
-}
-}
+  let new_room: string;
+  let new_password: string;
 
-  </script>
-  
-  <div class="filter">
-    <input
-      list="nicknames_filter"
-      bind:value={filter}
-      on:blur={handleFilterChange}
-      class="input-text"
-      placeholder="필터 선택"
-    />
-    <datalist id="nicknames_filter">
-        <option value="All">모두 보기</option>
-        {#each $nicknames.map((n: string) => n.replace("_m", "")) as option}
-          <option value={option}>{option}</option>
-        {/each}
-      </datalist>  </div>
-  
-  <div class="table-outline">
-    {#if loading}
-      <p>{$lang ? "로딩 중" : "Loading"}...</p>
-    {:else if error}
-      <p>Error: {error}</p>
-    {:else}
-      <table class="data-table">
-        <thead>
+  let rooms: Room[] = [];
+
+  interface member {
+      account: string;
+      babapk: string;
+      mpk: string;
+      zpke: string;
+      ip_address: string;
+      access_time: Date;
+  }
+
+  let list: member[];
+
+  async function fetchData() {
+      try {
+          const response = await fetch("/rooms");
+          if (!response.ok) throw new Error("데이터를 가져오는 데 실패했습니다.");
+          const data = await response.json();
+
+          // ✅ API 응답을 받을 때 created_at을 Date 객체로 변환
+          rooms = data.map((room: any) => ({
+              ...room,
+              created_at: new Date(room.created_at),
+          }));
+      } catch (error) {
+          console.error("데이터 로드 오류:", error);
+      }
+  }
+
+  async function fetchNewRoom() {
+      const data = { name: new_room, password: new_password, mode: $mode };
+      try {
+          const response = await SecurityFetch("/rooms/new", "POST", data);
+          if (response.status === 201) {
+              alert($lang ? "방 등록에 성공하였습니다!" : "Room successfully created!");
+              fetchData();
+          } else if (response.status === 401) {
+              alert($lang ? "권한이 없습니다" : "You do not have permission.");
+          }
+      } catch (error) {
+          alert($lang ? "서버 에러입니다" : "Server error.");
+      }
+  }
+
+  onMount(fetchData);
+
+  async function view_room_password(id: number) {
+      const userResponse = confirm(
+          $lang
+              ? "해당 방의 암호를 조회하면 당신의 조회기록이 남습니다. 조회하시겠습니까?"
+              : "Your access record will be saved when viewing the room password. Continue?"
+      );
+      if (userResponse) {
+          const data = { id };
+          try {
+              const response = await SecurityFetch("/rooms/password", "POST", data);
+              const password = await response.json();
+              if (response.status === 201) {
+                  alert(($lang ? "암호는 다음과 같습니다: " : "The password is: ") + password.password);
+
+                  // ✅ 새로운 배열을 재할당하여 반응형 업데이트 보장
+                  rooms = rooms.map(room =>
+                      room.id === id ? { ...room, views: room.views + 1 } : room
+                  );
+              } else if (response.status === 401) {
+                  alert($lang ? "권한이 없습니다" : "You do not have permission.");
+              }
+          } catch (error) {
+              alert($lang ? "암호 조회에 실패하였습니다" : "Failed to retrieve password.");
+          }
+      }
+  }
+
+  async function views_account(id: number) {
+      const data = { id };
+      try {
+          const response = await SecurityFetch("/rooms/views", "POST", data);
+          const member: member[] = await response.json();
+          if (response.status === 201) {
+              alert($lang ? "암호를 조회한 사람들의 정보를 봅니다" : "Viewing users who accessed the password.");
+
+              // ✅ 새로운 배열로 업데이트하여 반응형 트리거
+              list = member.map((ppl: any) => ({
+                  ...ppl,
+                  created_at: new Date(ppl.created_at),
+              }));
+          } else if (response.status === 401) {
+              alert($lang ? "권한이 없습니다" : "You do not have permission.");
+          }
+      } catch (error) {
+          alert($lang ? "암호 조회에 실패하였습니다" : "Failed to retrieve password.");
+      }
+  }
+
+  function formatDateTime(date: Date): string {
+      const yy = date.getFullYear().toString().slice(-2);
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const hh = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      const ss = String(date.getSeconds()).padStart(2, '0');
+
+      return `${yy} ${mm} ${dd} ${hh} ${min} ${ss}`;
+  }
+</script>
+
+<table>
+  <thead>
+      <tr>
+          <th>{ $lang ? "방 제목" : "Room Name" }</th>
+          <th>{ $lang ? "게임모드" : "Game Mode" }</th>
+          <th>{ $lang ? "생성시간" : "Created At" }</th>
+          <th>{ $lang ? "조회수" : "Views" }</th>
+      </tr>
+  </thead>
+  <tbody>
+      {#if $myaccount}
+      <tr>
+          <td><input class="input-text" type="text" bind:value={new_room} placeholder={ $lang ? "새 방 이름 입력" : "Enter New Room Name" }></td>
+          <td>{$mode}</td>
+          <td><input class="input-text" type="password" bind:value={new_password} placeholder={ $lang ? "새 방 암호 입력" : "Enter New Room Password" }></td>
+          <td><button class="emphasis-button" on:click={fetchNewRoom}>{ $lang ? "추가하기" : "Add" }</button></td>
+      </tr>
+      {/if}
+
+      {#each list as ppl}
           <tr>
-            <th>{$lang ? "번호" : "No."}</th>
-            <th>{$lang ? "승자" : "Win"}</th>
-            <th>{$lang ? "패자" : "Lose"}</th>
-            <th>{$lang ? "날짜" : "Date"}</th>
-            {#if $admin.includes($mode)}
-              <th>{$lang ? "삭제" : "Set"}</th>
-            {/if}
+              <td colspan="4">
+                  { $lang ? "계정" : "Account" }: {ppl.account} 
+                  { $lang ? "아이피" : "IP Address" }: {ppl.ip_address}
+                  <br/> 
+                  { $lang ? "바바" : "Babapk" }: {ppl.babapk} 
+                  { $lang ? "밀리" : "Mpk" }: {ppl.mpk} 
+                  { $lang ? "질딘" : "Zpke" }: {ppl.zpke}
+                  <br/> 
+                  { $lang ? "엑세스시간" : "Access Time" }: {formatDateTime(ppl.access_time)} 
+              </td>
           </tr>
-        </thead>
-        <tbody>
-          {#each paginatedData as { orderNum, winner, loser, date }}
-            <tr>
-              <td>{orderNum}</td>
-              <td>{winner.replace("_m", "").replace("_z","")}</td>
-              <td>{loser.replace("_m", "").replace("_z","")}</td>
-              <td>{date}</td>
-              {#if $admin.includes($mode)}
-                <td>
-                  <button class="simple-button small" on:click={() => delete_row(orderNum)}>{$lang ? "삭제" : "Remove"}</button>
-                </td>
-              {/if}
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-      <div class="pagination">
-        {#if currentPage > 1}
-          <button class="simple-button" on:click={() => changePage(1)}>{$lang ? "처음" : "First"}</button>
-          <button class="simple-button" on:click={() => changePage(currentPage - 1)}>{$lang ? "이전" : "Before"}</button>
-        {/if}
-        {#each visiblePages as page}
-          <button class={page===currentPage? "emphasis-button" : "simple-button" } on:click={() => changePage(page)}>
-            {page}
-          </button>
-        {/each}
-        {#if currentPage < totalPages}
-          <button class="simple-button" on:click={() => changePage(currentPage + 1)}>{$lang ? "다음" : "Next"}</button>
-          <button class="simple-button" on:click={() => changePage(totalPages)}>{$lang ? "마지막" : "Last"}</button>
-        {/if}
-      </div>
-    {/if}
+      {/each}
 
+      {#each rooms as room}
+          <tr>
+              <td class="pointer" on:click={() => view_room_password(room.id)}>{room.room_name}</td>
+              <td>{room.mode}</td>
+              <td>{formatDateTime(room.created_at)}</td>
+              <td class="pointer" on:click={() => views_account(room.id)}>{room.views}</td>
+          </tr>
+      {/each}
+  </tbody>
+</table>
 
-    {#if $myaccount}
-      <div class="fixed-button-div">
-        <button class="simple-button" on:click={() => form.set("recordcreate")}>{$lang ? "기록하기" : "Record"}</button>
-        <button class="simple-button" on:click={() => form.set("recordok")}>{$lang ? "승인하기" : "Accept"}
-         {#if newdata}       
-          <span class="badge">NEW</span>
-        {/if}        
-        </button>
-      </div>
-    {/if}
-
-  </div>
-  
-
-  <style>
-table tr td:first-child, table tr th:first-child {
-  width: 10%; /* 첫 번째 열 */
-}
-table tr td:nth-child(2), table tr th:nth-child(2) {
-  width: 30%; /* 두 번째 열 */
-}
-table tr td:nth-child(3), table tr th:nth-child(3) {
-  width: 30%; /* 세 번째 열 */
-}
-table tr td:nth-child(4), table tr th:nth-child(4) {
-  width: 20%; /* 네 번째 열 */
-}
-table tr td:nth-child(5), table tr th:nth-child(5) {
-  width: 10%; /* 다섯 번째 열 */
-}
-
-.filter{
-width: 200px;    
-}
-
-.small {
-font-size: 0.7rem;
-padding: 3px;
-}
-
+<style>
+  .pointer {
+      cursor: pointer;
+  }
 </style>

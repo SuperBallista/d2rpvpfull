@@ -63,6 +63,7 @@ function menuSet() {
     { label: $lang ? "통합밀리" : "Melee PK", href: "/mpk" },
     { label: $lang ? "질딘PK" : "Zeal PK", href: "/zpke" },
   ] : [
+    {label: $lang ? "암호조회" : "ViewPW", href: "/room"},
     { label: $lang ? "공지사항" : "Notice", href: "/info" },
     { label: $lang ? "랭킹조회" : "Ladder", href: "/rank" },
     { label: $lang ? "대전기록" : "Records", href: "/record" },
@@ -152,7 +153,11 @@ onMount(async () => {
   
     .menu-items {
       display: flex;
-      gap: 20px;
+      gap: 10px;
+      white-space: nowrap; /* 줄바꿈 방지 */
+  flex-wrap: nowrap; /* 자동 줄바꿈 방지 */
+  overflow: hidden; /* 넘치는 경우 숨김 */
+  justify-content: center; /* 중앙 정렬 */
     }
   
     .hamburger {
@@ -287,6 +292,11 @@ onMount(async () => {
   .switch-container{
     display: flex;
     flex-direction: row;
+  }
+  .link{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   </style>

@@ -37,6 +37,7 @@ import {
           const { nowpw, newpw } = body;
           await this.userDataService.changePassword(user.username, nowpw, newpw);
       }
+      
     // 도전 취소
     @Delete('/challenge/cancel')
     async cancelChallenge(@User() user: any, @Body() body: { mode: string }) {

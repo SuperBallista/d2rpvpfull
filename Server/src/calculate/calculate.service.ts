@@ -223,13 +223,13 @@ else if (yourCharHp > 0) {
         
 // 현재 상태를 저장할 객체를 선언
 const thisStatus = new FrameStatus(
-  FrameCount,
-  myCharHp,
-  yourCharHp,
-  myWoundStatus,
-  yourWoundStatus,
-  myAttackTried,
-  yourAttackTried,
+ FrameCount,
+ myCharHp,
+ yourCharHp,
+ myWoundStatus,
+ yourWoundStatus,
+ myAttackTried,
+ yourAttackTried,
  myAttackSuccess,
  yourAttackSuccess,
  myCrushSuccess,

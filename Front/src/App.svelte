@@ -27,6 +27,7 @@ import Elo from "./components/calculater/elo.svelte";
     import Zpkeadmin from "./components/zpkeadmin.svelte";
     import Clanrank from "./components/clanrank.svelte";
     import Home from "./components/home.svelte";
+    import Roomcheck from "./components/roomcheck.svelte";
     
 </script>
 <Router>
@@ -65,7 +66,7 @@ import Elo from "./components/calculater/elo.svelte";
   <Route path="/zpke/simul" component={Zpkesimul}/>
   <Route path="/zpke/admin" component={Zpkeadmin}/>
   <Route path="/babapk/clan" component={Clanrank}/>
-  
+  <Route path="/:type/room" component={Roomcheck}/>
 
 </main>
 

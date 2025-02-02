@@ -24,6 +24,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtService } from './jwt/jwt.service';
 import { ConnectModule } from './connect/connect.module';
 import { Account } from './entities/account.entity';
+import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
   imports: [
@@ -60,7 +61,8 @@ import { Account } from './entities/account.entity';
     RankModule,
     RecordModule,
     JwtModule,
-    ConnectModule
+    ConnectModule,
+    RoomsModule
   ],
   controllers: [],
   providers: [jwtService, JwtAuthMiddleware],
