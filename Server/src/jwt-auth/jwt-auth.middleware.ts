@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NestMiddleware } from '@nestjs/common';
 import { Request as ExpressRequest, Response, NextFunction } from 'express';
 import { jwtService } from 'src/jwt/jwt.service';
 import { Account } from 'src/entities/account.entity';
@@ -96,6 +96,7 @@ export class JwtAuthMiddleware implements NestMiddleware {
     // 토큰이 없거나 유효하지 않으면 다음 단계로 진행
     if (!req.user) {
       console.warn('Unauthorized request: no valid tokens');
+      return new HttpException('권한이 없습니다.', HttpStatus.UNAUTHORIZED);
     }
 
     next();

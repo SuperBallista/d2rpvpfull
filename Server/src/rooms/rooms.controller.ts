@@ -30,8 +30,8 @@ export class RoomsController {
   }
 
   @Post("/new")
-  async makeNewRoom(@Body() body: any){
-    return this.roomsService.makeNewRoom(body);
+  async makeNewRoom(@Body() body: any, @Req() request: Request, @User() user: any){
+    return this.roomsService.makeNewRoom(body, user.account, request.headers['x-forwarded-for'] || "local");
   }
 
 

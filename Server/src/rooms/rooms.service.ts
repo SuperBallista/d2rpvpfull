@@ -64,9 +64,11 @@ export class RoomsService {
     return userList;
  }
 
-  async makeNewRoom(body: any){
+  async makeNewRoom(body: any, userAccount: string, ip_address: string){
     const newRoom = await this.roomRepository.create({room_name: body.name, password:body.password, mode: body.mode})
-   await this.roomRepository.save(newRoom);
+   const madeRoom =  await this.roomRepository.save(newRoom);
+    const accessLog = this.roomAccessLogRepository.create({ room_id: madeRoom.id, user_account: userAccount, ip_address: ip_address });
+    await this.roomAccessLogRepository.save(accessLog);
   }
 }
 

@@ -59,6 +59,8 @@
     onMount(fetchData);
 
     async function view_room_password(id: number) {
+        if (!$myaccount)
+    {return}
         const userResponse = confirm(
             $lang
                 ? "해당 방의 암호를 조회하면 당신의 조회기록이 남습니다. 조회하시겠습니까?"
@@ -86,6 +88,8 @@
     }
 
     async function views_account(id: number) {
+        if (!$myaccount)
+    {return}
         const data = { id };
         try {
             const response = await SecurityFetch("/rooms/views", "POST", data);
