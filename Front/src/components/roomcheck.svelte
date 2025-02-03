@@ -114,7 +114,7 @@
     if (!(date instanceof Date)) {
         date = new Date(date); // ✅ 문자열이면 Date 객체로 변환
     }
-    const yy = date.getFullYear().toString().slice(-2);
+    const yy = String(date.getFullYear()).toString().slice(-2);
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
     const hh = String(date.getHours()).padStart(2, '0');
