@@ -13,6 +13,9 @@
     $: if (pathname.includes("rank")) {
         titlestring = $lang ? "랭킹조회" : "Ladder";
     }
+    else if (pathname.includes("room")) {
+        titlestring = $lang ? "암호조회" : "ViewPW";
+    }
     else if (pathname.includes("info")) {
         titlestring = $lang ? "공지사항" : "Notice";
     }
