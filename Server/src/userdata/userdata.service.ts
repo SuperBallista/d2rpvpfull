@@ -129,7 +129,7 @@ let user
         throw new HttpException('현재 암호가 일치하지 않습니다.', HttpStatus.UNAUTHORIZED);
       }
 
-      user.password = await bcrypt.hash(newpw, 10);
+      user.password = await bcrypt.hash(newpw, 12);
         await this.AccountRepository.save(user);
       return { success: true };
     } catch (error) {

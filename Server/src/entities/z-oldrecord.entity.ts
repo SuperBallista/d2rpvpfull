@@ -6,7 +6,7 @@ export class ZOldRecord {
   orderNum: number; // PRIMARY KEY, AUTO_INCREMENT
 
   @Column({ type: 'date', nullable: false })
-  month: Date; // NOT NULL
+  Month: Date; // NOT NULL
 
   @Column({ length: 255, nullable: false })
   nickname: string; // NOT NULL

@@ -1,22 +1,22 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('m_oldrecord')
-export class MOldRecord {
+@Entity('b_oldrecord') // 데이터베이스의 'b_oldrecord' 테이블과 매핑
+export class BOldRecord {
   @PrimaryGeneratedColumn()
-  orderNum: number;
+  orderNum: number; // PRIMARY KEY, AUTO_INCREMENT
 
-  @Column()
-  date: Date;
+  @Column({ type: 'date', nullable: false })
+  Month: Date; // NOT NULL
 
-  @Column()
-  winner: string;
+  @Column({ length: 255, nullable: false })
+  nickname: string; // NOT NULL
 
-  @Column()
-  loser: string;
+  @Column({ type: 'float', nullable: false })
+  bScore: number; // NOT NULL
 
-  @Column()
-  wScore: number;
+  @Column({ type: 'float', nullable: false })
+  lScore: number; // NOT NULL
 
-  @Column()
-  lScore: number;
-} 
+  @Column({ type: 'int', nullable: true })
+  class?: number; // NULL 허용
+}

@@ -69,7 +69,7 @@ export class ResetPasswordService {
 
       // 임시 비밀번호 생성
       const temporaryPassword = this.generateRandomPassword(10);
-      const temporaryPasswordHash = await bcrypt.hash(temporaryPassword, 10);
+      const temporaryPasswordHash = await bcrypt.hash(temporaryPassword, 12);
 
       // 비밀번호 업데이트
       user.password = temporaryPasswordHash;

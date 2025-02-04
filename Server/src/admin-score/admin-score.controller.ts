@@ -32,19 +32,25 @@ import {
     // b_user 랭킹 리셋
     @Delete('/reset')
     async resetRank(@User() user, @Body() body) {
-      
-    const prefix = body.mode.slice(0,1)
+      const allowedModes = ['b', 'm', 'z']; // 허용된 모드 리스트
+      const prefix = body.mode.slice(0,1);
     
-    console.log(body.mode , ' 계정 데이터를 초기화합니다'); 
-      return       await this.adminScoreService.resetRank(
-        prefix + '_user',
-        prefix + '_record',
-        prefix + '_temp',
-        prefix + '_eventrecord',
-        prefix + '_oldrecord',
-        prefix + '_oldhistory',
-        prefix + '_oldtournament',
-        body.mode, user.admin
+      if (!allowedModes.includes(prefix)) {
+        throw new HttpException('잘못된 모드입니다.', HttpStatus.BAD_REQUEST);
+      }
+    
+      console.log(body.mode , ' 계정 데이터를 초기화합니다');
+    
+      return await this.adminScoreService.resetRank(
+        `${prefix}_user`,
+        `${prefix}_record`,
+        `${prefix}_temp`,
+        `${prefix}_eventrecord`,
+        `${prefix}_oldrecord`,
+        `${prefix}_oldhistory`,
+        `${prefix}_oldtournament`,
+        body.mode,
+        user.admin
       );
     }
-    }
+            }

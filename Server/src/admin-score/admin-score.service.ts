@@ -61,6 +61,12 @@ export class AdminScoreService {
     mode: string,
     admin: string
   ): Promise<void> {
+    const allowedTables = ['b_user', 'm_user', 'z_user']; // 허용된 테이블 목록
+    if (!allowedTables.includes(userTable)) {
+      throw new HttpException('잘못된 테이블 이름입니다.', HttpStatus.BAD_REQUEST);
+    }
+  
+    // 나머지 로직 실행
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();

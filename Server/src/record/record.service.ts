@@ -55,12 +55,18 @@ export class RecordService {
     {throw new HttpException('Mode Error', HttpStatus.BAD_REQUEST);}
 
     try {
-      const record = await queryRunner.manager.query(
-        `SELECT Winner, Win2, Win3, Win4, Loser, Lose2, Lose3, Lose4, AddScore 
-         FROM ${tableName}_record
-         WHERE OrderNum = ?`,
-        [orderNum],
-      );
+      const allowedTables = ['b', 'm', 'z']; // 허용된 테이블 리스트
+      if (!allowedTables.includes(tableName)) {
+        throw new Error('Invalid table name');
+      }
+      
+      const record = await queryRunner.manager
+        .createQueryBuilder()
+        .select(['Winner', 'Win2', 'Win3', 'Win4', 'Loser', 'Lose2', 'Lose3', 'Lose4', 'AddScore'])
+        .from(`${tableName}_record`, 'r') // 안전한 테이블 바인딩
+        .where('OrderNum = :orderNum', { orderNum })
+        .getRawMany();
+      
 
       if (!record || record.length === 0) {
         throw new HttpException('Row not found', HttpStatus.NOT_FOUND);
@@ -70,17 +76,32 @@ export class RecordService {
       const loserNicknames = [record[0].Loser, record[0].Lose2, record[0].Lose3, record[0].Lose4];
       const addScore = Number(record[0].AddScore);
 
-      // 점수 업데이트 및 기록 삭제
-      await queryRunner.manager.query(
-        `UPDATE ${tableName}_user SET BScore = BScore - ?, Records = Records - 1  WHERE Nickname IN (?, ?, ?, ?)`,
-        [addScore, ...winnerNicknames],
-      );
-      await queryRunner.manager.query(
-        `UPDATE ${tableName}_user SET BScore = BScore + ?, Records = Records - 1 WHERE Nickname IN (?, ?, ?, ?)`,
-        [addScore, ...loserNicknames],
-      );
-      await queryRunner.manager.query(`DELETE FROM ${tableName}_record WHERE OrderNum = ?`, [orderNum]);
 
+      if (!allowedTables.includes(tableName)) {
+        throw new Error('Invalid table name');
+      }
+      
+      await queryRunner.manager
+        .createQueryBuilder()
+        .update(`${tableName}_user`) // 안전한 테이블 바인딩
+        .set({ BScore: () => "BScore - :addScore", Records: () => "Records - 1" })
+        .where("Nickname IN (:...nicknames)", { nicknames: winnerNicknames, addScore })
+        .execute();
+      
+      await queryRunner.manager
+        .createQueryBuilder()
+        .update(`${tableName}_user`)
+        .set({ BScore: () => "BScore + :addScore", Records: () => "Records - 1" })
+        .where("Nickname IN (:...nicknames)", { nicknames: loserNicknames, addScore })
+        .execute();
+            
+      await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(`${tableName}_record`) // 안전한 테이블 바인딩
+        .where('OrderNum = :orderNum', { orderNum })
+        .execute();
+      
 
       if (mode === "babapk") {
         // Winner와 Loser를 데이터베이스에서 조회

@@ -102,7 +102,7 @@ throw new HttpException('삭제할 계정이 없습니다', HttpStatus.BAD_REQUE
     const { nickname, password, email } = body;
 
     
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     const UnionUser = new Account();
     UnionUser.account = nickname.toLowerCase();
