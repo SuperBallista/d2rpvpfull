@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('b_oldrecord') // 데이터베이스의 'b_oldrecord' 테이블과 매핑
-export class BOldRecord {
+@Entity('m_oldrecord') // 데이터베이스의 'b_oldrecord' 테이블과 매핑
+export class MOldRecord {
   @PrimaryGeneratedColumn()
   orderNum: number; // PRIMARY KEY, AUTO_INCREMENT
 
