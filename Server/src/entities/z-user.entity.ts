@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
-@Entity('z_user') // 데이터베이스의 'b_user' 테이블과 매핑
+@Entity('z_user') // 데이터베이스의 'z_user' 테이블과 매핑
 export class ZUser {
   @PrimaryColumn({ name: "Nickname", length: 255 })
   nickname: string; // PRIMARY KEY, NOT NULL

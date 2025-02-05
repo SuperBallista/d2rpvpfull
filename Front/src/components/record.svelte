@@ -22,6 +22,7 @@
   let newdata:boolean = false
 
   async function fetchData() {
+    console.log($mode)
     const endpoint = "/record/data?mode="+ $mode;
     try {
       await fetchNicknames($mode);

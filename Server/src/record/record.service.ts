@@ -84,14 +84,14 @@ export class RecordService {
       await queryRunner.manager
         .createQueryBuilder()
         .update(`${tableName}_user`) // 안전한 테이블 바인딩
-        .set({ BScore: () => "BScore - :addScore", Records: () => "Records - 1" })
+        .set({ bScore: () => "BScore - :addScore", records: () => "Records - 1" })
         .where("Nickname IN (:...nicknames)", { nicknames: winnerNicknames, addScore })
         .execute();
       
       await queryRunner.manager
         .createQueryBuilder()
         .update(`${tableName}_user`)
-        .set({ BScore: () => "BScore + :addScore", Records: () => "Records - 1" })
+        .set({ bScore: () => "BScore + :addScore", records: () => "Records - 1" })
         .where("Nickname IN (:...nicknames)", { nicknames: loserNicknames, addScore })
         .execute();
             
