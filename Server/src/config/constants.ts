@@ -41,6 +41,6 @@ export const TEAMS_SCORES_Z = {
 export const EVENT_HOST_SCORE = 3;
 
 
-export const BABAPK_ADMIN = ["kor8240@gmail.com", "mhj2030@hanmail.net"]
+export const BABAPK_ADMIN = ["kor8240@gmail.com", "mhj2030@hanmail.net", "acertn@gmail.com"]
 export const MPK_ADMIN = ["kor8240@gmail.com", "mhj2030@hanmail.net", "3864769874", "3864854217"]
 export const ZPKE_ADMIN = ["kor8240@gmail.com", "mhj2030@hanmail.net", "ari", "ericpark909@gmail.com", "3865796655"]
