@@ -1,5 +1,7 @@
-import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { ResetPasswordService } from './reset-pw.service';
+import { RolesGuard } from 'src/guard/auth.guard';
+import { Roles } from 'src/guard/roles.decorator';
 
 @Controller('/reset-pw')
 export class ResetPasswordController {
@@ -7,7 +9,9 @@ export class ResetPasswordController {
 
 
     // 통합유저 임시 비밀번호 요청
-  @Post('/')
+  @Post()
+    @UseGuards(RolesGuard)
+    @Roles("guest")
   async processEmailPw(
     @Body() body: { findpw_nickname: string; findpw_email: string },
   ): Promise<void> {

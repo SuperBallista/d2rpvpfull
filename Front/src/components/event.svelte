@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { showMessageBox } from "../custom/customStore";
     import { myaccount, key, form, SecurityFetch, mode, admin, lang } from "../store";
     import { onMount } from "svelte";
   
@@ -28,14 +29,19 @@
      {
      try{
       const response = await SecurityFetch("/event/memo","PATCH",data);
-      if (response.ok){
-        alert($lang ? "메모 수정 완료하였습니다" : "Modified Completed")
+      if (response.status===200){
+        
+        showMessageBox("success", $lang? "메모 수정 완료":"Modified Completed",$lang ? "메모 수정을 완료했습니다":"This Memo Modified Completed.")
+
         fetchData();
+      }
+      else{
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
       }
     }
       catch (error)
       {
-        alert($lang ? "오류가 발생하였습니다" + error : "Error :" + error)
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
           finally{
             eventData[index].modify = false
@@ -49,11 +55,15 @@
         const endpoint = `/event/cancel`;
         const response = await SecurityFetch(endpoint, "DELETE", data);
   
-        if (response && response.ok) {
-          alert($lang ? "토너먼트 히스토리를 삭제하고 점수를 초기화하였습니다" : "Results removed and returned score.");
+        if (response && response.status===200) {
+          showMessageBox("success","토너먼트 히스토리 삭제", "토너먼트 히스토리를 삭제하고 점수를 초기화하였습니다")
+        }
+        else
+        {
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
         }
       } catch (error) {
-        alert($lang ? "에러가 발생하였습니다: " + error : "Error :" + error);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       } finally {
         fetchData();
       }
@@ -66,10 +76,13 @@
         const response = await SecurityFetch(endpoint, "POST", data);
   
         if (response && response.status === 201) {
-          alert($lang ? "토너먼트 히스토리를 승인하였습니다" : "Event results registered");
+          showMessageBox("success","토너먼트 히스토리 승인", "토너먼트 히스토리를 승인하였습니다")
+        }
+        else{
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
         }
       } catch (error) {
-        alert($lang ? "에러가 발생하였습니다: " + error : "Error :" + error);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       } finally {
         fetchData();
       }
@@ -82,10 +95,13 @@
         const response = await SecurityFetch(endpoint, "DELETE", data);
 
         if (response && response.status === 200) {
-          alert($lang ? "토너먼트 히스토리를 삭제하였습니다" : "Results deleted");
+          showMessageBox("success","토너먼트 히스토리 삭제", "토너먼트 히스토리를 삭제하였습니다")
+        }
+        else {
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
         }
       } catch (error) {
-        alert($lang ? "에러가 발생하였습니다: " + error : "Error :" + error);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       } finally {
         fetchData();
       }

@@ -8,13 +8,15 @@ import {
     HttpStatus,
     HttpCode,
     UseGuards, Get,
+    HttpException,
   } from '@nestjs/common';
   import { AuthService } from './auth.service';
-  import { Response, Request as ExpressRequest } from 'express';
-import { AuthGuard } from '@nestjs/passport';
+  import { Response, Request as ExpressRequest, response } from 'express';
 import { User } from '../user/user.decorator';
 import { ConfigService } from '@nestjs/config';
 import { jwtService } from 'src/jwt/jwt.service';
+import { RolesGuard } from 'src/guard/auth.guard';
+import { Roles } from 'src/guard/roles.decorator';
   
   interface Request extends ExpressRequest {
     user?: any;
@@ -30,6 +32,8 @@ import { jwtService } from 'src/jwt/jwt.service';
     ) {}
   
     @Post('logout')
+    @UseGuards(RolesGuard)
+    @Roles("admin", "user")
     @HttpCode(200)
     logout(@Res({ passthrough: true }) res: Response): string {
       res.clearCookie('d2rpvprefreshToken', {
@@ -41,24 +45,26 @@ import { jwtService } from 'src/jwt/jwt.service';
     }
   
     @Delete('/delete')
+    @UseGuards(RolesGuard)
+    @Roles('user')
     async deleteAccount(@User() user: any, @Body() body: any, @Res() res: Response) {
         const userNickname = user.account; // 인증 미들웨어로부터 사용자 정보 추출
         const { nowpw } = body;
-        await this.authService.deleteAccount(
-          userNickname,
-          nowpw,
-        );
-          res.clearCookie('d2rpvprefreshToken', {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'strict',
+    
+           // 리프레시 토큰 쿠키 삭제
+            res.clearCookie('d2rpvprefreshToken', {
+              httpOnly: true,
+              secure: true,
+              sameSite: 'strict',
           });
-          console.log(userNickname, '계정 삭제');
+     
+       return await this.authService.deleteAccount(userNickname, nowpw);
     }
- 
-
+    
   
     @Post('/login')
+    @UseGuards(RolesGuard)
+    @Roles("guest", "user", "admin")
     async processLogin(@Body() body: any, @Res() res: Response) {
       // 로그인 처리
     const data = await this.authService.processLogin(body);
@@ -75,14 +81,9 @@ import { jwtService } from 'src/jwt/jwt.service';
       res.status(HttpStatus.OK).json(data[0]);
     }
 
-  
-    @UseGuards(AuthGuard('jwt'))
-    @Get('/me')
-    async getProfile(@User('username') username: string) {
-      return { username };
-    }
-
 @Post('/register')
+@UseGuards(RolesGuard)
+@Roles("guest", "user", "admin")
     async processRegiU(@Body() body: any) {
       return this.authService.processRegiU(body);
     }
@@ -95,6 +96,8 @@ import { jwtService } from 'src/jwt/jwt.service';
 
     
     @Post('/check-jwt')
+    @UseGuards(RolesGuard)
+    @Roles("guest", "user", "admin")
     async checkJwt(@Req() req: Request, @Res() res: Response) {
       const token = req.cookies['d2rpvprefreshToken'];
       const decodedToken = await this.jwtService.verifyRefreshToken(token);

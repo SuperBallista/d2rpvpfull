@@ -28,8 +28,10 @@ import Elo from "./components/calculater/elo.svelte";
     import Clanrank from "./components/clanrank.svelte";
     import Home from "./components/home.svelte";
     import Roomcheck from "./components/roomcheck.svelte";
+    import BoxOverlay from "./custom/BoxOverlay.svelte";
     
 </script>
+<BoxOverlay/>
 <Router>
 <nav>
   <Menu />

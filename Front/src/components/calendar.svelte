@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { showMessageBox } from "../custom/customStore";
     import {
       mode,
       SecurityFetch,
@@ -74,7 +75,7 @@
         const response = await SecurityFetch(endpoint, "POST", eventPayload);
   
         if (response.status === 201) {
-          alert($lang ? "이벤트 기록을 저장하였습니다" : "Memo Saved");
+          showMessageBox("success",$lang? "이벤트 기록 저장" : "Memo saved", $lang ? "이벤트 기록을 저장했습니다" : "Memo saving success")
           events = { ...events, [eventDate]: eventText };
           editing = null;
           eventText = "";
@@ -83,10 +84,10 @@
           const savedMonth = month;
           await getCalendartext(savedYear, savedMonth);
         } else {
-          alert(`오류 발생: ${response.status}`);
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
         }
       } catch (error) {
-        console.error("Error:", error);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
     };
   

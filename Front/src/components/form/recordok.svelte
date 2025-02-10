@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import {SecurityFetch, lang, mode} from "../../store";
+    import { showMessageBox } from "../../custom/customStore";
     let recordData:any[];
     let loading = true;
   
@@ -17,7 +18,7 @@
         recordData = await response.json();
       } catch (error) {
         console.error("데이터 불러오기 오류:", error);
-        alert(error);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       } finally{
         loading = false;
       }
@@ -33,14 +34,13 @@
       try {
         const response = await SecurityFetch(endpoint,action==="approve"? "POST":"DELETE",data);
         if (response.ok) {
-          alert(`${action === "approve" ? ok : remove} 완료`);
+          showMessageBox("success", $lang ? "요청 성공":"Success", `${action === "approve" ? ok : remove} 완료`);
           fetchGameData();
         } else {
-          throw new Error(`오류 발생: ${response.status}`);
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
         }
       } catch (error) {
-        console.error(`${action === "approve" ? ok : remove} 오류:`, error);
-        alert(`오류 발생: ${error}`);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
     }
   
@@ -101,7 +101,6 @@ tr td:nth-child(2){
   width: 40%;
   max-width: 40%;
   white-space: nowrap;
-  overflow: scroll;
 }
 tr td:nth-child(3){
   width: 30%;

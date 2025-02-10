@@ -19,11 +19,7 @@ export class AdminScoreService {
   ) {}
 
   // 사용자 점수 업데이트
-  async updateUserScore(mode: string, player: string, adminScore: number, admin: string): Promise<void> {
-
-    if (!admin.includes(mode)) {
-      throw new HttpException('권한이 없습니다.', HttpStatus.FORBIDDEN);
-    }
+  async updateUserScore(mode: string, player: string, adminScore: number): Promise<void> {
 
 
     let repository;
@@ -78,9 +74,6 @@ export class AdminScoreService {
     else if (mode === "zpke") {score = START_SCORE_Z}
     else {throw new HttpException('잘못된 상태값입니다. ' + mode, HttpStatus.BAD_REQUEST);}
 
-    if (!admin.includes(mode))
-    {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN);}
-    
     try {
       // 사용자 데이터 백업
       await queryRunner.manager.query(`

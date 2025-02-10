@@ -87,10 +87,7 @@ else
     }
   }
 
-  async deleteEvent(eventname: string, mode: string, admin: string[]): Promise<void> {
-    
-    if (!admin.includes(mode))
-    {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
+  async deleteEvent(eventname: string, mode: string): Promise<void> {
     
     let repository
     if (mode === "babapk")
@@ -114,10 +111,7 @@ else
     }
   }
 
-  async acceptEvent(eventData: any, mode: string, admin: string[]): Promise<void> {
-
-    if (!admin.includes(mode))
-      {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
+  async acceptEvent(eventData: any, mode: string): Promise<void> {
   
 
     let userRepository
@@ -241,7 +235,6 @@ else
 
       console.log('Event data:', eventData);
       console.log('Mode:', mode);
-      console.log('Admin list:', admin);
       console.log('Selected repository:', repository);
       
 
@@ -257,11 +250,7 @@ else
 
 
   
-  async cancelAccepted(eventData: any, mode: string, admin: string[]): Promise<void> {
-
-    if (!admin.includes(mode))
-      {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
-  
+  async cancelAccepted(eventData: any, mode: string): Promise<void> {  
     let userRepository
     let scores
 
@@ -384,10 +373,8 @@ else
     }
   }
 
-  async modifyMemo(eventData: any, admin: string[]): Promise<void> {
+  async modifyMemo(eventData: any): Promise<void> {
   
-    if (!admin.includes(eventData.mode))
-      {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
   
   let EventRecordRepository
   if (eventData.mode === "babapk")

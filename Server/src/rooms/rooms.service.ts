@@ -61,8 +61,13 @@ export class RoomsService {
         WHERE r.room_id = ?`, 
         [id] // SQL 바인딩
     );
-    return userList;
- }
+
+    // ✅ userList가 배열인지 확인 후 ip_address 마스킹
+    return userList.map(user => ({
+        ...user,
+        ip_address: maskIP(user.ip_address) // 🔥 개별 IP 주소 마스킹
+    }));
+}
 
   async makeNewRoom(body: any, userAccount: string, ip_address: string){
     const newRoom = await this.roomRepository.create({room_name: body.name, password:body.password, mode: body.mode})
@@ -73,3 +78,16 @@ export class RoomsService {
 }
 
 
+function maskIPv4(ip: string): string {
+  return ip.replace(/\d+$/, "***"); // 마지막 숫자를 '***'로 변경
+}
+
+function maskIPv6(ip: string): string {
+  const parts = ip.split(":");
+  parts[parts.length - 1] = "****"; // 마지막 그룹 마스킹
+  return parts.join(":");
+}
+
+function maskIP(ip: string): string {
+  return ip.includes(".") ? maskIPv4(ip) : maskIPv6(ip);
+}

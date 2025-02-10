@@ -56,9 +56,7 @@ return JSON.stringify(user.clan)
     }
   }
 
-  async clanResetService(nickname: string, admin: string[]): Promise<void> {
-    if (!admin.includes("babapk"))
-    {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
+  async clanResetService(nickname: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { nickname } });
     if (!user) {
       throw new HttpException('유저를 찾을 수 없습니다', HttpStatus.NOT_FOUND)
@@ -67,9 +65,7 @@ return JSON.stringify(user.clan)
     await this.userRepository.save(user);
   }
 
-  async adminClanScoreService(clan: string, clanScore: number, admin: string[]): Promise<void> {
-    if (!admin.includes('babapk'))
-    {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
+  async adminClanScoreService(clan: string, clanScore: number): Promise<void> {
     const clanEntity = await this.clanRepository.findOne({ where: { name: clan } });
 
     if (!clanEntity) {
@@ -80,112 +76,9 @@ throw new HttpException('해당 클랜이 없습니다', HttpStatus.NOT_FOUND)
     await this.clanRepository.save(clanEntity);
   }
 
-//   async createClanObject(clans: MClan[], playerdb: MUser[]): Promise<any[]> {
-//     return clans.map((clan) => {
-//       const members = playerdb.filter((player) => player.clan?.name === clan.name);
-//       return {
-//         ...clan,
-//         members: members.map((member) => member.nickname),
-//         wins: 0, // 계산 로직 추가
-//         loses: 0, // 계산 로직 추가
-//         draws: 0, // 계산 로직 추가
-//       };
-//     });
-//   }
-
-//   async clanRecordService(): Promise<any[]> {
-//     const records = await this.clanRecordRepository.find();
-//     // 추가적인 포맷 로직 필요
-//     return records;
-//   }
-
-//   async clanRecordDeleteService(orderNumber: number): Promise<string> {
-//     const record = await this.clanRecordRepository.findOne({ where: { orderNumber } });
-
-//     if (!record) {
-//       return 'Record not found';
-//     }
-
-//     await this.clanRecordRepository.remove(record);
-//     return 'ok';
-//   }
-
-//   async clanRecordSubmitService(
-//     loser: string,
-//     winner: string,
-//     result: boolean,
-//   ): Promise<string> {
-//     const loserClan = await this.userRepository.findOne({ where: { nickname: loser } });
-//     const winnerClan = await this.userRepository.findOne({ where: { nickname: winner } });
-
-//     if (!loserClan || !winnerClan || loserClan.clan === winnerClan.clan) {
-//       return 'no clan error';
-//     }
-
-//     const tempRecord = this.clanRecordTempRepository.create({
-//       winner,
-//       loser,
-//       gameDate: new Date(),
-//     });
-//     await this.clanRecordTempRepository.save(tempRecord);
-
-//     return 'ok';
-//   }
-
-//   async clanNoApprovedRecordsService(user: string): Promise<any[]> {
-//     const records = await this.clanRecordTempRepository.find({
-//       where: [{ winner: user }, { draw1: user }],
-//     });
-
-//     return records.map((record) => ({
-//       ...record,
-//       result: record.winner ? 'win' : 'draw',
-//     }));
-//   }
-
-//   async clanRecordCancelService(orderNumber: number): Promise<string> {
-//     const record = await this.clanRecordTempRepository.findOne({ 
-//       where: { orderNumber }  // order_num -> orderNumber
-//     });
-
-//     if (!record) {
-//       return 'Record not found';
-//     }
-
-//     await this.clanRecordTempRepository.remove(record);
-//     return 'ok';
-//   }
-
-//   async clanRecordAcceptService(orderNumber: number, result: string): Promise<string> {
-//     const tempRecord = await this.clanRecordTempRepository.findOne({
-//       where: { orderNumber },
-//     });
-
-//     if (!tempRecord) {
-//       return 'Record not found';
-//     }
-
-//     const clanRecord = this.clanRecordRepository.create({
-//       winner: tempRecord.winner,
-//       loser: tempRecord.loser,
-//       draw1: tempRecord.draw1,
-//       draw2: tempRecord.draw2,
-//       gameDate: tempRecord.gameDate,
-//     });
-
-//     await this.clanRecordRepository.save(clanRecord);
-//     await this.clanRecordTempRepository.remove(tempRecord);
-
-//     return 'ok';
-//   }
-
-  async clanRemoveService(clan: string, admin: string[]): Promise<void> {
+  async clanRemoveService(clan: string): Promise<void> {
     const clanEntity = await this.clanRepository.findOne({ where: { name: clan } });
 
-    if (!admin.includes('babapk'))
-    {
-      throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)
-    }
 
     if (!clanEntity) {
       throw new HttpException('해당 클랜을 찾을 수 없습니다', HttpStatus.NOT_FOUND)
@@ -194,13 +87,9 @@ throw new HttpException('해당 클랜이 없습니다', HttpStatus.NOT_FOUND)
     await this.clanRepository.remove(clanEntity);
   }
 
-  async clanCreateService(clan: string, admin: string[]): Promise<void> {
+  async clanCreateService(clan: string): Promise<void> {
     const existingClan = await this.clanRepository.findOne({ where: { name: clan } });
 
-    if (!admin.includes('babapk'))
-      {
-        throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)
-      }
   
     if (existingClan) {
       throw new HttpException('클랜 이름이 중복됩니다!', HttpStatus.CONFLICT)

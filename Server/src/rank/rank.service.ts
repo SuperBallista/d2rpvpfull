@@ -26,11 +26,8 @@ export class RankService {
     private readonly zRecordRepository: Repository<ZRecord>,
   ) {}
 
-  async memoModify(admin:string[], nickname:string, mode:string, memo:string) {   
+  async memoModify(nickname:string, mode:string, memo:string) {   
     let userRepository:any
-
-    if (!admin.includes(mode))
-    {throw new HttpException("권한이 없습니다", HttpStatus.FORBIDDEN)}
 
     if (mode==="babapk")
     {userRepository = this.bUserRepository}

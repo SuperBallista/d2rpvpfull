@@ -7,6 +7,7 @@
       SecurityFetch,
       admin
     } from "../store.js";
+    import { showMessageBox } from "../custom/customStore.js";
     let player:string;
     let playerscore:number;
   
@@ -28,40 +29,38 @@
   
   
     async function submit_bonus_score() {
-      const data = { player: player, playerScore: playerscore, mode: $mode };
-  
+    const data = { player: player, playerScore: playerscore, mode: $mode };
+
+    try {
+      const response = await SecurityFetch("/admin-score/submit", "POST", data);
+
+      if (response && response.status === 201) {
+        showMessageBox("success","점수 부여 완료","점수 부여에 성공했습니다")
+      } else {
+        showMessageBox("error", "에러 발생", `에러 발생: ${response.status}`)
+      }
+    } catch (error) {
+      showMessageBox("error", "에러 발생", `에러 발생: ${error}`)
+    }
+  }
+
+  async function score_reset() {
+    const userResponse = await showMessageBox("confirm","참가자 점수 초기화","모든 참가자 점수를 초기화합니다. 계속하시겠습니까?")
+
+    if (userResponse.success) {
       try {
-        const response = await SecurityFetch("/admin-score/submit", "POST", data);
-  
+        const response = await SecurityFetch("/admin-score/reset", "DELETE", {mode: $mode});
+
         if (response && response.status === 201) {
-          alert("점수 부여 완료");
+          showMessageBox("success","점수 초기화 성공","점수를 초기화하였습니다")
         } else {
-          alert(`에러 발생: ${response.status}`);
+          showMessageBox("error", "에러 발생", `에러 발생: ${response.status}`)
         }
       } catch (error) {
-        alert("오류 발생");
+        showMessageBox("error", "에러 발생", `에러 발생: ${error}`)
       }
     }
-  
-    async function score_reset() {
-      const userResponse = confirm(
-        "모든 참가자 점수를 초기화합니다. 계속하시겠습니까?"
-      );
-  
-      if (userResponse) {
-        try {
-          const response = await SecurityFetch("/admin-score/reset", "DELETE", {mode: $mode});
-  
-          if (response && response.status === 200) {
-            alert("점수를 초기화하였습니다");
-          } else {
-            alert(`에러 발생: ${response.status}`);
-          }
-        } catch (error) {
-          alert("오류 발생");
-        }
-      }
-    }
+  }
   </script>
   
   <div class="main_data">

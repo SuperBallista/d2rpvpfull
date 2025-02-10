@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { formatDate, myaccount, modify_postid, mode, SecurityFetch, admin, myUnionAccount, lang } from "../store";
     import { Link, navigate } from "svelte-routing";
+    import { showMessageBox } from "../custom/customStore";
 
     // 변수 타입 정의
     let id: string = "";
@@ -69,31 +70,37 @@
         try {
             const response = await SecurityFetch("/board/comment/add", "POST", data);
             if (response.ok) {
-                alert($lang ? "댓글을 등록하였습니다" : "Comment added");
+                showMessageBox("success",$lang? "댓글 등록" : "Success", $lang ? "댓글을 등록하였습니다" : "Comment added")
                 comment_content = ""; // 댓글 내용 초기화
                 fetchcomment(id);
             }
+            else {
+                showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+            }
         } catch (error) {
-            console.error("댓글 작성 오류:", error);
+            showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
         }
     }
 
     // 댓글 삭제
     async function delete_comment(post_id: string, comment_id: string): Promise<void> {
 
-        const userResponse =  confirm($lang ? "댓글을 삭제하시겠습니까? 삭제시 복원이 불가합니다" : "Do you really want to delete this comment?")
-
-        if (userResponse) {
+        const userResponse = await showMessageBox("confirm",$lang ? "댓글 삭제": "Delete Confirm", $lang ? "댓글을 삭제하시겠습니까? 삭제시 복원이 불가합니다" : "Do you really want to delete this comment?")
+        
+        if (userResponse.success) {
 
         const data = { comment_id: comment_id };
         try {
             const response = await SecurityFetch("/board/comment/delete", "DELETE", data)
             if (response.ok) {
-                alert($lang ? "댓글을 삭제하였습니다" : "Comment removed");
+                showMessageBox("success",$lang ? "댓글 삭제" : "Remove Completed", $lang ? "댓글을 삭제하였습니다" : "Your Comment removed.")
                 fetchcomment(post_id);
             }
+            else{
+                showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+            }
         } catch (error) {
-            console.error("댓글 삭제 오류:", error);
+            showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
         }
     }
     }
@@ -107,20 +114,23 @@
     // 게시물 삭제
     async function delete_post(id: string): Promise<void> {
 
-      const userResponse =  confirm($lang ? "글을 삭제하시겠습니까? 삭제시 복원이 불가합니다" : "Do you really want to delete this post?")
-
-        if (userResponse) {
+      const userResponse = await showMessageBox("confirm", $lang ? "삭제 확인" : "Delete Confirm", $lang ? "글을 삭제하시겠습니까? 삭제시 복원이 불가합니다" : "Do you really want to delete this post?")
+        if (userResponse.success) {
 
         const data = { post_id: id};
 
         try {
             const response = await SecurityFetch("/board/delete", "DELETE",data)
                         if (response.ok) {
-                alert($lang ? "글을 삭제하였습니다" : "Post removed");
+                            showMessageBox("success", $lang ? "삭제 성공":"Success", $lang ? "글을 삭제하였습니다" : "Your post removed")
                 navigate(`${modepage}/boardlist`);
             }
+            else
+            {
+                showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+            }
         } catch (error) {
-            console.error("글 삭제 오류:", error);
+            showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
         }
     }
     }

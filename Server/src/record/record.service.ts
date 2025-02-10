@@ -41,10 +41,7 @@ export class RecordService {
   ) {}
 
   // 기록 삭제
-  async deleteRecord(orderNum: number, mode: string, admin: string): Promise<void> {
-
-    if (!admin.includes(mode))
-    {throw new HttpException('권한이 없습니다', HttpStatus.FORBIDDEN)}
+  async deleteRecord(orderNum: number, mode: string): Promise<void> {
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();

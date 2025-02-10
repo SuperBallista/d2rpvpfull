@@ -9,6 +9,7 @@
     //   clanlists,
       SecurityFetch
     } from "../store.js";
+    import { showMessageBox } from "../custom/customStore.js";
   
     let player:string;
     // let playerclan;
@@ -51,76 +52,37 @@
       try {
         const response = await SecurityFetch("/admin-score/submit", "POST", data);
 
-      if  (response.status===201) {
-        alert("점수 부여 완료")
+        if (response && response.status === 201) {
+        showMessageBox("success","점수 부여 완료","점수 부여에 성공했습니다")
+      } else {
+        showMessageBox("error", "에러 발생", `에러 발생: ${response.status}`)
       }
-
-      } catch (error) {
-        alert("오류 발생");
-      }
+    } catch (error) {
+      showMessageBox("error", "에러 발생", `에러 발생: ${error}`)
     }
+  }
 
 
   
     // 점수 초기화
     async function score_reset() {
-      const userResponse = confirm(
-        "모든 참가자 점수를 초기화합니다. 계속하시겠습니까?"
-      );
+      const userResponse = await showMessageBox("confirm","참가자 점수 초기화","모든 참가자 점수를 초기화합니다. 계속하시겠습니까?")
   
-      if (userResponse) {
+      if (userResponse.success) {
         try {
           const response = await SecurityFetch("/admin-score/reset", "DELETE", {mode: $mode});
-          if (response && response.status === 200) {
-          alert("점수를 초기화하였습니다");
+          if (response && response.status === 201) {
+          showMessageBox("success","점수 초기화 성공","점수를 초기화하였습니다")
         } else {
-          alert(`에러 발생: ${response.status}`);
+          showMessageBox("error", "에러 발생", `에러 발생: ${response.status}`)
         }
-        } catch (error) {
-          alert("오류 발생");
-        }
+      } catch (error) {
+        showMessageBox("error", "에러 발생", `에러 발생: ${error}`)
       }
     }
+  }
   
-  
-  
-//    async function submit_clan_score() {
-//     const data = { clan: clan, clanScore: clanscore };
-//       try {
-//         const response = await SecurityFetch("/admin_clan_score", "POST", data);
-//         alert(clan ,"클랜 점수 부여 완료");
-//       } catch (error) {
-//         alert("오류 발생 :", error);
-//       }
-    
-//    }
-  
-//    async function submit_clan_delete() {
-//     const data = {clan: clan};
-//     const userResponse = confirm(`${clan} 클랜을 삭제합니다. 계속하시겠습니까?`);
-  
-//     if (userResponse) {
-//      try {
-//       const response = await SecurityFetch("/admin_clan_delete", "DELETE", data);
-//       alert(`${clan} 클랜 삭제 완료`);
-//       fetechClanList();
-//     } catch (error) {
-//         alert("오류 발생 :", error);
-//       }
-//     }
-//    }
-  
-//    async function submit_new_clan() {
-//     const data = {clan: newclan};
-//      try {
-//       const response = await SecurityFetch("/admin_clan_create", "POST", data);
-//         alert(`${newclan} 클랜 추가 완료`);
-//         fetechClanList();
-//       } catch (error) {
-//         alert("오류 발생 :", error);
-//       }
-//      }
-  
+
   
   </script>
   

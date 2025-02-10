@@ -4,8 +4,9 @@
     let simulCheck:any = []
 
     import { writable } from "svelte/store";
-    import { SecurityFetch } from "../../store";
-  
+    import { lang, SecurityFetch } from "../../store";
+    import { showMessageBox } from "../../custom/customStore";
+    
     // Player variables
     let mycharlv = writable(99);
     let myhp = writable(0);
@@ -13,7 +14,7 @@
     let mymaxdmg = writable(0);
     let myar = writable(0);
     let mydf = writable(0);
-    let myframe = writable(4);
+    let myframe = writable([4]);
     let mydfoff = writable(0);
     let myreduce = writable(0);
     let mycrush = writable(0);
@@ -31,7 +32,7 @@
     let yourmaxdmg = writable(0);
     let yourar = writable(0);
     let yourdf = writable(0);
-    let yourframe = writable(4);
+    let yourframe = writable([4]);
     let yourdfoff = writable(0);
     let yourreduce = writable(50);
     let yourcrush = writable(0);
@@ -134,7 +135,7 @@
           mythorns.set(parsedJson.thorns);
           myclass.set(parsedJson.class);
         } catch (error) {
-          alert("Invalid JSON file");
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
         }
       };
       reader.readAsText(file);
@@ -169,7 +170,7 @@
           yourthorns.set(parsedJson.thorns);
           yourclass.set(parsedJson.class);
         } catch (error) {
-          alert("Invalid JSON file");
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
         }
       };
       reader.readAsText(file);
@@ -230,11 +231,10 @@
           simulframeResult = data[1].length;
           simulCheck = data[1];
         } else {
-          console.error("Error calculating:", response.statusText);
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
         }
       } catch (error) {
-        console.error("Error calculating:", error);
-        alert("Calculation failed.");
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
     };
   </script>
@@ -265,8 +265,8 @@
       <tr>
         <td>총 생명력</td>
         <td><input type="number" bind:value={$myhp} class="input-text short" /></td>
-        <td>공격 프레임</td>
-        <td><input type="number" bind:value={$myframe} class="input-text short" /></td>
+        <td>-</td>
+        <td>-</td>
       </tr>
       <tr>
         <td>피해 감소 %</td>
@@ -329,8 +329,8 @@
       <tr>
         <td>총 생명력</td>
         <td><input type="number" bind:value={$yourhp} class="input-text short" /></td>
-        <td>공격 프레임</td>
-        <td><input type="number" bind:value={$yourframe} class="input-text short" /></td>
+        <td>-</td>
+        <td>-</td>
       </tr>
       <tr>
         <td>피해 감소 %</td>

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { showMessageBox } from "../../custom/customStore";
     import {
       lang,
       form, SecurityFetch
@@ -11,7 +12,7 @@
   
     async function changepw() {
       if (newpw !== checkpw) {
-        alert($lang ? "암호 확인이 일치하지 않습니다. 다시 확인해주세요.": "Check Password please");
+        showMessageBox("alert",$lang ? "암호 오류" : "Password Error", $lang ? "암호 확인이 일치하지 않습니다. 다시 확인해주세요.": "Check Password please")
         return;
       }
   
@@ -25,12 +26,15 @@
         const response = await SecurityFetch(endpoint,"POST",pwdata);
   
         if (response.status === 201) {
-          alert($lang ? "암호 변경 완료" : "Your Password Changed");
+          showMessageBox("success", $lang ? "변경 완료":"Success", $lang ? "암호 변경 완료" : "Your Password Changed")
           form.set("none");
+        }
+        else {
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
         }
       } catch (error) {
         console.error("Error:", error);
-        alert("Error: " + error);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
     }
   </script>

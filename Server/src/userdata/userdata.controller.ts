@@ -3,11 +3,16 @@ import {
     Post,
     Body,
     Delete,
+    UseGuards,
   } from '@nestjs/common';
   import { UserDataService } from './userdata.service';
   import { User } from '../user/user.decorator';
+import { Roles } from 'src/guard/roles.decorator';
+import { RolesGuard } from 'src/guard/auth.guard';
   
   @Controller('/userdata')
+    @UseGuards(RolesGuard)
+    @Roles("admin", "user")
   export class UserDataController {
     constructor(private readonly userDataService: UserDataService) {}
   
@@ -24,18 +29,17 @@ import {
       @User() user: any,
       @Body() body: { nowpw: string; newemail: string },
     ) {
-        const { nowpw, newemail } = body;
-        await this.userDataService.changeEmail(user.username, nowpw, newemail);
+       return await this.userDataService.changeEmail(user.account, body.nowpw, body.newemail);
     }
   
       // 암호 변경 (b_user)
       @Post('/change-pw')
       async changePassword(
-        @User() user: any,
+        @User() user: {account: string},
         @Body() body: { newpw: string; nowpw: string },
       ) {
           const { nowpw, newpw } = body;
-          await this.userDataService.changePassword(user.username, nowpw, newpw);
+         return await this.userDataService.changePassword(user.account, nowpw, newpw);
       }
       
     // 도전 취소

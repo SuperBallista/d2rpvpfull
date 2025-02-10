@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { nicknames, fetchNicknames, myaccount, mode, SecurityFetch, lang } from "../../store";
+    import { showMessageBox } from "../../custom/customStore";
   
     let nicknameexceptme:any[] = [];
     let winner:string | null
@@ -35,13 +36,12 @@ function handle_winner_change(event: Event): void {
       try {
         const response = await SecurityFetch("/record/submit", "POST", data)
         if (response.ok) {
-          alert($lang ? "기록 전송 완료" : "Your record sended");
+         showMessageBox("success", $lang ? "전송 완료" : "Success", $lang ? "기록 전송 완료" : "Your record sended");
         } else {
-          alert(response.status);
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
         }
       } catch (error) {
-        console.error(error);
-        alert(error);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
     }
   </script>

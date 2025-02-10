@@ -10,6 +10,7 @@
     import { navigate } from "svelte-routing";
     import Quill from "quill";
     import "quill/dist/quill.snow.css";
+    import { showMessageBox } from "../custom/customStore";
   
     let title: string = "";
     let content: string = "";
@@ -26,8 +27,10 @@
   
       input.onchange = async () => {
         const file = input.files ? input.files[0] : null;
-        if (!file) return alert( $lang ? "파일이 선택되지 않았습니다." : "No File Selected.");
-  
+        if (!file) {
+          showMessageBox("alert", $lang ? "파일 없음": "No File",$lang ? "파일이 선택되지 않았습니다." : "No File Selected.")
+          return
+        }
         const reader = new FileReader();
         reader.onloadend = async () => {
           const base64Image = reader.result as string;
@@ -69,13 +72,16 @@
       try {
         const response = await SecurityFetch("/board/write", "POST", data);
         if (response.ok) {
-          alert($lang ? "글을 성공적으로 작성하였습니다" : "Post Successed");
+          showMessageBox("success", $lang ? "작성 성공" : "Success", $lang ? "글을 성공적으로 작성하였습니다" : "Post Successed")
           resetForm();
           navigate(`${modepage}/boardlist`);
+        } 
+        else {
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
         }
       } catch (error) {
         console.error("네트워크 오류:", error);
-        alert(`Network Error: ${(error as Error).message}`);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
     }
   
@@ -89,7 +95,7 @@
           content = postData.content;
           category = postData.category;
         } catch (error) {
-          alert($lang ? "게시물을 불러오는데 실패하였습니다" : "Loading post failed");
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
         }
       }
     }

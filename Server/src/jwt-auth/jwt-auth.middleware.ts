@@ -1,10 +1,10 @@
-import { HttpException, HttpStatus, Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request as ExpressRequest, Response, NextFunction } from 'express';
 import { jwtService } from 'src/jwt/jwt.service';
 import { Account } from 'src/entities/account.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BABAPK_ADMIN, MPK_ADMIN, ZPKE_ADMIN } from 'src/config/constants';
+import { giveAdmin } from 'src/utils/checkRole';
 
 interface Request extends ExpressRequest {
   user?: any;
@@ -24,14 +24,6 @@ export class JwtAuthMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
 
 
-
-    if (req.method === 'GET') {
-      return next(); // GET 요청은 미들웨어 통과
-    }
-    
-
-    
-
     const findNickname = async (account: string, mode: string): Promise<string> => {
       const userDB = await this.AccountRepository.findOne({ where: { account } });
       let result
@@ -43,23 +35,19 @@ export class JwtAuthMiddleware implements NestMiddleware {
 
     const accessToken = req.headers['d2rpvpjwttoken'] as string; // 요청 헤더의 액세스 토큰
     const refreshToken = req.cookies['d2rpvprefreshToken']; // 쿠키의 리프레시 토큰
-    let admin: string[] = []
+    const mode:string = req.headers['mode'] as string
 
     if (accessToken) {
       try {
         // 액세스 토큰 검증
         const decoded = await this.jwtService.verifyAccessToken(accessToken);
-       const username = await findNickname(decoded.username, req.headers['mode'] as string)
+        const role = giveAdmin(decoded.username)
+       const username = await findNickname(decoded.username, mode)
        if (!username) {
         console.warn('계정을 생성하지 않은 사용자입니다')
        }
-       if (BABAPK_ADMIN.includes(decoded.username))
-        {admin.push("babapk")}          
-       if (MPK_ADMIN.includes(decoded.username))
-        {admin.push("mpk")}          
-       if (ZPKE_ADMIN.includes(decoded.username))
-        {admin.push("zpke")} 
-        req.user = { username: username, account: decoded.username, admin: admin }; // 사용자 정보 설정
+
+        req.user = { username: username, account: decoded.username, role: role.includes(mode) ? "admin" : "user" }; // 사용자 정보 설정
         
         return next(); // 요청 흐름 계속
       } catch (error) {
@@ -69,24 +57,20 @@ export class JwtAuthMiddleware implements NestMiddleware {
 
     else if (refreshToken) {
       try {
+
         // 리프레시 토큰 검증 및 새 액세스 토큰 생성
         const decoded = await this.jwtService.verifyRefreshToken(refreshToken);
-        const newAccessToken = await this.jwtService.createAccessToken(decoded.username);
+        const role = giveAdmin(decoded.username)
+        const newAccessToken = await this.jwtService.createAccessToken(decoded.username, role);
 
         // 새 액세스 토큰을 응답 헤더에 설정
         res.setHeader('d2rpvpjwttoken', newAccessToken);
         res.setHeader('Access-Control-Expose-Headers', 'd2rpvpjwttoken');
-        const username = await findNickname(decoded.username, req.headers['mode'] as string)
+        const username = await findNickname(decoded.username, mode)
         if (!username) {
          console.warn('계정을 생성하지 않은 사용자입니다')
         }
-         if (BABAPK_ADMIN.includes(decoded.username))
-          {admin.push("babapk")}          
-         if (MPK_ADMIN.includes(decoded.username))
-          {admin.push("mpk")}          
-         if (ZPKE_ADMIN.includes(decoded.username))
-          {admin.push("zpke")} 
-         req.user = { username: username, account: decoded.username, admin: admin }; // 사용자 정보 설정
+         req.user = { username: username, account: decoded.username, role: role.includes(mode) ? "admin" : "user" }; // 사용자 정보 설정
         console.log('New access token generated and set in header');
       } catch (error) {
         console.error('Invalid refresh token:', error.message);
@@ -95,10 +79,8 @@ export class JwtAuthMiddleware implements NestMiddleware {
 
     // 토큰이 없거나 유효하지 않으면 다음 단계로 진행
     if (!req.user) {
-      console.warn('Unauthorized request: no valid tokens');
-      return new HttpException('권한이 없습니다.', HttpStatus.UNAUTHORIZED);
+      req.user = { username: undefined, account: undefined, role: "guest"}
     }
-
     next();
   }
 }

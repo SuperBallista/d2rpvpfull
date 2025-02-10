@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { showMessageBox } from "../../custom/customStore";
     import { form, lang, SecurityFetch } from "../../store";
     let isValidEmail = true; // 이메일 검증 상태
 
@@ -22,13 +23,13 @@
       const response = await SecurityFetch(endpoint,"POST",findpwdata);
 
       if (response.ok) {
-        alert($lang ? "이메일을 확인하세요" : "Check Your E-mail");
+        showMessageBox("alert", $lang ? "이메일 확인" : "Notice", $lang ? "이메일을 확인하세요" : "Check Your E-mail") 
         form.set("none")
       } else {
-        alert("error");
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
       }
     } catch (error) {
-      alert(error);
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
     }
 
 

@@ -6,9 +6,12 @@ import {
     Body,
     Req,
     Patch,
+    UseGuards,
   } from '@nestjs/common';
   import { ClanService } from './clan.service';
 import { User } from 'src/user/user.decorator';
+import { Roles } from 'src/guard/roles.decorator';
+import { RolesGuard } from 'src/guard/auth.guard';
   
   
   @Controller('clan')
@@ -16,17 +19,23 @@ import { User } from 'src/user/user.decorator';
     constructor(private readonly clanService: ClanService) {}
   
     @Get('/babapk/list')
+      @UseGuards(RolesGuard)
+      @Roles("admin", "user", "guest")
     async getClanList() {
         const result = await this.clanService.clanListService();
         return result;
     }
 
     @Post('/babapk/myclan')
+    @UseGuards(RolesGuard)
+    @Roles("admin", "user")  
     async getMyClan(@User() user:any){
       return await this.clanService.getMyClanService(user.username);
     }
   
     @Patch('/babapk/join')
+    @UseGuards(RolesGuard)
+    @Roles("admin", "user")  
     async joinClan(@Body('clanname') clanname: string, @User() user:any) {
         return await this.clanService.clanJoinService(
           user.username,
@@ -35,32 +44,38 @@ import { User } from 'src/user/user.decorator';
     }
   
     @Post('/babapk/reset')
-    async resetClan(@Req() @User() user: any, @Body('player') player: string) {     
-        return await this.clanService.clanResetService(player, user.admin);
+    @UseGuards(RolesGuard)
+    @Roles("admin")  
+    async resetClan(@Body('player') player: string) {     
+        return await this.clanService.clanResetService(player);
     }
   
     @Post('/babapk/score')
+    @UseGuards(RolesGuard)
+    @Roles("admin")  
     async updateClanScore(
-      @User() user: any,
       @Body('clan') clan: string,
       @Body('clanScore') clanScore: number,
     ) { 
         return await this.clanService.adminClanScoreService(
           clan,
           clanScore,
-          user.admin
         );
   
     }
     
   
     @Post('/babapk/create')
-    async createClan(@User() user: any, @Body('name') name: string) {
-       return await this.clanService.clanCreateService(name, user.admin);
+    @UseGuards(RolesGuard)
+    @Roles("admin")  
+    async createClan(@Body('name') name: string) {
+       return await this.clanService.clanCreateService(name);
     }
   
     @Delete('babapk/delete')
-    async removeClan(@User() user: any, @Body('clan') clan: string) {
-        return await this.clanService.clanRemoveService(clan, user.admin);
+    @UseGuards(RolesGuard)
+    @Roles("admin")  
+    async removeClan(@Body('clan') clan: string) {
+        return await this.clanService.clanRemoveService(clan);
   }
 }

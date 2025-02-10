@@ -8,9 +8,7 @@ import { MUser } from '../entities/m-user.entity';
 import { ConfigService } from '@nestjs/config';
 import { ZUser } from 'src/entities/z-user.entity';
 import { Account } from 'src/entities/account.entity';
-import { BABAPK_ADMIN } from 'src/config/constants';
-import { MPK_ADMIN } from 'src/config/constants';
-import { ZPKE_ADMIN } from 'src/config/constants';
+import { giveAdmin } from 'src/utils/checkRole';
 
 @Injectable()
 export class AuthService {
@@ -53,6 +51,9 @@ throw new HttpException('삭제할 계정이 없습니다', HttpStatus.BAD_REQUE
     if (deleteResult.affected !== 1) {
     throw new HttpException("데이터 베이스 삭제 오류입니다", HttpStatus.INTERNAL_SERVER_ERROR)
     }
+    else {
+      throw new HttpException("삭제 성공", HttpStatus.NO_CONTENT)
+    }
   }
 
 
@@ -72,18 +73,13 @@ throw new HttpException('삭제할 계정이 없습니다', HttpStatus.BAD_REQUE
       throw new HttpException('비밀번호가 일치하지 않습니다.', HttpStatus.UNAUTHORIZED);
     }
   
-    //  엑세스토큰 생성, 리프레시토큰 생성 및 저장은 컨트롤러영역에서 따로 지정
-    const token = this.jwtService.createAccessToken(lowerCaseNickname);
-    const refreshToken = this.jwtService.createRefreshToken(lowerCaseNickname);
+    const role = giveAdmin(lowerCaseNickname)
 
-    const admin = []
-    if (BABAPK_ADMIN.includes(nickname))
-      {admin.push("babapk")}          
-     if (MPK_ADMIN.includes(nickname))
-      {admin.push("mpk")}          
-     if (ZPKE_ADMIN.includes(nickname))
-      {admin.push("zpke")} 
-     
+    //  엑세스토큰 생성, 리프레시토큰 생성 및 저장은 컨트롤러영역에서 따로 지정
+    const token = this.jwtService.createAccessToken(lowerCaseNickname, role);
+    const refreshToken = this.jwtService.createRefreshToken(lowerCaseNickname, role);
+
+
     return [{
       username: nickname,
       accessToken: token,
@@ -93,7 +89,7 @@ throw new HttpException('삭제할 계정이 없습니다', HttpStatus.BAD_REQUE
       how: user.how,
       email: user.email,
       origin: user.how,
-      admin: admin
+      admin: role
     },{      refreshToken: refreshToken,    }];
   }
 
@@ -133,16 +129,10 @@ throw new HttpException('삭제할 계정이 없습니다', HttpStatus.BAD_REQUE
     if (!req.user) {
       return res.status(200).json({ authenticated: false });
     }
-    const token = this.jwtService.createAccessToken(username);
+    const role = giveAdmin(username)
+    const token = this.jwtService.createAccessToken(username, role);
     const userData = await this.AccountRepository.findOne({where: {account: username}})
-    const admin = []
-    if (BABAPK_ADMIN.includes(username))
-      {admin.push("babapk")}          
-     if (MPK_ADMIN.includes(username))
-      {admin.push("mpk")}          
-     if (ZPKE_ADMIN.includes(username))
-      {admin.push("zpke")} 
-    return res.status(200).json({ authenticated: true, username: username, token: token, babapk: userData.babapk, mpk: userData.mpk, zpke: userData.zpke, email: userData.email, origin: userData.how, admin: admin});
+    return res.status(200).json({ authenticated: true, username: username, token: token, babapk: userData.babapk, mpk: userData.mpk, zpke: userData.zpke, email: userData.email, origin: userData.how, admin: role});
   }
 
   async validateGoolge(email: string): Promise<any> {
@@ -156,9 +146,9 @@ throw new HttpException('삭제할 계정이 없습니다', HttpStatus.BAD_REQUE
         })
         await this.AccountRepository.save(user);
       }
-
+      const role = giveAdmin(user.account)
     //  엑세스토큰 생성, 리프레시토큰 생성 및 저장은 컨트롤러영역에서 따로 지정
-    const refreshToken = this.jwtService.createRefreshToken(user.account);
+    const refreshToken = this.jwtService.createRefreshToken(user.account, role);
 
       return [user, refreshToken];
     } catch (error) {
@@ -179,9 +169,9 @@ throw new HttpException('삭제할 계정이 없습니다', HttpStatus.BAD_REQUE
         })
         await this.AccountRepository.save(user);
       }
-
+      const role = giveAdmin(user.account)
     //  엑세스토큰 생성, 리프레시토큰 생성 및 저장은 컨트롤러영역에서 따로 지정
-    const refreshToken = this.jwtService.createRefreshToken(user.account);
+    const refreshToken = this.jwtService.createRefreshToken(user.account, role);
 
       return [user, refreshToken];
     } catch (error) {

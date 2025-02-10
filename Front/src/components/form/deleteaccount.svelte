@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { showMessageBox } from "../../custom/customStore";
   import { form, myaccount, SecurityFetch, jwtToken, mybabapk, mympk, myUnionAccount, myzpke, email, lang} from "../../store";
 
 let pw = "";
@@ -13,9 +14,17 @@ async function delete_account() {
     const endpoint = `/auth/delete`;
     const response = await SecurityFetch(endpoint,"DELETE",pwdata);
 
-    if (response.status===200) {
-      alert($lang ? "계정 삭제 완료" : "Your Account Removed");
-      form.set("none");
+    if (response.status===204) {
+      showMessageBox("success", $lang ? "삭제 완료" : "Success", $lang ? "계정 삭제 완료" : "Your Account Removed")
+    } else {
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
+  }
+  finally{
+    form.set("none");
       myaccount.set("");
       mybabapk.set("");
       mympk.set("");
@@ -23,12 +32,6 @@ async function delete_account() {
       myUnionAccount.set("");
       email.set("");
       jwtToken.set("");
-    } else {
-      alert(`Error Code: ${response.status}`);
-    }
-  } catch (error) {
-    console.error("Error:", error);
-    alert("Error: " + error);
   }
 }
 

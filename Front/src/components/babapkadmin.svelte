@@ -7,6 +7,7 @@
     SecurityFetch,
     admin
   } from "../store.js";
+    import { showMessageBox } from "../custom/customStore.js";
   let player:string;
   let playerscore:number;
 
@@ -61,31 +62,29 @@ async function fetchClanList(): Promise<void> {
       const response = await SecurityFetch("/admin-score/submit", "POST", data);
 
       if (response && response.status === 201) {
-        alert("점수 부여 완료");
+        showMessageBox("success","점수 부여 완료","점수 부여에 성공했습니다")
       } else {
-        alert(`에러 발생: ${response.status}`);
+        showMessageBox("error", "에러 발생", `에러 발생: ${response.status}`)
       }
     } catch (error) {
-      alert("오류 발생");
+      showMessageBox("error", "에러 발생", `에러 발생: ${error}`)
     }
   }
 
   async function score_reset() {
-    const userResponse = confirm(
-      "모든 참가자 점수를 초기화합니다. 계속하시겠습니까?"
-    );
+    const userResponse = await showMessageBox("confirm","참가자 점수 초기화","모든 참가자 점수를 초기화합니다. 계속하시겠습니까?")
 
-    if (userResponse) {
+    if (userResponse.success) {
       try {
         const response = await SecurityFetch("/admin-score/reset", "DELETE", {mode: $mode});
 
-        if (response && response.status === 200) {
-          alert("점수를 초기화하였습니다");
+        if (response && response.status === 201) {
+          showMessageBox("success","점수 초기화 성공","점수를 초기화하였습니다")
         } else {
-          alert(`에러 발생: ${response.status}`);
+          showMessageBox("error", "에러 발생", `에러 발생: ${response.status}`)
         }
       } catch (error) {
-        alert("오류 발생");
+        showMessageBox("error", "에러 발생", `에러 발생: ${error}`)
       }
     }
   }
@@ -97,9 +96,15 @@ async function fetchClanList(): Promise<void> {
       const data = { player: playerclan };
       try {
         const response = await SecurityFetch(`/clan/${$mode}/reset`, "POST", data);
-        alert("해당 선수 클랜 리셋 완료");
+        if (response.status===201)
+      {
+        showMessageBox("success","클랜 리셋 성공", "해당 선수의 클랜을 리셋하였습니다")
+      }
+      else{
+        showMessageBox("error", "에러 발생", `에러 발생: ${response.status}`)
+      }
       } catch (error) {
-        alert("오류 발생 :" + error);
+        showMessageBox("error", "에러 발생", `에러 발생: ${error}`)
       }
     }
   
@@ -111,16 +116,20 @@ async function fetchClanList(): Promise<void> {
         const response = await SecurityFetch(endpoint, "POST", data)
         if (response.status===201)
     {
-        alert("클랜 생성에 성공하였습니다")
+      showMessageBox("success","클랜 생성 성공", "클랜을 새로 생성하였습니다")
     }
      else if (response.status===400)
      {
-        alert("클랜 생성에 실패하였습니다")
+      showMessageBox("error","클랜 생성 실패", "클랜 생성에 실패하였습니다")
+     }
+     else
+     {
+      showMessageBox("error", "에러 발생", `에러 발생: ${response.status}`)
      }
     }
     catch (error)
     {
-        alert("클랜 생성에 실패하였습니다")
+      showMessageBox("error", "에러 발생", `에러 발생: ${error}`)
     }
 
 }
@@ -139,27 +148,38 @@ async function fetchClanList(): Promise<void> {
       try {
         const response = await SecurityFetch(`/clan/${$mode}/score`, "POST", data);
         if (response.status===201)
-        {alert(clan + " 클랜 점수 부여 완료")}
+        {
+          showMessageBox("success", "클랜 점수 부여 성공", clan + " 클랜 점수 부여 완료")
+        }
         else
-        {alert("오류 발생")};
+        showMessageBox("error", "에러 발생", `에러 발생: ${response.status}`)
       } catch (error) {
-        alert("오류 발생 :" + error);
+        showMessageBox("error", "에러 발생", `에러 발생: ${error}`)
       }
     
    }
   
    async function submit_clan_delete() {
     const data = {clan: clan};
-    const userResponse = confirm(`${clan} 클랜을 삭제합니다. 계속하시겠습니까?`);
-  
-    if (userResponse) {
+    const userResponse = await showMessageBox("confirm", "클랜 삭제 확인",`${clan} 클랜을 삭제합니다. 계속하시겠습니까?`)
+    
+      
+    if (userResponse.success) {
      try {
       const response = await SecurityFetch(`/clan/${$mode}/delete`, "DELETE", data);
-      alert(`${clan} 클랜 삭제 완료`);
+
+      if (response.status===200)
+     {
+      showMessageBox("success", "클랜 삭제 완료", `${clan} 클랜을 삭제하였습니다`)
       fetchClanList();
+     }
+     else
+     {
+      showMessageBox("error", "에러 발생", `에러 발생: ${response.status}`)
+     }
     } catch (error) {
-        alert("오류 발생 :" + error);
-      }
+      showMessageBox("error", "에러 발생", `에러 발생: ${error}`)
+    }
     }
    }
   

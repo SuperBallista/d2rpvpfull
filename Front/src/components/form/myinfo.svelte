@@ -14,16 +14,12 @@
 
     } from "../../store";
   import { navigate } from "svelte-routing";
+    import { showMessageBox } from "../../custom/customStore";
   
-    let rscore = "Loading";
     let bscore = "Loading";
     let lscore = "Loading";
     let wins = "Loading";
     let loses = "Loading";
-    // let clan = "Loading";
-    // let clanwin = "Loading";
-    // let clanlose = "Loading";
-    // let clandraw = "Loading";
     let challenge = "";
     let challengeDate = "";
   
@@ -35,24 +31,16 @@
         if (response.ok) {
           const data = await response.json();
           if ($mode != "babapk") {
-          //   email = data.email;
-          //   lscore = data.lscore;
-          //   clan = data.clan;
-          //   clanwin = data.clanwin;
-          //   clanlose = data.clanlose;
-          //   clandraw = data.clandraw;
             challenge = data.challenge;
             challengeDate = data.challengeDate;
           } 
             bscore = data.bscore;
             lscore = data.lscore;
-            // rscore = data.rscore;
             wins = data.countwin;
             loses = data.countlose;
         }
       } catch (error) {
-        console.error("정보를 불러오는 중 오류가 발생하였습니다:", error);
-        alert(error);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
     }
   
@@ -62,11 +50,13 @@
       try {
         const response = await SecurityFetch("/userdata/challenge/cancel", "DELETE", data);
         if (response.status === 200) {
-          alert($lang ? "도전 중인 게임 정보를 삭제하였습니다" : "You cancel challenge");
+          showMessageBox("success", $lang ? "삭제 성공": "Success", $lang ? "도전 중인 게임 정보를 삭제하였습니다" : "You cancel challenge")
+        }
+        else {
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
         }
       } catch (error) {
-        console.error("요청에 실패하였습니다", error);
-        alert("요청에 실패하였습니다");
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
     }
   
@@ -82,16 +72,15 @@
     const msg = $lang ? "도전 중이 아니거나 응답 기간이 끝나지 않았습니다" : "You didn't challenge game or it is still within the period."
     
     if (response.status === 201) {
-      alert($lang ? "도전 기간에 상대가 응답하지 않아 자동 승리로 입력되었습니다" : "You win because your Opposite give up the match");
+      showMessageBox("alert",$lang ? "기권 승리":"Wins", $lang ? "도전 기간에 상대가 응답하지 않아 자동 승리로 입력되었습니다" : "You win because your Opposite give up the match");
     } else if (response.status === 400) {
-      alert(responseData.message || msg);
-    } else {
-      alert("Error Code :" + response.status);
-    }
+      showMessageBox("alert", $lang ? "잘못된 요청": "Request Error", responseData.message || msg)
+      } else {
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+      }
   } catch (error) {
     // 예상치 못한 네트워크 오류 처리
-    console.error("요청에 실패하였습니다:", error);
-    alert(error);
+    showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
   }
 }
 
@@ -102,8 +91,10 @@
 
     async function logout() {
     try{
- await SecurityFetch("/auth/logout", "POST")
- alert($lang ? "로그아웃하였습니다" : "Logout success")  
+const response = await SecurityFetch("/auth/logout", "POST")
+ if (response.status===200)
+ {
+ showMessageBox("success", $lang? "로그아웃" : "LogOut", $lang ? "로그아웃하였습니다" : "Logout success" )  
  navigate($mode === "babapk"? "/" : "/"+$mode)
   form.set("none")
   myaccount.set("")
@@ -115,9 +106,12 @@
   email.set("")
   admin.set([])
   }
+  else {
+    showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+  }}
     catch (error)
     {
-      alert(error)
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
     }
 
       
@@ -137,33 +131,7 @@
         <td>{$myaccount.replace("_m","").replace("_z","")}</td>
         <td><button class="simple-button" on:click={() => logout()}>{$lang ? "로그아웃" : "Leave"}</button></td>
       </tr>
-      <!-- <tr>
-        <td>암호</td>
-        <td>********</td>
-        <td>
-          <button class="simple-button" on:click={() => form.set("changepw")}>변경</button>
-        </td>
-      </tr> -->
       {#if $mode != "babapk"}
-        <!-- <tr>
-          <td>대회점수</td>
-          <td>{lscore}</td>
-          <td></td>
-        </tr> -->
-        <!-- <tr>
-          <td>소속 클랜</td>
-          <td>{clan}</td>
-          <td>
-            {#if clan === "none"}
-              <button class="simple-button" on:click={() => form.set("clanjoin")}>클랜 가입</button>
-            {/if}
-          </td>
-        </tr>
-        <tr>
-          <td>클랜전 승무패</td>
-          <td>{clanwin}/{clandraw}/{clanlose}</td>
-          <td></td>
-        </tr> -->
         <tr> 
           <td>{$lang ? "도전 신청" : "Challenge"}</td>
           <td>{challenge ? challenge.replace("_m","") : ""}</td>
@@ -212,7 +180,6 @@
   width: 100%;
   max-width: 100%; /* 테이블이 화면 너비를 초과하지 않도록 제한 */
   table-layout: fixed; /* 테이블 셀 크기를 고정 */
-  overflow-x: auto; /* 가로 스크롤 허용 */
   font-size: 0.8rem;
 }
 
@@ -224,7 +191,6 @@ tr td:nth-child(2){
   width: 40%;
   max-width: 40%;
   white-space: nowrap;
-  overflow: scroll;
 }
 tr td:nth-child(3){
   width: 30%;

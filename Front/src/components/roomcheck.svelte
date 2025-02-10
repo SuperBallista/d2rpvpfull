@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { mode, myaccount, SecurityFetch, lang } from "../store";
+    import { showMessageBox } from "../custom/customStore";
 
     interface Room {
         id: number;
@@ -46,13 +47,15 @@
         try {
             const response = await SecurityFetch("/rooms/new", "POST", data);
             if (response.status === 201) {
-                alert($lang ? "방 등록에 성공하였습니다!" : "Room successfully created!");
+                showMessageBox("success", $lang ? "등록 성공": "Success", $lang ? "방 등록에 성공하였습니다!" : "Room successfully created!")
                 fetchData();
             } else if (response.status === 401) {
-                alert($lang ? "권한이 없습니다" : "You do not have permission.");
+                showMessageBox("alert", $lang ? "권한 없음" : "No Permission", $lang ? "권한이 없습니다" : "You do not have permission.")
+            } else{
+                showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
             }
         } catch (error) {
-            alert($lang ? "서버 에러입니다" : "Server error.");
+            showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
         }
     }
 
@@ -61,28 +64,30 @@
     async function view_room_password(id: number) {
         if (!$myaccount)
     {return}
-        const userResponse = confirm(
-            $lang
-                ? "해당 방의 암호를 조회하면 당신의 조회기록이 남습니다. 조회하시겠습니까?"
-                : "Your access record will be saved when viewing the room password. Continue?"
-        );
-        if (userResponse) {
+        const userResponse = await showMessageBox("confirm",$lang?"조회 확인":"View Confirm",
+        $lang?
+        "해당 방의 암호를 조회하면 당신의 조회기록이 남습니다. 조회하시겠습니까?"
+         : "Your access record will be saved when viewing the room password. Continue?")
+        if (userResponse.success) {
             const data = { id };
             try {
                 const response = await SecurityFetch("/rooms/password", "POST", data);
                 const password = await response.json();
                 if (response.status === 201) {
-                    alert(($lang ? "암호는 다음과 같습니다: " : "The password is: ") + password.password);
-
+                    showMessageBox("alert", $lang ? "암호 확인": "Check Password", ($lang ? "암호는 다음과 같습니다: " : "The password is: ") + password.password)
                     // ✅ 새로운 배열을 재할당하여 반응형 업데이트 보장
                     rooms = rooms.map(room =>
                         room.id === id ? { ...room, views: room.views + 1 } : room
                     );
                 } else if (response.status === 401) {
-                    alert($lang ? "권한이 없습니다" : "You do not have permission.");
-                }
+                    showMessageBox("alert", $lang ? "권한 없음" : "No Permission", $lang ? "권한이 없습니다" : "You do not have permission.")
+                   }   else
+                    {
+                        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+                    }
+                
             } catch (error) {
-                alert($lang ? "암호 조회에 실패하였습니다" : "Failed to retrieve password.");
+                showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
             }
         }
     }
@@ -95,7 +100,7 @@
             const response = await SecurityFetch("/rooms/views", "POST", data);
             const member: member[] = await response.json();
             if (response.status === 201) {
-                alert($lang ? "암호를 조회한 사람들의 정보를 봅니다" : "Viewing users who accessed the password.");
+                showMessageBox("alert", $lang? "암호 조회자 확인": "Check Users", $lang ? "암호를 조회한 사람들의 정보를 봅니다" : "Viewing users who accessed the password.")
 
                 // ✅ 새로운 배열로 업데이트하여 반응형 트리거
                 list = member.map((ppl: any) => ({
@@ -103,10 +108,13 @@
                     created_at: new Date(ppl.created_at),
                 }));
             } else if (response.status === 401) {
-                alert($lang ? "권한이 없습니다" : "You do not have permission.");
+                showMessageBox("alert", $lang ? "권한 없음" : "No Permission", $lang ? "권한이 없습니다" : "You do not have permission.")
+            }
+            else {
+                showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
             }
         } catch (error) {
-            alert($lang ? "암호 조회에 실패하였습니다" : "Failed to retrieve password.");
+            showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
         }
     }
 

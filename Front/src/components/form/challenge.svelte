@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { SecurityFetch, mode, lang } from "../../store";
+    import { showMessageBox } from "../../custom/customStore";
   
     interface Record {
       challengeDate: string; // 날짜 정보
@@ -20,7 +21,7 @@
         recordData = await response.json();
       } catch (error) {
         console.error("데이터 불러오기 오류:", (error as Error).message);
-        alert(error);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }finally {
     // 로딩 상태를 항상 업데이트
     loading = false;
@@ -38,17 +39,14 @@
         const response = await SecurityFetch(endpoint, "POST", data);
   
         if (response.ok) {
-          alert(
-            action === "win"
-              ? win : giveUp
-          );
+          showMessageBox("alert",$lang ? "도전 결과" : "Result", action==="win" ? win : giveUp );
           fetchGameData();
         } else {
-          throw new Error(`Error Code: ${response.status}`);
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
         }
       } catch (error) {
         console.error(`${action === "win" ? "승인" : "삭제"} 오류:`, (error as Error).message);
-        alert(`오류 발생: ${(error as Error).message}`);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
     }
   

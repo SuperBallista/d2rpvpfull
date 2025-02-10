@@ -7,15 +7,20 @@ import {
     Query,
     HttpException,
     HttpStatus,
+    UseGuards,
   } from '@nestjs/common';
   import { BoardService } from './board.service';
   import { User } from '../user/user.decorator';
+import { Roles } from 'src/guard/roles.decorator';
+import { RolesGuard } from 'src/guard/auth.guard';
   
   @Controller('/board')
   export class BoardController {
     constructor(private readonly boardService: BoardService) {}
   
     @Get('/list')
+        @UseGuards(RolesGuard)
+        @Roles("admin", "user", "guest")
     async getBoardList(@Query() query: { data?: string; page?: number }) {
       const category = query.data || 'all'; // 기본값으로 'all'
       const page = Number(query.page) > 0 ? Number(query.page) : 1; // 1 이상인 페이지 번호
@@ -28,6 +33,8 @@ import {
       
     // 글 검색하기
     @Get('/search')
+    @UseGuards(RolesGuard)
+    @Roles("admin", "user", "guest")
     async searchBoard(@Query() query: { data: string; find: string }) {
       const { data: category, find: word } = query;
         return await this.boardService.searchBoardPosts(category, word);
@@ -35,6 +42,8 @@ import {
   
     // 글 작성 및 수정
     @Post('/write')
+    @UseGuards(RolesGuard)
+    @Roles("admin", "user")
     async writePost(
       @Body() body: { title: string; category: string; content: string; postId: string },
       @User() user: any, // `@User` 데코레이터 사용
@@ -68,6 +77,8 @@ import {
   
     // 게시물 보기
     @Get('/post')
+    @UseGuards(RolesGuard)
+    @Roles("admin", "user", "guest")
     async getPost(@Query('post_id') postId: string) {
         return await this.boardService.getPost(Number(postId));
       }
@@ -75,15 +86,19 @@ import {
   
     // 게시물 삭제
     @Delete('/delete')
+    @UseGuards(RolesGuard)
+    @Roles("admin", "user")
     async deletePost(@Body('post_id') postId: string, @User() user: any) {
       const account = user.account
-      const admin = user.admin
+      const admin = user.role
         console.log(postId, '번째 글 삭제 완료');
         return await this.boardService.deletePost(Number(postId), account, admin);
     }
   
     // 댓글 추가
     @Post('/comment/add')
+    @UseGuards(RolesGuard)
+    @Roles("admin", "user")
     async addComment(
       @Body() body: { post_id: string; content: string },
       @User() user: any,
@@ -102,14 +117,18 @@ import {
   
     // 댓글 삭제
     @Delete('/comment/delete')
+    @UseGuards(RolesGuard)
+    @Roles("admin", "user")
     async deleteComment(@Body('comment_id') commentId: string, @User() user: any) {
-      const {account, admin} = user
+      const {account, role} = user
         console.log(commentId, '댓글 삭제');
-        return await this.boardService.deleteComment(Number(commentId), account, admin);
+        return await this.boardService.deleteComment(Number(commentId), account, role);
         }
   
     // 댓글 가져오기
     @Get('/comments')
+    @UseGuards(RolesGuard)
+    @Roles("admin", "user", "guest")
     async getComments(@Query('post_id') postId: string) {
         return await this.boardService.fetchCommentsByPostId(Number(postId));
     }

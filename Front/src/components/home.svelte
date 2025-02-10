@@ -57,13 +57,16 @@
 
     };
     import { form, myUnionAccount, myorigin, mybabapk, mympk, myzpke, modeinput, email, myaccount, jwtToken, SecurityFetch, admin } from "../store"
+    import { showMessageBox } from "../custom/customStore";
 
     
 
     async function logout() {
     try{
- await SecurityFetch("/auth/logout", "POST")
-  alert($lang ? "로그아웃하였습니다" : "Logout success")  
+        const response = await SecurityFetch("/auth/logout", "POST")
+        if (response.status===200)
+ {
+ showMessageBox("success", $lang? "로그아웃" : "LogOut", $lang ? "로그아웃하였습니다" : "Logout success" )  
   form.set("none")
   myaccount.set("")
   myUnionAccount.set("")
@@ -74,10 +77,14 @@
   email.set("")
   admin.set([])
   }
+  else {
+    showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+  }}
     catch (error)
     {
-      alert(error)
-    }     
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
+    }
+
     }
 
 
@@ -100,14 +107,15 @@ async function Unconnect(mode:string) {
 
     const data = {mode: mode, nickname: unconnectAccount}
     
-    const userResponse = confirm($lang ? "다음 캐릭터 정보를 삭제하겠습니까? 캐릭터 정보 삭제시 현 시즌에 획득한 점수도 삭제되므로 꼭 확인해주세요!" + unconnectAccount : "Are you sure you want to delete this character? Deleting the character will also result in losing the points you have earned." + unconnectAccount)
+    const userResponse = await showMessageBox("confirm", $lang ? "캐릭터 삭제 확인" : "Delete Confirm", $lang ? "다음 캐릭터 정보를 삭제하겠습니까? 캐릭터 정보 삭제시 현 시즌에 획득한 점수도 삭제되므로 꼭 확인해주세요! :" + unconnectAccount : "Are you sure you want to delete this character? Deleting the character will also result in losing the points you have earned. :" + unconnectAccount)    
 
-    if (userResponse) {
+    if (userResponse.success) {
         try{
             const response = await SecurityFetch("/connect/delete", "DELETE", data)
             
             if (response.status===200)
-        {alert($lang ? "삭제하였습니다!" : "Delete Completed")
+        {
+        showMessageBox("success",$lang? "삭제 완료" : "Success", $lang ? "삭제하였습니다!" : "Delete Completed")
 
         if (mode==="babapk"){
             mybabapk.set("")
@@ -115,16 +123,15 @@ async function Unconnect(mode:string) {
             mympk.set("")
         }else if (mode==="zpke"){
             myzpke.set("")
-        }}
-        else
-        {
-        alert($lang ? "삭제에 실패하였습니다" : "Error")    
         }
-
+    }
+    else {
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+    }
         
         }
         catch (error){
-            alert(error)
+            showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
         }
 
     }

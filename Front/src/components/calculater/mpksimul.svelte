@@ -4,8 +4,9 @@
     let simulCheck:any = []
     
     import { writable } from "svelte/store";
-    import { SecurityFetch } from "../../store";
-  
+    import { lang, SecurityFetch } from "../../store";
+    import { showMessageBox } from "../../custom/customStore";
+
     // Player variables
     let mycharlv = writable(99);
     let myhp = writable(0);
@@ -154,10 +155,10 @@
       if (matchingOption) {
         myframe.set(matchingOption.value); // 일치하는 옵션 값 설정
       } else {
-        alert("Frame 값이 목록에 없습니다.");
+        showMessageBox("error", "입력 오류", "Frame 값이 목록에 없습니다.")
       }
     } catch (error) {
-      alert("Invalid JSON file");
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
     }
   };
   reader.readAsText(file);
@@ -202,10 +203,10 @@ const handleYourStatFile = (event: Event) => {
       if (matchingOption) {
         yourframe.set(matchingOption.value); // 일치하는 옵션 값 설정
       } else {
-        alert("Frame 값이 목록에 없습니다.");
+        showMessageBox("error", "입력 오류", "Frame 값이 목록에 없습니다.")
       }
     } catch (error) {
-      alert("Invalid JSON file");
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
     }
   };
   reader.readAsText(file);
@@ -269,8 +270,7 @@ const handleYourStatFile = (event: Event) => {
           console.error("Error calculating:", response.statusText);
         }
       } catch (error) {
-        console.error("Error calculating:", error);
-        alert("Calculation failed.");
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
     };
 

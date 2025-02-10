@@ -1,10 +1,14 @@
-import { Controller, Get, Query, Res } from '@nestjs/common';
+import { Controller, Get, Query, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import axios from 'axios';
 import { AuthService } from '../auth.service';
 import { ConfigService } from '@nestjs/config';
+import { RolesGuard } from 'src/guard/auth.guard';
+import { Roles } from 'src/guard/roles.decorator';
 
 @Controller('/auth/google')
+    @UseGuards(RolesGuard)
+    @Roles("guest")
 export class GoogleAuthController {
   constructor(
     private readonly authService: AuthService,

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { showMessageBox } from "../../custom/customStore";
 import {form, jwtToken, SecurityFetch, myUnionAccount, mybabapk, mympk, myzpke, myorigin, email, admin, lang } from "../../store";
 
 
@@ -14,6 +15,7 @@ async function formprocess() {
     const response = await SecurityFetch(endpoint,"POST",logindata);
 
     if (response.status === 200) {
+      showMessageBox("success", $lang ? "로그인 성공":"Success", $lang ? "로그인에 성공하였습니다" :"Login Success")
       const data = await response.json();
       
       // JWT 토큰을 본문에서 가져오기
@@ -30,10 +32,10 @@ async function formprocess() {
       form.set("none");
       admin.set(data.admin)
     } else {
-      alert("로그인 실패"); // 에러 메시지 출력
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
     }
   } catch (error) {
-    alert(error);
+    showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
   }
 }
 

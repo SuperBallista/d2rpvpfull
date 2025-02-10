@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { key, myaccount, SecurityFetch, mode, lang } from "../store.js";
+    import { showMessageBox } from "../custom/customStore.js";
   
     let rankData: any[] = [];
     let loading = true;
@@ -68,20 +69,23 @@
    async function clanJoin(clanname:string){
     const data = {clanname: clanname}
     const endpoint = `/clan/${$mode}/join`
-    const userResponse = confirm($lang ? `${clanname} 클랜에 가입합니다. 계속하시겠습니까?` : "Are you sure you want to join the clan? Do you want to continue? :" + clanname);
-    if (userResponse) {
+    const userResponse = await showMessageBox("confirm", $lang ? "가입 확인":"Confirm", $lang ? `${clanname} 클랜에 가입합니다. 계속하시겠습니까?` : "Are you sure you want to join the clan? Do you want to continue? :" + clanname)
+    if (userResponse.success) {
     try{
         const response = await SecurityFetch(endpoint, "PATCH", data)
         if (response.status===200)
-    {alert($lang ? "클랜에 가입하였습니다" : "You joined clan")
+    {
+      showMessageBox("success", $lang ? "클랜 가입 성공":"Joined Clan", $lang ? "클랜에 가입하였습니다" : "You joined clan")
      fetchData();   
     }
     else
-    {alert($lang ? "오류 발생" : "Error")}
+    {    
+     showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+  }
     }
     catch (error)
     {
-alert(error)
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
     }
   }
    }

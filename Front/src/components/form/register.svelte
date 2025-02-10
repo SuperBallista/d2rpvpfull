@@ -2,6 +2,7 @@
     import { SecurityFetch, form, lang } from "../../store";
     import Terms from "./terms.svelte";
     import Privacy from "./privacy.svelte";
+    import { showMessageBox } from "../../custom/customStore";
 
     let isValidEmail = true;
     let Open = "";
@@ -46,12 +47,13 @@
 
     const result = validateNickname(reginickname); // 닉네임 검증
   if (!result.isValid) {
-    alert(result.message);
+    showMessageBox("alert", $lang ? "닉네임 오류" : "Request Error", result.message);
     return; // 검증 실패 시 종료
   }
 
   if (checked_nickname) {
-    alert($lang ? "계정을 이미 확인하였습니다" : "Your Account name checked");
+    showMessageBox("alert", $lang ? "요청 오류":"Request Error", $lang ? "계정을 이미 확인하였습니다" : "Your Account name checked");
+
   } else {
     const checkEndpoint = `/auth/check-nickname`;
     const data = { nickname: reginickname };
@@ -59,16 +61,16 @@
     try {
       const response = await SecurityFetch(checkEndpoint, "POST", data);
       if (response.status === 200) {
-        alert($lang ? "해당 계정은 사용 가능합니다" : "You can use this name");
+        showMessageBox("alert", $lang ? "사용 가능":"OK",$lang ? "해당 계정은 사용 가능합니다" : "You can use this name");
         checked_nickname = true;
       } else if (response.status === 403)
       {
-        alert($lang ? "해당 계정은 사용이 불가능합니다" : "You can't use this name");
+       showMessageBox("alert",$lang ? "사용불가":"Confict",  $lang ? "해당 계정은 사용이 불가능합니다" : "You can't use this name");
       }
       
     } catch (error) {
       console.error("Error occurred while checking nickname:", error);
-      alert(error);
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
     }
   }
 }
@@ -85,17 +87,15 @@
     try {
       const endpoint = `/auth/register`;
       const response = await SecurityFetch(endpoint, "POST",payload);
-      if (!response.ok) {
-        throw new Error($lang ? "회원가입에 실패했습니다." : "Register Failed");
-      }
-
      if (response.status===201) {
-
-      alert($lang ? "회원가입이 성공적으로 완료되었습니다." : "Register Success");
+      showMessageBox("success", $lang ? "회원가입 성공": "Success", $lang ? "회원가입이 성공적으로 완료되었습니다." : "Register Success");
       form.set("none")
     }
+    else {
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+    }
     } catch (error) {
-      alert(error);
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
     }
   }
 

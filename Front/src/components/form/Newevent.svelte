@@ -7,6 +7,7 @@
       myaccount, lang,
       SecurityFetch, admin
     } from "../../store";
+    import { showMessageBox } from "../../custom/customStore";
   
 
     onMount(async () => {
@@ -43,7 +44,7 @@
   
     async function sendEvent() {
       if (!checkForDuplicates()) {
-        alert($lang ? "중복 기록된 선수가 있습니다" : "Do Not input one player twice");
+        showMessageBox("alert", $lang ? "요청 오류": "Request Error",$lang ? "중복 기록된 선수가 있습니다" : "Do Not input one player twice" )
         return;
       }
   
@@ -58,11 +59,14 @@
         const response = await SecurityFetch(`/event/submit`, "POST", data);
   
         if (response.status===201)
-  {        alert($lang ? "기록 전송 완료" : "Event Result Saved")}
+  { 
+    showMessageBox("success", $lang ? "전송 완료" : "Success", $lang ? "기록 전송 완료" : "Event Result Saved");
+  } else {
+    showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+  }
   
       } catch (error) {
-        console.error("오류 발생:", error);
-        alert(`오류 발생: ${error}`);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
     }
   

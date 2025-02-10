@@ -14,13 +14,15 @@ import Register from "./form/register.svelte";
   import Challenge from "./form/challenge.svelte";
   import Unionlogin from "./form/unionlogin.svelte";
   import Connect from "./form/connect.svelte";
+  import { isOpen } from "../custom/customStore";
 
 
 function handleKeydown(event: KeyboardEvent) {
+  if (!$isOpen){
     if (event.key === "Escape") {
 close();
-    }
-}
+} }}
+
 
 onMount(() => {
     // 컴포넌트가 마운트되었을 때 esc 키를 처리하는 이벤트 리스너 추가

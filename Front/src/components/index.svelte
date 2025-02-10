@@ -3,6 +3,7 @@
     import Calendar from "./calendar.svelte";
     import { mode, SecurityFetch, lang } from "../store";
     import { useLocation } from "svelte-routing"
+    import { showMessageBox } from "../custom/customStore";
 
     const location = useLocation()
     let eventname = {};
@@ -64,7 +65,7 @@
         });
         eventname = eventsByDate;
       } catch (error) {
-        alert($lang ? "달력 DB 오류" : "Calendar DB error");
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
         console.error("Error:", error);
       }
     }

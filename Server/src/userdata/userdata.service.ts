@@ -89,35 +89,39 @@ let user
   }
 
   // 이메일 변경
-  async changeEmail(userNickname: string, nowpw: string, newemail: string): Promise<any> {
+  async changeEmail(userNickname: string, nowpw: string, newemail: string) {
     try {
       let repository = this.AccountRepository
       const user = await repository.findOne({ where: { account: userNickname } });
+
 
       if (!user) {
         throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
       }
 
       const passwordMatch = await bcrypt.compare(nowpw, user.password);
+      
+      console.log(user)
 
       if (!passwordMatch) {
         throw new HttpException('현재 암호가 일치하지 않습니다.', HttpStatus.UNAUTHORIZED);
       }
 
-      user.email = newemail;
-        await this.AccountRepository.save(user);
-      return { success: true };
+      console.log(user)
+
+      user.email = newemail; 
+        await repository.save(user);
     } catch (error) {
-      return { success: false };
+      throw new HttpException('서버 오류입니다.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   // 비밀번호 변경
-  async changePassword(userNickname: string, nowpw: string, newpw: string): Promise<any> {
+  async changePassword(account: string, nowpw: string, newpw: string) {
     try {
 
       let repository = this.AccountRepository
-      const user = await repository.findOne({ where: { account: userNickname } });
+      const user = await repository.findOne({ where: { account } });
 
       if (!user) {
         throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
@@ -131,9 +135,8 @@ let user
 
       user.password = await bcrypt.hash(newpw, 12);
         await this.AccountRepository.save(user);
-      return { success: true };
     } catch (error) {
-      return { success: false };
+      throw new HttpException('서버 오류입니다.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 

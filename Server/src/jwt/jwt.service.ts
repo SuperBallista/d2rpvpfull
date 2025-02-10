@@ -8,17 +8,17 @@ export class jwtService {
   constructor(private readonly jwtService: JwtService, private readonly configService: ConfigService) {}
 
   // 액세스 토큰 생성
-  createAccessToken(username: string): string {
+  createAccessToken(username: string, role: string[]): string {
     return this.jwtService.sign(
-      { username }, // 페이로드
+      { username, role }, // 페이로드
       { expiresIn: '1h', secret: this.configService.get<string>('JWT_SECRET') }, // 옵션
     );
   }
 
   // 리프레시 토큰 생성
-  createRefreshToken(username: string): string {
+  createRefreshToken(username: string, role: string[]): string {
     return this.jwtService.sign(
-      { username }, // 페이로드
+      { username, role }, // 페이로드
       { expiresIn: '7d', secret: this.configService.get<string>('JWT_REFRESH') }, // 리프레시 토큰 전용 비밀키
 
 

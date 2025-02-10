@@ -10,6 +10,7 @@
     lang,
     SecurityFetch, form
   } from "../store.js";
+    import { showMessageBox } from "../custom/customStore.js";
 
   let recordData: any[] = [];
   let loading = true;
@@ -32,8 +33,8 @@
       recordData = await response.json();
       filteredData = applyFilter(recordData);
       updatePaginatedData();
-    } catch (error: unknown) {
-      alert($lang ? "서버 오류가 발생하여 자료를 불러올 수 없습니다" : "Server Error");
+    } catch (error) {
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
     } finally {
       loading = false;
     }
@@ -113,13 +114,13 @@ return data.filter((item: any) =>
     try {
       const response = await SecurityFetch("/record/delete", "DELETE", data);
       if (response.status === 200) {
-        alert($lang ? "삭제 완료하였습니다" : "Remove Complete");
+        showMessageBox("success", $lang? "삭제 성공" : "Success", $lang ? "삭제 완료하였습니다" : "Remove Complete")
         fetchData();
       } else {
-        alert(`오류 발생: ${response.status}`);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
       }
-    } catch (error: unknown) {
-      alert(`Error : ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
+    } catch (error) {
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
     }
   }
 

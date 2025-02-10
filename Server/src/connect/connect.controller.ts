@@ -1,9 +1,13 @@
-import { Controller, Body, Post, Delete } from '@nestjs/common';
+import { Controller, Body, Post, Delete, UseGuards } from '@nestjs/common';
 import { ConnectService } from './connect.service';
 import { User } from '../user/user.decorator';
+import { RolesGuard } from 'src/guard/auth.guard';
+import { Roles } from 'src/guard/roles.decorator';
 
 
 @Controller('connect')
+  @UseGuards(RolesGuard)
+  @Roles("admin", "user")
 export class ConnectController {
     constructor(
         private readonly ConnectService: ConnectService,

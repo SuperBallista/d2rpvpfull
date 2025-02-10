@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { key, myaccount, SecurityFetch, mode, form, admin, lang } from "../store.js";
+    import { showMessageBox } from "../custom/customStore.js";
   
     let rankData: any[] = [];
     let loading = true;
@@ -62,16 +63,16 @@
         const response = await SecurityFetch(`/rank/challenge`, "POST", data);
   
         if (response.status === 201) {
-          alert($lang ? `${challengeNickname.replace("_m", "")}님에게 도전을 신청하였습니다` : `You challenged to ${challengeNickname}`);
+          showMessageBox("success", $lang? "도전 신청 성공": "Success", $lang ? `${challengeNickname.replace("_m", "")}님에게 도전을 신청하였습니다` : `You challenged to ${challengeNickname}`)
         } else if (response.status === 400) {
-          alert($lang ? `당신은 이미 도전 신청을 한 상태입니다` : `You should cancel or finished your challenge first`);
+          showMessageBox("error", $lang ? "에러 발생" : "Error", $lang ? `당신은 이미 도전 신청을 한 상태입니다` : `You should cancel or finished your challenge first`)
         } else if (response.status === 403) {
-          alert($lang ? `${challengeNickname.replace("_m", "")}님은 휴가중으로 도전을 받을 수 없는 상태입니다` : `You can't challenge to ${challengeNickname} now`);
-        } else if (response.status === 404) {
-          alert($lang ? `서버 오류입니다` : `Server Error`);
+          showMessageBox("error", $lang ? "에러 발생" : "Error", $lang ? `${challengeNickname.replace("_m", "")}님은 휴가중으로 도전을 받을 수 없는 상태입니다` : `You can't challenge to ${challengeNickname} now`)
+        } else {
+          showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
         }
       } catch (err) {
-        alert($lang ? "서버 오류입니다" : `Server Error`);
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
     }
   
@@ -128,13 +129,17 @@
      try{
       const response = await SecurityFetch("/rank/memo","PATCH",data);
       if (response.ok){
-        alert($lang ? "메모 수정 완료하였습니다" : "Memo modified complete")
+        showMessageBox("success",$lang? "수정 성공": "Success", $lang ? "메모 수정 완료하였습니다" : "Memo modified complete")
         fetchData();
+      }
+      else
+      {
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
       }
     }
     catch (error)
       {
-        alert($lang ? "오류가 발생하였습니다" + error : "Error: " + error)
+        showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
       }
           finally{
             rankData[index].memoModify = false

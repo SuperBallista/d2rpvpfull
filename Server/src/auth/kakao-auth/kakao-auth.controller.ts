@@ -1,10 +1,14 @@
-import { Controller, Get, Query, Res } from '@nestjs/common';
+import { Controller, Get, Query, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import axios from 'axios';
 import { AuthService } from '../auth.service';
 import { ConfigService } from '@nestjs/config';
+import { Roles } from 'src/guard/roles.decorator';
+import { RolesGuard } from 'src/guard/auth.guard';
 
 @Controller('/auth/kakao')
+    @UseGuards(RolesGuard)
+    @Roles("guest")
 export class KakaoAuthController {
   constructor(
     private readonly authService: AuthService,

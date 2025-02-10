@@ -90,10 +90,6 @@ export class AppModule implements NestModule {
 
     consumer
       .apply(JwtAuthMiddleware) // JWT 인증 미들웨어
-      .exclude(
-        '/auth/*', // 인증 경로 제외
-        { path: '/*', method: RequestMethod.GET }, // GET 요청 제외
-      )
       .forRoutes('*');
   }
 }

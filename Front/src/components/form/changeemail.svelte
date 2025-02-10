@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { showMessageBox } from "../../custom/customStore";
+
 
 import {
     email,
@@ -12,24 +14,23 @@ import {
   async function changeemail() {
     const emaildata = {
       nowpw: pw,
-      newemail: newemail,
+      newemail: newemail
     };
 
     try {
       const endpoint = `/userdata/change-email`
       const response = await SecurityFetch(endpoint, "POST",emaildata);
-      const data = await response.json();
       
-      if (typeof data.message === "string") {
-        alert($lang ? "이메일 변경 완료" : "E-mail Changed");
+      if (response.status === 201) {
+        showMessageBox("success", $lang? "변경 완료": "Success",$lang ? "이메일 변경 완료" : "E-mail Changed" )
         email.set(newemail)
         form.set("none")
     } else {
-        alert(`오류 발생: ${response.status}`);
-      }
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
+    }
     } catch (error) {
       console.error("오류 발생:", error);
-      alert("오류 발생: " + error);
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
     }
   }
 

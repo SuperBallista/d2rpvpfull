@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { showMessageBox } from "../../custom/customStore";
 import { form, mode, modeinput, SecurityFetch, mybabapk, mympk, myzpke, lang } from "../../store";
 
 
@@ -23,12 +24,12 @@ async function formprocess() {
     else if ($modeinput === "zpke")
     {myzpke.set(data.nickname)}
       form.set("none");
-    alert(data.nickname + ($lang ?  " 계정을 연동하였습니다" : "Connected"));
+      showMessageBox("alert", $lang ? "연동 성공": "Success", data.nickname + ($lang ?  " 계정을 연동하였습니다" : "Connected"))
     } else {
-      alert($lang ? "로그인 실패 혹은 수정이 불가합니다" : "Connecting Failed"); // 에러 메시지 출력
+      showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)
     }
   } catch (error) {
-    alert(error);
+    showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${error}` : `Error: ${error}`)
   }
 }
 

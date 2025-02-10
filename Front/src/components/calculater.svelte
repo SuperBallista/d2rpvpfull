@@ -43,9 +43,6 @@
     {
     href: "/zpke/simul", title: "시뮬레이터"
     },
-{
-href: "/zpke/ring", title: $lang ? "시뮬레이터" : "Simulate"
-}
     ]
 
 if ($mode === "babapk")
