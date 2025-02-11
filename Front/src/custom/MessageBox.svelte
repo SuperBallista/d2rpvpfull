@@ -6,6 +6,7 @@
     } from "./customStore";
     import InputBox from "./InputBox.svelte";
     import LoadingSpinner from "./LoadingSpinner.svelte";
+    import messageBoxColor from "./config/messageBoxColor.json"
   
     let inputValues: Record<string, string> = {};
       let confirmButton: HTMLButtonElement;
@@ -39,7 +40,7 @@
 
   </script>
   
-      <div class="message-box">
+      <div class="message-box" style="background: {messageBoxColor.background}; color: {messageBoxColor.font}">
         <div class="header" style="background: {$messageColor}">
             {#if $messageIcon}
             <div class="icon">{@html $messageIcon}</div>  
@@ -83,17 +84,13 @@
     justify-content: center;
     align-items: center;
   }
-
-
   
     .message-box {
       width: 90%;
       max-width: 400px;
-      background: white;
       border-radius: 10px;
       overflow: hidden;
       box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-      color: black;
     }
   
     .header {
@@ -105,7 +102,6 @@
       text-align: center;
       align-items: center;
     justify-content: center;
-    gap: 8px;
     }
   
     .content {

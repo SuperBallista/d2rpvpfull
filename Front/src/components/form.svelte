@@ -45,7 +45,7 @@ form.set("none");
 
 {#if $form !== "none"}
 <div class="message-container">
-    <div class="message-box">
+    <div class="d2rpvp-message-box">
       <!-- 닫기 버튼 -->
       <button class="close-button" on:click={() => close()}>&times;</button>
       <!-- 조건부 렌더링 -->
