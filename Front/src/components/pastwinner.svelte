@@ -14,7 +14,15 @@
     let hide = $lang ? "이전 시즌 결과 숨기기" : "Hide Past Season"
     let show = $lang ? "이전 시즌 결과 보이기" : "Show Past Season"
     let babapkwinner = [
-        {
+      {
+      season: "2025.1-2 랭킹전",
+      first: "마스터",
+      second: "금복이",
+      third: "yongjin",
+      details:
+        "레어 정식전 : 1위 Duky 2위 마스터 3위 fuga<br/>고뇌 정식전 : 1위 IRONKIM 2위 Jay 3위 행복한우빈이네<br/>인내or고뇌 정식전 : 1위 마스터 2위 IRONKIM 3위 BallistaBB",
+    },
+    {
       season: "2024.10-11 랭킹전",
       first: "마스터",
       second: "DTBar",
@@ -95,6 +103,13 @@
     },
   ]
   let mpkwinner =  [
+    {
+      season: "2025.1-2 랭킹전",
+      first: "그린늑대",
+      second: "우리",
+      third: "Hyeonmin",
+      details: "정규대회 : 1위 마스터치누 2위 Hyeonmin 3위 우리",
+    },
     {
       season: "2024.11-12 랭킹전",
       first: "제트",
