@@ -106,6 +106,10 @@
       <option value="8">{$lang ? "6-11팀(8강)" : "6-11 Teams"}</option>
       <option value="16">{$lang ? "12팀 이상(16강)" : "More than 12 Teams"}</option>
       <option value="24">{$lang ? "정규전" : "Official"}</option>
+      {#if $mode === 'babapk'}
+      <option value="20">{$lang ? "테마전" : "Theme"}</option>
+      <option value="32">{$lang ? "국제전" : "Global"}</option>
+      {/if}
     </select>
     <select bind:value={teamSize} on:change={HandleteamSize} class="optionwidth input-text">
       <option value="1">{$lang ? "1인 1팀" : "TeamSize 1"}</option>

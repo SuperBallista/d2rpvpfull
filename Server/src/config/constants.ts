@@ -19,6 +19,8 @@ export const TEAMS_SCORES_B = {
   teams8: { Championship: 42, Runner_up: 22, Place3rd: 12 },
   teams16: { Championship: 83, Runner_up: 43, Place3rd: 23 },
   teams24: { Championship: 150, Runner_up: 75, Place3rd: 40 },
+  teams20: {Championship: 100, Runner_up: 50, Place3rd: 25 },
+  teams32: {Championship: 140, Runner_up: 70, Place3rd: 30 }
 };
 
 export const TEAMS_SCORES_M = {

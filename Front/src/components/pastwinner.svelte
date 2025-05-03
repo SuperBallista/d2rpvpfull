@@ -15,6 +15,22 @@
     let show = $lang ? "이전 시즌 결과 보이기" : "Show Past Season"
     let babapkwinner = [
       {
+      season: "2025.3-4 랭킹전",
+      first: "마스터",
+      second: "yongjin",
+      third: "heartbreak",
+      details:
+        `조드 정식전 : 1위 퓨리 2위 바바밥 3위 aerts<br/>
+        고뇌 정식전 : 1위 joral_sinsa 2위 과락 3위 yongjin<br/>
+        레어 정식전 : 1위 귀멸의칼날 2위 dp 3위 pk<br/>
+        레어 정식전(새벽) : 1위 babais 2위 yongjin 3위 jbhb<br/>
+        극증 정식전(새벽) : 1위 오만한 2위 바바밥 3위 퓨리<br/>
+        숨죽에 정식전 : 1위 Rona 2위 heartbreak 3위 마스터<br/>
+        고뇌or인내 정식전 : 1위 SU 2위 dp 3위 rona<br/>
+        레어 2차 정식전(새벽): 1위 yongjin 2위 마스터 3위 광황<br/>
+        슬가룩 고뇌 정식전 : 1위 옥땅 2위 aerts 3위 heartbreak<br/>`,
+    },
+      {
       season: "2025.1-2 랭킹전",
       first: "마스터",
       second: "금복이",

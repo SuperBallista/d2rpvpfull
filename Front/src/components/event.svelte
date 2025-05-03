@@ -168,6 +168,10 @@
               <td>
                 {#if event.numberteams === 24}
                   {$lang ? "정규전" : "Official"}
+                  {:else if event.numberteams === 20}
+                  {$lang ? "테마전" : "Theme"}
+                  {:else if event.numberteams === 32}
+                  {$lang ? '국제전' : 'Global'}
                 {:else}
                   {event.numberteams}x{event.teamSize}
                 {/if}
