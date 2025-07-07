@@ -3,10 +3,16 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('m_oldhistory')
 export class MOldHistory {
   @PrimaryGeneratedColumn()
-  orderNum: number;
+  id: number;
 
-  @Column()
-  date: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  date?: Date;
+
+  @Column({ type: 'integer', nullable: true })
+  orderNum?: number;
+
+  @Column({ type: 'integer', nullable: true })
+  checked?: number;
 
   @Column()
   winner: string;

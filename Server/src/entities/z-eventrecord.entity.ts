@@ -105,14 +105,23 @@ export class ZEventRecord {
   @Column({ length: 255, nullable: true })
   quarterfinalist16?: string; // NULL 허용
 
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'integer', nullable: false })
   teamSize: number; // NOT NULL
 
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'integer', nullable: false })
   numberteams: number; // NOT NULL
 
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'integer', nullable: false })
   accept: number; // NOT NULL
+
+  @Column({ type: 'integer', nullable: false })
+  score?: number;
+
+  @Column({ type: 'integer', nullable: false })
+  rank?: number;
+
+  @Column({ type: 'integer', nullable: false })
+  season?: number;
 
   @Column({ length: 255, nullable: true })
   Eventhost?: string; // NULL 허용

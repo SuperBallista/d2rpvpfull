@@ -33,14 +33,14 @@ import { RoomsModule } from './rooms/rooms.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: 'mariadb',
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USER'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_NAME'),
+        type: 'postgres',
+        host: configService.get<string>('POSTGRES_HOST'),
+        port: configService.get<number>('POSTGRES_PORT'),
+        username: configService.get<string>('POSTGRES_USER'),
+        password: configService.get<string>('POSTGRES_PASSWORD'),
+        database: configService.get<string>('POSTGRES_DB'),
         entities: [__dirname + '/../**/*.entity.js'], // 엔티티 경로 수정
-        synchronize: false,
+        synchronize: true,
       }),
     }),
     TypeOrmModule.forFeature([Account]), // Account 엔티티 등록

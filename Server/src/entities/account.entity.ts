@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity('account') // 데이터베이스의 'account' 테이블과 매핑
 export class Account {
-  @PrimaryColumn({ name: "id", type: 'int' })
+  @PrimaryColumn({ name: "id", type: 'integer' })
   id: number; // PRIMARY KEY, NOT NULL
 
   @Column({ name: "password", length: 255, nullable: true })

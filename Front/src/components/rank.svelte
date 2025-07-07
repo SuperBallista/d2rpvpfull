@@ -222,7 +222,7 @@
                   <span on:click={()=> modify_memo(index)} class={$admin.includes($mode) ? "modify" : "" }>{typeof user.memo === "string" ? user.memo : noMemo }</span>
                   {/if}
                   <br/>
-                  {#if (Number(myRank) > Number(user.rank)) && ($mode != "babapk")}
+                  {#if (Number(myRank) > Number(user.rank))}
                     <button class="simple-button" on:click={() => challengeRank(user.nickname)}>
                       {$lang ? "도전하기" : "Challenge"}
                     </button>

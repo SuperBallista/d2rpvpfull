@@ -35,7 +35,10 @@ export class RoomsService {
       }))
     );
   
-    return roomsWithViews;
+    return roomsWithViews.map(room => ({
+      ...room,
+      mode: room.mode as 'babapk' | 'zpke' | 'mpk'
+    }));
   }
 
   async getRoomPassword(id: number) {
@@ -50,16 +53,16 @@ export class RoomsService {
   async viewsRoomAccess(id: number) {
     const userList = await this.roomAccessLogRepository.query(
         `SELECT 
-            a.account, 
-            a.babapk, 
-            a.mpk, 
-            a.zpke,
-            r.ip_address,
-            r.access_time
-        FROM account a
-        INNER JOIN room_access_logs r ON a.account = r.user_account
-        WHERE r.room_id = ?`, 
-        [id] // SQL 바인딩
+            a."account", 
+            a."babapk", 
+            a."mpk", 
+            a."zpke",
+            r."ip_address",
+            r."access_time"
+        FROM "account" a
+        INNER JOIN "room_access_logs" r ON a."account" = r."user_account"
+        WHERE r."room_id" = $1`, 
+        [id]
     );
 
     // ✅ userList가 배열인지 확인 후 ip_address 마스킹

@@ -68,7 +68,7 @@ function menuSet() {
     { label: $lang ? "랭킹조회" : "Ladder", href: "/rank" },
     { label: $lang ? "대전기록" : "Records", href: "/record" },
     { label: $lang ? "대회기록" : "Event", href: "/tournament" },
-    ...($mode === "babapk" ? [{ label: $lang ? "클랜목록" : "Clans", href: "/clan" }] : []),
+    // ...($mode === "babapk" ? [{ label: $lang ? "클랜목록" : "Clans", href: "/clan" }] : []),
     { label: $lang ? "커뮤니티" : "Community", href: "/boardlist" },
     ...($mode === "zpke" ? [] : [{ label: $lang ? "역대우승" : "Winners", href: "/winners" }]),
     { label: $lang ? "계산하기" : "Calculator", href: "/calculator" },

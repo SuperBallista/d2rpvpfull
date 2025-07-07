@@ -20,11 +20,11 @@ export class Post {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date; // NOT NULL, 업데이트 시 자동으로 갱신
 
-  @Column({ type: 'int', default: 0, nullable: true })
-  views: number; // 기본값 0, NULL 허용
+  @Column({ type: 'integer', default: 0, nullable: true })
+  views?: number; // 기본값 0, NULL 허용
 
-  @Column({ name: 'comments_count', type: 'int', default: 0, nullable: true })
-  commentsCount: number; // 기본값 0, NULL 허용
+  @Column({ name: 'comments_count', type: 'integer', default: 0, nullable: true })
+  commentsCount?: number; // 기본값 0, NULL 허용
 
   @Column({ length: 255, default: 'free', nullable: false })
   category: string; // 기본값 'free', NOT NULL

@@ -5,15 +5,15 @@ export class Room {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'enum', enum: ['babapk', 'mpk', 'zpke'], default: 'babapk' })
-  mode: 'babapk' | 'mpk' | 'zpke';
+  @Column({ type: 'varchar', length: 16, nullable: false })
+  mode: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @Column({ type: 'varchar', length: 255, charset: 'utf8mb4', collation: 'utf8mb4_general_ci' })
+  @Column({ type: 'varchar', length: 255 })
   room_name: string;
 
-  @Column({ type: 'varchar', length: 255, charset: 'utf8mb4', collation: 'utf8mb4_general_ci' })
+  @Column({ type: 'varchar', length: 255 })
   password: string;
 }

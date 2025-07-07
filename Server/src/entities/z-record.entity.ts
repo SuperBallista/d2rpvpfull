@@ -3,10 +3,16 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('z_record') // 데이터베이스의 'b_record' 테이블과 매핑
 export class ZRecord {
   @PrimaryGeneratedColumn()
-  orderNum: number; // PRIMARY KEY, AUTO_INCREMENT
+  id: number;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   date?: Date; // NULL 허용
+
+  @Column({ type: 'integer', nullable: true })
+  orderNum?: number;
+
+  @Column({ type: 'integer', nullable: true })
+  checked?: number;
 
   @Column({ length: 255, nullable: true })
   winner?: string; // NULL 허용
@@ -32,12 +38,12 @@ export class ZRecord {
   @Column({ length: 255, nullable: true })
   lose4?: string; // NULL 허용
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'double precision', nullable: true })
   wScore?: number; // NULL 허용
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'double precision', nullable: true })
   lScore?: number; // NULL 허용
 
-  @Column({ type: 'float', nullable: true })
+  @Column({ type: 'double precision', nullable: true })
   addScore?: number; // NULL 허용
 }

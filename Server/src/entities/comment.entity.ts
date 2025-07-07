@@ -5,7 +5,7 @@ export class Comment {
   @PrimaryGeneratedColumn( {name: 'comment_id'})
   commentId: number; // PRIMARY KEY, AUTO_INCREMENT
 
-  @Column({ name: 'post_id', type: 'int', nullable: false })
+  @Column({ name: 'post_id', type: 'integer', nullable: false })
   postId: number; // FOREIGN KEY를 참조 (MUL)
 
   @Column({ name: 'Nickname', length: 255, nullable: false })

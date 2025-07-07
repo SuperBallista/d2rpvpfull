@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>랭킹 - D2RPvP</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2a2d21 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: #ccc;
+        }
+
+        /* 필터 섹션 */
+        .filter-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .filter-select, .filter-input {
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+        }
+
+        .search-btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        /* 랭킹 카드 */
+        .ranking-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .rank-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            transition: all 0.3s ease;
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .rank-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+            border-color: #ffd700;
+        }
+
+        .rank-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .player-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .player-details h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #ffd700;
+        }
+
+        .player-stats {
+            display: flex;
+            gap: 1rem;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .tier-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .tier-challenger {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: #fff;
+        }
+
+        .tier-diamond {
+            background: linear-gradient(45deg, #b9f2ff, #0074d9);
+            color: #000;
+        }
+
+        .tier-platinum {
+            background: linear-gradient(45deg, #e6f3ff, #39cccc);
+            color: #000;
+        }
+
+        .tier-gold {
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            color: #000;
+        }
+
+        .tier-silver {
+            background: linear-gradient(45deg, #c0c0c0, #e0e0e0);
+            color: #000;
+        }
+
+        .tier-bronze {
+            background: linear-gradient(45deg, #cd7f32, #daa520);
+            color: #fff;
+        }
+
+        .score-section {
+            text-align: center;
+        }
+
+        .score-main {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-details {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffd700;
+            border: 1px solid #ffd700;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.3);
+        }
+
+        /* 상세 정보 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            border: 1px solid #ffd700;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: #ffd700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .player-detail-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .stat-label {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        /* 페이지네이션 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 6px;
+            color: #ffd700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover, .pagination-btn.active {
+            background: #ffd700;
+            color: #000;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .rank-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .player-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .player-stats {
+                justify-content: center;
+            }
+
+            .action-buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+            <h1 class="page-title">정통바바 랭킹</h1>
+            <p class="page-subtitle">최고의 바바리안들의 치열한 경쟁</p>
+        </div>
+
+        <!-- 필터 섹션 -->
+        <div class="filter-section">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label class="filter-label">티어</label>
+                    <select class="filter-select" id="tierFilter">
+                        <option value="">전체</option>
+                        <option value="challenger">챌린저</option>
+                        <option value="diamond">다이아몬드</option>
+                        <option value="platinum">플래티넘</option>
+                        <option value="gold">골드</option>
+                        <option value="silver">실버</option>
+                        <option value="bronze">브론즈</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">최소 게임 수</label>
+                    <select class="filter-select" id="gameFilter">
+                        <option value="0">전체</option>
+                        <option value="10">10게임 이상</option>
+                        <option value="20">20게임 이상</option>
+                        <option value="50">50게임 이상</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">닉네임 검색</label>
+                    <input type="text" class="filter-input" placeholder="닉네임을 입력하세요" id="nameSearch">
+                </div>
+                <div class="filter-group">
+                    <button class="search-btn" onclick="applyFilters()">
+                        <i class="fas fa-search"></i> 검색
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 랭킹 목록 -->
+        <div class="ranking-grid" id="rankingGrid">
+            <!-- 1위 -->
+            <div class="rank-card">
+                <div class="rank-number">1</div>
+                <div class="player-info">
+                    <div class="player-avatar">왕</div>
+                    <div class="player-details">
+                        <h3>PvP황제</h3>
+                        <div class="player-stats">
+                            <span>승률: 89.2%</span>
+                            <span>총 게임: 125</span>
+                            <span>연승: 15</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tier-badge tier-challenger">
+                    <i class="fas fa-crown"></i>
+                    챌린저
+                </div>
+                <div class="score-section">
+                    <div class="score-main">3,250</div>
+                    <div class="score-details">
+                        <div>승: 108</div>
+                        <div>패: 17</div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="challengePlayer('PvP황제')">도전</button>
+                    <button class="btn btn-secondary" onclick="showPlayerDetail('PvP황제')">상세</button>
+                </div>
+            </div>
+
+            <!-- 2위 -->
+            <div class="rank-card">
+                <div class="rank-number">2</div>
+                <div class="player-info">
+                    <div class="player-avatar">바</div>
+                    <div class="player-details">
+                        <h3>바바킹</h3>
+                        <div class="player-stats">
+                            <span>승률: 85.7%</span>
+                            <span>총 게임: 98</span>
+                            <span>연승: 8</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tier-badge tier-diamond">
+                    <i class="fas fa-gem"></i>
+                    다이아몬드
+                </div>
+                <div class="score-section">
+                    <div class="score-main">2,980</div>
+                    <div class="score-details">
+                        <div>승: 84</div>
+                        <div>패: 14</div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="challengePlayer('바바킹')">도전</button>
+                    <button class="btn btn-secondary" onclick="showPlayerDetail('바바킹')">상세</button>
+                </div>
+            </div>
+
+            <!-- 3위 -->
+            <div class="rank-card">
+                <div class="rank-number">3</div>
+                <div class="player-info">
+                    <div class="player-avatar">전</div>
+                    <div class="player-details">
+                        <h3>전사의혼</h3>
+                        <div class="player-stats">
+                            <span>승률: 78.9%</span>
+                            <span>총 게임: 152</span>
+                            <span>연승: 3</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tier-badge tier-diamond">
+                    <i class="fas fa-gem"></i>
+                    다이아몬드
+                </div>
+                <div class="score-section">
+                    <div class="score-main">2,750</div>
+                    <div class="score-details">
+                        <div>승: 120</div>
+                        <div>패: 32</div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="challengePlayer('전사의혼')">도전</button>
+                    <button class="btn btn-secondary" onclick="showPlayerDetail('전사의혼')">상세</button>
+                </div>
+            </div>
+
+            <!-- 추가 랭킹 카드들... -->
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination">
+            <button class="pagination-btn" onclick="changePage(-1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn" onclick="changePage(2)">2</button>
+            <button class="pagination-btn" onclick="changePage(3)">3</button>
+            <button class="pagination-btn" onclick="changePage(1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 플레이어 상세 정보 모달 -->
+    <div id="playerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">플레이어 상세 정보</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="player-detail-stats">
+                <div class="stat-item">
+                    <div class="stat-value">89.2%</div>
+                    <div class="stat-label">승률</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">3,250</div>
+                    <div class="stat-label">점수</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">125</div>
+                    <div class="stat-label">총 게임</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">15</div>
+                    <div class="stat-label">연승</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">현재 순위</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">시즌 최고 순위</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function challengePlayer(playerName) {
+            alert(`${playerName}님에게 도전을 신청합니다!`);
+        }
+
+        function showPlayerDetail(playerName) {
+            document.getElementById('playerModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('playerModal').style.display = 'none';
+        }
+
+        function applyFilters() {
+            // 필터 적용 로직
+            const tier = document.getElementById('tierFilter').value;
+            const games = document.getElementById('gameFilter').value;
+            const name = document.getElementById('nameSearch').value;
+            
+            console.log('필터 적용:', { tier, games, name });
+            // 실제 필터링 로직 구현
+        }
+
+        function changePage(page) {
+            // 페이지 변경 로직
+            console.log('페이지 변경:', page);
+            // 실제 페이지 변경 로직 구현
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('playerModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -17,8 +17,8 @@ export class ClanService {
     const rawResult = await this.dataSource.query(`
 SELECT 
   b_clan.*, 
-  GROUP_CONCAT(user.Nickname) AS members,
-  SUM(CASE WHEN user.Records > 20 THEN 20 ELSE user.Records END ) AS records
+  STRING_AGG(user."Nickname", ',') AS members,
+  SUM(CASE WHEN user."Records" > 20 THEN 20 ELSE user."Records" END ) AS records
 FROM 
   b_clan
 LEFT JOIN 
