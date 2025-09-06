@@ -77,7 +77,7 @@ export class RecordService {
       if (!allowedTables.includes(tableName)) {
         throw new Error('Invalid table name');
       }
-      
+      if (tableName !== "z") {
       await queryRunner.manager
         .createQueryBuilder()
         .update(`${tableName}_user`) // 안전한 테이블 바인딩
@@ -91,7 +91,21 @@ export class RecordService {
         .set({ bScore: () => "BScore + :addScore", records: () => "Records - 1" })
         .where("Nickname IN (:...nicknames)", { nicknames: loserNicknames, addScore })
         .execute();
-            
+      } else {
+        // zpke 점수 계산방식 적용
+        await queryRunner.manager
+        .createQueryBuilder()
+        .update(`z_user`)
+        .set({ bScore: () => "BScore - 2", records: () => "Records - 1" })
+        .where("Nickname IN (:...nicknames)", { nicknames: winnerNicknames })
+        .execute();
+        await queryRunner.manager
+        .createQueryBuilder()
+        .update(`z_user`)
+        .set({ bScore: () => "BScore - 1", records: () => "Records - 1" })
+        .where("Nickname IN (:...nicknames)", { nicknames: loserNicknames })
+        .execute();
+      }
       await queryRunner.manager
         .createQueryBuilder()
         .delete()
@@ -212,7 +226,7 @@ else
     let E_VALUE
     let clanRepository
 
-    if (mode === "babapk")
+    if (mode === "b")
     {
       tempRepository = this.bTempRepository
       recordRepository = this.bRecordRepository
@@ -221,7 +235,7 @@ else
       K_VALUE = K_VALUE_B
       E_VALUE = E_VALUE_B
     }
-    else if (mode === "mpk")
+    else if (mode === "m")
     {
       tempRepository = this.mTempRepository
       recordRepository = this.mRecordRepository
@@ -262,11 +276,18 @@ else
       const addScore = K_VALUE * (1 - 1 / (1 + 10 ** ((loserScore - winnerScore) / E_VALUE)));
 
       // 점수 업데이트
+      if (mode !== "zpke"){
       winner.bScore += addScore;
       loser.bScore -= addScore;
       winner.records += 1
       loser.records +=1
-
+    } else {
+      // zpke 점수 계산방식 적용
+      winner.bScore += 2;
+      loser.bScore += 1;
+      winner.records += 1
+      loser.records += 1
+    }
       await (userRepository as Repository<BUser | MUser | ZUser>).save([winner, loser]);
 
       // 기록 저장
@@ -334,9 +355,9 @@ else
   }
 
   // 도전 경기 자동 패배 기록
-  async challengeLose(isMUser: string, winner: string, loser: string): Promise<string> {
-    const tempRepository = isMUser === 'm' ? this.mTempRepository : this.zTempRepository;
-    const userRepository = isMUser === 'm' ? this.mUserRepository : this.zUserRepository;
+  async challengeLose(tablePrefix: string, winner: string, loser: string): Promise<object> {
+    const tempRepository = tablePrefix === 'm' ? this.mTempRepository : tablePrefix === 'z' ? this.zTempRepository : this.bTempRepository;
+    const userRepository = tablePrefix === 'm' ? this.mUserRepository : tablePrefix === 'z' ? this.zUserRepository : this.bUserRepository;
 
     const currentDate = moment().utcOffset('+0900').format('YYYY-MM-DD HH:mm:ss');
     const record = tempRepository.create({
@@ -354,7 +375,7 @@ else
       });
       if (!latestRecord) throw new HttpException('Failed to find record', HttpStatus.NOT_FOUND);
 
-      await this.approveRecord(latestRecord.orderNum, isMUser);
+      await this.approveRecord(latestRecord.orderNum, tablePrefix);
 
       // 도전 상태 초기화
       const winnerUser = await userRepository.findOneBy({ nickname: winner });
@@ -364,21 +385,21 @@ else
         await (userRepository as Repository<ZUser | MUser>).save(winnerUser);
       }
 
-      return "ok"
+      return {success: "created"}
     } catch (error) {
       console.error('Error processing challenge lose:', error);
       throw new HttpException('Failed to process challenge lose', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async challengeWin(isMUser: string, winner: string): Promise<void> {
-    const userRepository = isMUser === 'm' ? this.mUserRepository : this.zUserRepository;
+  async challengeWin(tablePrefix: string, winner: string): Promise<void> {
+    const userRepository = tablePrefix === 'm' ? this.mUserRepository : tablePrefix === 'z' ? this.zUserRepository : this.bUserRepository;
 
     const user = await userRepository.findOne({ where: { nickname: winner } });
     if (user) {
       user.challenge = null;
       user.challengeDate = null;
-      await (userRepository as Repository<ZUser | MUser>).save(user);
+      await (userRepository as Repository<ZUser | MUser | BUser>).save(user);
     }
   }
 
@@ -390,7 +411,7 @@ else
     tablePrefix: string,
   ): Promise<void> {
     const repository =
-      tablePrefix === 'm' ? this.mUserRepository : this.zUserRepository;
+      tablePrefix === 'm' ? this.mUserRepository : tablePrefix === 'z' ? this.zUserRepository : this.bUserRepository;
       
       if (!challenge) {
         throw new HttpException(

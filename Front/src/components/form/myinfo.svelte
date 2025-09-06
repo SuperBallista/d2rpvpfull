@@ -64,14 +64,12 @@
   try {
     const response = await SecurityFetch("/record/challenge/check", "POST", data);
 
-    // JSON 응답 처리
-    const responseData = await response.json();
-
     const msg = $lang ? "도전 중이 아니거나 응답 기간이 끝나지 않았습니다" : "You didn't challenge game or it is still within the period."
     
-    if (response.status === 201) {
+    if (response.ok) {
       showMessageBox("alert",$lang ? "기권 승리":"Wins", $lang ? "도전 기간에 상대가 응답하지 않아 자동 승리로 입력되었습니다" : "You win because your Opposite give up the match");
     } else if (response.status === 400) {
+      const responseData = await response.json();
       showMessageBox("alert", $lang ? "잘못된 요청": "Request Error", responseData.message || msg)
       } else {
         showMessageBox("error",$lang ? "에러 발생" : "Error", $lang? `에러 발생: ${response.status}` : `Error: ${response.status}`)

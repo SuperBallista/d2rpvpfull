@@ -79,8 +79,8 @@ let user
           countwin: winCount.toString(),
           countlose: loseCount.toString(),
           countrecord: (winCount + loseCount).toString(),
-          challenge: userTable != 'babapk'? user.challenge || "" : null,
-          challengeDate: userTable != 'babapk'? user.challengeDate || "" : null,
+          challenge: user.challenge,
+          challengeDate: user.challengeDate,
         }
     } catch (error) {
       console.error('사용자 정보 및 전적 조회 오류:', error);
@@ -150,12 +150,19 @@ let user
           user.challengeDate = null;
           await this.zUserRepository.save(user);
         }
-      } else {
+      } else if (tablePrefix === 'm') {
         const user = await this.mUserRepository.findOne({ where: { nickname: userNickname } });
         if (user) {
           user.challenge = null;
           user.challengeDate = null;
           await this.mUserRepository.save(user);
+        }
+      } else if (tablePrefix === 'b') {
+        const user = await this.bUserRepository.findOne({ where: { nickname: userNickname } });
+        if (user) {
+          user.challenge = null;
+          user.challengeDate = null;
+          await this.bUserRepository.save(user);
         }
       }
     } catch (error) {

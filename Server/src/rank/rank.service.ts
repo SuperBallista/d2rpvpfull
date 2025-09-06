@@ -92,19 +92,19 @@ export class RankService {
       const wins = recordWin.find(record => record.nickname === user.nickname)?.TotalWins || 0;
       const losses = recordLose.find(record => record.nickname === user.nickname)?.TotalLoses || 0;
 
-      const totalBScore = Math.round(user.bScore * 100) / 100 +
-        (user.records > 20 ? 20 * RECORD_SCORE : user.records * RECORD_SCORE);
+      const totalBScore = mode !== "zpke" ? Math.round(user.bScore * 100) / 100 +
+        (user.records > 10 ? 10 * RECORD_SCORE : user.records * RECORD_SCORE) : 0;
 
       return {
         nickname: user.nickname,
         RScore: user.rScore,
         LScore: user.lScore,
-        BScore: totalBScore,
+        BScore: mode !== "zpke" ? totalBScore : user.bScore + (user.lScore * 0.4),
         wins,
         losses,
         clan: mode ? user.clan : null,
-        Elo: user.bScore,
-        TScore: totalBScore + (user.lScore * 0.3),
+        Elo: mode !== "zpke" ? user.bScore : 0,
+        TScore: mode !== "zpke" ? totalBScore + (user.lScore * 0.3) : user.bScore + (user.lScore * 0.4),
         memo: user.memo
       };
     });
