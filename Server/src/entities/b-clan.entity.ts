@@ -8,9 +8,9 @@ export class BClan {
     @Column({length: 255, nullable: false})
     name: string;
   
-    @Column({ type: 'double precision', default: 0, nullable: false })
-    Bscore: number;
+    @Column({ type: 'float', default: 0, nullable: false })
+  Bscore: number; // NOT NULL, 기본값 0
    
-  @Column({ type: 'integer', default: 0, nullable: false })
-  Lscore: number;
+  @Column({ type: 'int', default: 0, nullable: false })
+  Lscore: number; // NOT NULL, 기본값 0
 }

@@ -3,13 +3,10 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('z_temp') // 데이터베이스의 'b_temp' 테이블과 매핑
 export class ZTemp {
   @PrimaryGeneratedColumn()
-  id: number;
+  orderNum: number; // PRIMARY KEY, AUTO_INCREMENT
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'date', nullable: true })
   date?: Date; // NULL 허용
-
-  @Column({ type: 'integer', nullable: true })
-  orderNum?: number; // PRIMARY KEY, AUTO_INCREMENT
 
   @Column({ length: 255, nullable: true })
   winner?: string; // NULL 허용
@@ -35,12 +32,12 @@ export class ZTemp {
   @Column({ length: 255, nullable: true })
   lose4?: string; // NULL 허용
 
-  @Column({ type: 'integer', nullable: true })
+  @Column({ type: 'int', nullable: true })
   wScore?: number; // NULL 허용
 
-  @Column({ type: 'integer', nullable: true })
+  @Column({ type: 'int', nullable: true })
   lScore?: number; // NULL 허용
 
-  @Column({ type: 'integer', nullable: true })
+  @Column({ type: 'int', nullable: true })
   checked?: number; // NULL 허용
 }

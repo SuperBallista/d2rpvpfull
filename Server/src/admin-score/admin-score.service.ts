@@ -77,24 +77,24 @@ export class AdminScoreService {
     try {
       // 사용자 데이터 백업
       await queryRunner.manager.query(`
-        INSERT INTO "${oldRecordTable}" ("Nickname", "BScore", "LScore", "Class", "Month")
-        SELECT "Nickname", "BScore", "LScore", "Class", TO_CHAR(NOW(), 'YYYY-MM-01')
-        FROM "${userTable}";
+        INSERT INTO ${oldRecordTable} (Nickname, BScore, LScore, Class, Month)
+        SELECT Nickname, BScore, LScore, Class, DATE_FORMAT(NOW(), '%Y-%m-01')
+        FROM ${userTable};
       `);
 
       // 기록 데이터 백업
       await queryRunner.manager.query(`
-        INSERT INTO "${oldHistoryTable}" ("Date", "Winner", "Loser", "Win2", "Win3", "Win4", "Lose2", "Lose3", "Lose4", "WScore", "LScore")
-        SELECT "Date", "Winner", "Loser", "Win2", "Win3", "Win4", "Lose2", "Lose3", "Lose4", "WScore", "LScore"
-        FROM "${recordTable}";
+        INSERT INTO ${oldHistoryTable} (Date, Winner, Loser, Win2, Win3, Win4, Lose2, Lose3, Lose4, WScore, LScore)
+        SELECT Date, Winner, Loser, Win2, Win3, Win4, Lose2, Lose3, Lose4, WScore, LScore
+        FROM ${recordTable};
       `);
 
       // 대회 기록 백업
       await queryRunner.manager.query(`
-        INSERT INTO "${oldTournamentTable}" ("eventname", "Championship", "Runner_up", "Place3rd", "numberteams")
-        SELECT "eventname", "Championship1", "Runner_up1", "Place3rd1", "numberteams"
-        FROM "${eventRecordTable}"
-        WHERE "teamSize" = 1 AND "accept" = 2;
+        INSERT INTO ${oldTournamentTable} (eventname, Championship, Runner_up, Place3rd, numberteams)
+        SELECT eventname, Championship1, Runner_up1, Place3rd1, numberteams
+        FROM ${eventRecordTable}
+        WHERE teamSize = 1 AND accept = 2;
       `);
 
       // 사용자 점수 초기화
@@ -110,14 +110,15 @@ export class AdminScoreService {
         .execute();
 
       if (userTable === 'b_user') {
-        await queryRunner.manager.query(`UPDATE "b_user" SET "clan" = 'none'`);
-        await queryRunner.manager.query(`DELETE FROM "b_clan"`);
+        await queryRunner.manager.query(`UPDATE b_user SET clan = "none"`);
+        await queryRunner.manager.query(`DELETE FROM b_clan`);
       }
 
+
       // 기록 및 임시 테이블 초기화
-      await queryRunner.manager.query(`DELETE FROM "${recordTable}";`);
-      await queryRunner.manager.query(`DELETE FROM "${tempTable}";`);
-      await queryRunner.manager.query(`DELETE FROM "${eventRecordTable}";`);
+      await queryRunner.manager.query(`DELETE FROM ${recordTable};`);
+      await queryRunner.manager.query(`DELETE FROM ${tempTable};`);
+      await queryRunner.manager.query(`DELETE FROM ${eventRecordTable};`);
 
       await queryRunner.commitTransaction();
     } catch (error) {

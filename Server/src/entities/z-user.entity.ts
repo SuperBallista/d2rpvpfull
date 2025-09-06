@@ -11,34 +11,34 @@ export class ZUser {
   @Column({ length: 255, nullable: true })
   email?: string; // NULL 허용
 
-  @Column({ name: "BScore", type: 'double precision', nullable: true })
+  @Column({ name: "BScore", type: 'float', nullable: true })
   bScore?: number; // NULL 허용
 
-  @Column({ name: "LScore", type: 'double precision', nullable: false })
+  @Column({ name: "LScore", type: 'float', nullable: false })
   lScore: number; // NOT NULL
 
-  @Column({ name: "Class", type: 'integer', nullable: true })
+  @Column({ name: "Class", type: 'int', nullable: true })
   class?: number; // NULL 허용
 
-  @Column({ name: "Lastgame", type: 'timestamp', nullable: true })
+  @Column({ name: "Lastgame", type: 'datetime', nullable: true })
   lastgame?: Date; // NULL 허용
 
-  @Column({ name: "Records", type: 'integer', default: 0 })
+  @Column({ name: "Records", type: 'int', default: 0 })
   records: number; // NOT NULL, 기본값 0
 
-  @Column({ name: "RScore", type: 'double precision', default: 0 })
+  @Column({ name: "RScore", type: 'float', default: 0 })
   rScore: number; // 기본값 0
 
   @Column({ length: 255, nullable: true })
   challenge?: string; // NULL 허용
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'date', nullable: true })
   challengeDate?: Date; // NULL 허용
 
-  @Column({ type: 'integer', default: 15 })
+  @Column({ type: 'int', default: 15 })
   playStopDate: number; // 기본값 15
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'tinyint', width: 1, default: 0 })
   playStop: boolean; // 기본값 0
 
   @Column({length: 255})

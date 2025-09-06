@@ -335,19 +335,8 @@ else
 
   // 도전 경기 자동 패배 기록
   async challengeLose(isMUser: string, winner: string, loser: string): Promise<string> {
-    let tempRepository, userRepository;
-    if (isMUser === 'm') {
-      tempRepository = this.mTempRepository;
-      userRepository = this.mUserRepository;
-    } else if (isMUser === 'z') {
-      tempRepository = this.zTempRepository;
-      userRepository = this.zUserRepository;
-    } else if (isMUser === 'b') {
-      tempRepository = this.bTempRepository;
-      userRepository = this.bUserRepository;
-    } else {
-      throw new HttpException('Invalid mode', HttpStatus.BAD_REQUEST);
-    }
+    const tempRepository = isMUser === 'm' ? this.mTempRepository : this.zTempRepository;
+    const userRepository = isMUser === 'm' ? this.mUserRepository : this.zUserRepository;
 
     const currentDate = moment().utcOffset('+0900').format('YYYY-MM-DD HH:mm:ss');
     const record = tempRepository.create({
@@ -383,16 +372,7 @@ else
   }
 
   async challengeWin(isMUser: string, winner: string): Promise<void> {
-    let userRepository;
-    if (isMUser === 'm') {
-      userRepository = this.mUserRepository;
-    } else if (isMUser === 'z') {
-      userRepository = this.zUserRepository;
-    } else if (isMUser === 'b') {
-      userRepository = this.bUserRepository;
-    } else {
-      throw new HttpException('Invalid mode', HttpStatus.BAD_REQUEST);
-    }
+    const userRepository = isMUser === 'm' ? this.mUserRepository : this.zUserRepository;
 
     const user = await userRepository.findOne({ where: { nickname: winner } });
     if (user) {
@@ -409,16 +389,8 @@ else
     challenge: string,
     tablePrefix: string,
   ): Promise<void> {
-    let repository;
-    if (tablePrefix === 'm') {
-      repository = this.mUserRepository;
-    } else if (tablePrefix === 'z') {
-      repository = this.zUserRepository;
-    } else if (tablePrefix === 'b') {
-      repository = this.bUserRepository;
-    } else {
-      throw new HttpException('Invalid mode', HttpStatus.BAD_REQUEST);
-    }
+    const repository =
+      tablePrefix === 'm' ? this.mUserRepository : this.zUserRepository;
       
       if (!challenge) {
         throw new HttpException(

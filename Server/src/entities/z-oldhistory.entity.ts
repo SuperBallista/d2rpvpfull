@@ -3,16 +3,10 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('z_oldhistory') // 데이터베이스의 'b_oldhistory' 테이블과 매핑
 export class ZOldHistory {
   @PrimaryGeneratedColumn()
-  id: number;
+  orderNum: number; // PRIMARY KEY, AUTO_INCREMENT
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'date', nullable: true })
   date?: Date; // NULL 허용
-
-  @Column({ type: 'integer', nullable: true })
-  orderNum?: number;
-
-  @Column({ type: 'integer', nullable: true })
-  checked?: number;
 
   @Column({ length: 255, nullable: true })
   winner?: string; // NULL 허용
@@ -38,9 +32,9 @@ export class ZOldHistory {
   @Column({ length: 255, nullable: true })
   lose4?: string; // NULL 허용
 
-  @Column({ type: 'integer', nullable: true })
+  @Column({ type: 'int', nullable: true })
   wScore?: number; // NULL 허용
 
-  @Column({ type: 'integer', nullable: true })
+  @Column({ type: 'int', nullable: true })
   lScore?: number; // NULL 허용
 }

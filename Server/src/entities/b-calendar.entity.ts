@@ -8,7 +8,7 @@ export class BCalendar {
   @PrimaryColumn({ length: 255 })
   yearmonthdate: string; // PRIMARY KEY, NOT NULL
 
-  @Column({ type: 'integer', nullable: true })
+  @Column({ type: 'int', nullable: true })
   date?: number; // NULL 허용
 
   @Column({ length: 255, nullable: true })

@@ -3,16 +3,10 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('m_record') // 데이터베이스의 'm_record' 테이블과 매핑
 export class MRecord {
   @PrimaryGeneratedColumn()
-  id: number;
+  orderNum: number; // PRIMARY KEY, AUTO_INCREMENT
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'date', nullable: true })
   date?: Date; // NULL 허용
-
-  @Column({ type: 'integer', nullable: true })
-  orderNum?: number;
-
-  @Column({ type: 'integer', nullable: true })
-  checked?: number;
 
   @Column({ length: 255, nullable: true })
   winner?: string; // NULL 허용
@@ -38,12 +32,12 @@ export class MRecord {
   @Column({ length: 255, nullable: true })
   lose4?: string; // NULL 허용
 
-  @Column({ type: 'double precision', nullable: true })
+  @Column({ type: 'int', nullable: true })
   wScore?: number; // NULL 허용
 
-  @Column({ type: 'double precision', nullable: true })
+  @Column({ type: 'int', nullable: true })
   lScore?: number; // NULL 허용
 
-  @Column({ type: 'double precision', nullable: true })
+  @Column({ type: 'float', nullable: true })
   addScore?: number; // NULL 허용
 }
