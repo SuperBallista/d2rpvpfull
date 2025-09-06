@@ -219,10 +219,10 @@
                     if (e.key === "Enter") SaveMemo(index);}}>
                     <button class="simple-button" on:click={() => SaveMemo(index)}>작성</button>
                   {:else}
-                  <span on:click={()=> modify_memo(index)} class={$admin.includes($mode) ? "modify" : "" }>{typeof user.memo === "string" ? user.memo : noMemo }</span>
+                  <span on:click={()=> modify_memo(index)} on:keydown={(e) => { if (e.key === "Enter" || e.key === " ") modify_memo(index); }} role="button" tabindex="0" class={$admin.includes($mode) ? "modify" : "" }>{typeof user.memo === "string" ? user.memo : noMemo }</span>
                   {/if}
                   <br/>
-                  {#if (Number(myRank) > Number(user.rank)) && ($mode != "babapk")}
+                  {#if (Number(myRank) > Number(user.rank))}
                     <button class="simple-button" on:click={() => challengeRank(user.nickname)}>
                       {$lang ? "도전하기" : "Challenge"}
                     </button>
@@ -238,7 +238,7 @@
   </div>
 
   
-  {#if $myaccount && ($mode==="zpke" || $mode==="mpk") }
+  {#if $myaccount && ($mode==="zpke" || $mode==="mpk" || $mode==="babapk") }
   <div class="fixed-button-div">
     <button class="simple-button" on:click={() => form.set("challenge")}>{$lang ? "도전승인" : "My challengers"}
       {#if newdata}       

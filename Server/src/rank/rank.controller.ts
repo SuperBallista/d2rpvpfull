@@ -67,12 +67,21 @@ export class RankController {
     return data
   }
 
-    // m_user 도전 데이터 조회
+    // z_user 도전 데이터 조회
     @Post('/challenge/zpke/show')
     @UseGuards(RolesGuard)
     @Roles("admin", "user")  
     async challengeDataZ(@User() user: any) {
       const data = await  this.rankingService.getChallengeData(user.username, "zpke");
+        return data
+    }
+
+    // b_user 도전 데이터 조회
+    @Post('/challenge/babapk/show')
+    @UseGuards(RolesGuard)
+    @Roles("admin", "user")  
+    async challengeDataB(@User() user: any) {
+      const data = await  this.rankingService.getChallengeData(user.username, "babapk");
         return data
     }
   

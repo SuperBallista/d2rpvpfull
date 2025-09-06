@@ -30,10 +30,8 @@
         const response = await SecurityFetch(endpoint, "POST", {mode: $mode, nickname: $myaccount});
         if (response.ok) {
           const data = await response.json();
-          if ($mode != "babapk") {
-            challenge = data.challenge;
-            challengeDate = data.challengeDate;
-          } 
+          challenge = data.challenge;
+        challengeDate = data.challengeDate; 
             bscore = data.bscore;
             lscore = data.lscore;
             wins = data.countwin;
@@ -131,7 +129,6 @@ const response = await SecurityFetch("/auth/logout", "POST")
         <td>{$myaccount.replace("_m","").replace("_z","")}</td>
         <td><button class="simple-button" on:click={() => logout()}>{$lang ? "로그아웃" : "Leave"}</button></td>
       </tr>
-      {#if $mode != "babapk"}
         <tr> 
           <td>{$lang ? "도전 신청" : "Challenge"}</td>
           <td>{challenge ? challenge.replace("_m","") : ""}</td>
@@ -146,7 +143,6 @@ const response = await SecurityFetch("/auth/logout", "POST")
             <button class="simple-button {challenge==="" ? "hidden" : null}" on:click={() => CheckTimeOver()}>{$lang ? "자동 승리" : "Check Date"}</button>
           </td>
         </tr>
-        {/if}
       <!-- {:else} -->
         <tr>
           <td>{$lang ? "대전 점수" : "Battle Score"}</td>

@@ -104,7 +104,7 @@ export class RankService {
         losses,
         clan: mode ? user.clan : null,
         Elo: user.bScore,
-        TScore: totalBScore + (user.lScore * 0.4),
+        TScore: totalBScore + (user.lScore * 0.3),
         memo: user.memo
       };
     });
@@ -162,17 +162,38 @@ export class RankService {
 
 
   async challengeRank(username: string, nickname: string, mode: string): Promise<void> {
-    const repository = mode==="mpk" ? this.mUserRepository : this.zUserRepository;
+    let repository: any;
+    
+    if (mode === "mpk") {
+      repository = this.mUserRepository;
+    } else if (mode === "zpke") {
+      repository = this.zUserRepository;
+    } else if (mode === "babapk") {
+      repository = this.bUserRepository;
+    } else {
+      throw new HttpException('잘못된 모드입니다.', HttpStatus.BAD_REQUEST);
+    }
+    
     const user = await repository.findOne({ where: { nickname: username } });
     if (!user) throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
     
     user.challenge = nickname;
     user.challengeDate = new Date();
-    await (repository as Repository<ZUser | MUser>).save(user);
+    await repository.save(user);
   }
 
   async getChallengeData(username: string, mode: string): Promise<any[]> {
-    const repository = mode==="mpk" ? this.mUserRepository : this.zUserRepository;
+    let repository: any;
+    
+    if (mode === "mpk") {
+      repository = this.mUserRepository;
+    } else if (mode === "zpke") {
+      repository = this.zUserRepository;
+    } else if (mode === "babapk") {
+      repository = this.bUserRepository;
+    } else {
+      throw new HttpException('잘못된 모드입니다.', HttpStatus.BAD_REQUEST);
+    }
   
     // 사용자 이름과 관련된 도전 데이터를 리스트로 조회
     const users = await repository.find({
