@@ -99,12 +99,12 @@ export class RankService {
         nickname: user.nickname,
         RScore: user.rScore,
         LScore: user.lScore,
-        BScore: mode !== "zpke" ? totalBScore : user.bScore + (user.lScore * 0.4),
+        BScore: mode !== "zpke" ? totalBScore : user.bScore,
         wins,
         losses,
         clan: mode ? user.clan : null,
         Elo: mode !== "zpke" ? user.bScore : 0,
-        TScore: mode !== "zpke" ? totalBScore + (user.lScore * 0.3) : user.bScore + (user.lScore * 0.4),
+        TScore: mode !== "zpke" ? totalBScore + (user.lScore * 0.3) : user.bScore + user.lScore,
         memo: user.memo
       };
     });

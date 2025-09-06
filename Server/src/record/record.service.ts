@@ -434,7 +434,7 @@ else
         (new Date().getTime() - new Date(user.challengeDate).getTime()) /
         (1000 * 60 * 60 * 24);
   
-      if (diffInDays <= 7) {
+      if (diffInDays <= 2) {
         throw new HttpException(
           '아직 기간이 남았습니다.',
           HttpStatus.BAD_REQUEST,
